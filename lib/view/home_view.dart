@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 class HomeView extends StatelessWidget {
-  const HomeView({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -25,6 +23,7 @@ class HomeView extends StatelessWidget {
                   children: [
                     ElevatedButton(
                       onPressed: () {
+                        Navigator.pushNamed(context, '/login');
                       },
                       style: ElevatedButton.styleFrom(
                         fixedSize: Size(225, 50),
@@ -46,6 +45,7 @@ class HomeView extends StatelessWidget {
                     SizedBox(height: 50),
                     OutlinedButton(
                       onPressed: () {
+                        Navigator.pushNamed(context, '/joinUs');
                       },
                       style: OutlinedButton.styleFrom(
                         fixedSize: Size(225, 50),
