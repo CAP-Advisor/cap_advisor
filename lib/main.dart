@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       home: HomeView(),
       routes: {
         '/login': (context) => LoginView(),
-        '/joinUs': (context) => JoinUsView(),
+        '/SignUp': (context) => SignUpView(),
       },
     );
   }
