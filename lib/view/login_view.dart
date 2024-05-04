@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'reset_password_view.dart';
 import 'sign_up_view.dart';
 
-class LoginPage extends StatelessWidget {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
+class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,9 +19,9 @@ class LoginPage extends StatelessWidget {
                   child: Image.asset('assets/images/login_logo.png'),
                 ),
                 const SizedBox(height: 40),
-                usernameField(_usernameController),
+                usernameField(),
                 const SizedBox(height: 30),
-                passwordField(_passwordController),
+                passwordField(),
                 const SizedBox(height: 60),
                 loginButton(context),
                 const SizedBox(height: 20),
@@ -39,17 +36,17 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget usernameField(TextEditingController controller) {
+  Widget usernameField() {
     return Center(
       child: Container(
         width: 360,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
         decoration: BoxDecoration(
           color: const Color(0xFFF5F8F9),
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextFormField(
-          controller: controller,
+          keyboardType: TextInputType.emailAddress,
           decoration: const InputDecoration(
             hintText: 'Username',
             hintStyle: TextStyle(color: Color(0xFF9A9A9A)),
@@ -60,7 +57,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget passwordField(TextEditingController controller) {
+  Widget passwordField() {
     return Center(
       child: Container(
         width: 360,
@@ -70,12 +67,12 @@ class LoginPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextFormField(
-          controller: controller,
           obscureText: true,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'Password',
             hintStyle: TextStyle(color: Color(0xFF9A9A9A)),
             border: InputBorder.none,
+            suffixIcon: Icon(Icons.remove_red_eye),
           ),
         ),
       ),
@@ -86,15 +83,18 @@ class LoginPage extends StatelessWidget {
     return Center(
       child: ElevatedButton(
         onPressed: () {
-          // Login logic here
+          null;
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF427D9D),
-          padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+          backgroundColor: Color(0xFF427D9D),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
         child: const Text(
           'Login',
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: TextStyle(fontSize: 23, color: Colors.white),
         ),
       ),
     );

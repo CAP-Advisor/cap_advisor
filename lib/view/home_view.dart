@@ -27,7 +27,7 @@ class HomeView extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
+                          MaterialPageRoute(builder: (context) => LoginView()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
