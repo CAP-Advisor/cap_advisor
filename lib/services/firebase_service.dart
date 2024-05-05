@@ -15,9 +15,11 @@ class FirebaseService {
       return querySnapshot.docs.map((doc) {
         return HR(
           companyName: doc['CompanyName'],
-          email: doc['Email'],
+            name: doc['Name'],
+            email: doc['Email'],
+            password: doc['Password'],
           jobsList: List<String>.from(doc['JobsList']),
-          name: doc['Name'],
+          userType: doc['userType']
         );
       }).toList();
     } catch (e) {
@@ -32,7 +34,9 @@ class FirebaseService {
       return querySnapshot.docs.map((doc) {
         return Instructor (
           email : doc['Email'],
+          password: doc['Password'],
           name: doc['Name'],
+          userType: doc['UserType'],
           studentList:List<String>.from( doc['StudentList']),
         );
       }).toList();
@@ -47,9 +51,13 @@ class FirebaseService {
       QuerySnapshot querySnapshot= await _firestore.collection('Student').get();
       return querySnapshot.docs.map((doc) {
         return Student(
+            name:doc['Name'],
+            email:doc['Email'],
+            password: doc['Password'],
             experiences:List<String>.from( doc['Experiences']),
+            skills:List<String>.from(doc ['Skills']),
             feedback:doc['Feedback'],
-            instructorId:doc['InstructorId'], name:doc['Name'], skills:List<String>.from(doc ['Skills']),
+            instructorId:doc['InstructorId'],
             supervisorId:doc ['SupervisorId']);
       }).toList();
     }catch (e){
@@ -62,14 +70,16 @@ class FirebaseService {
       QuerySnapshot querySnapshot =await _firestore.collection('Supervisor').get();
       return querySnapshot.docs.map((doc) {
         return Supervisor(
-            companyName:doc ['CompanyName'],
-            email:doc ['Email'],
-            name:doc ['name'],
-            studentList:List<String>.from (doc['StudentList'])
+          companyName:doc ['CompanyName'],
+          name:doc ['name'],
+          email:doc ['Email'],
+          password: doc['Password'],
+          studentList:List<String>.from (doc['StudentList']),
         );
       }).toList();
     }catch(e){
       print('Error getting Supervisor data: $e');
       return [];    }
   }
+
 }
