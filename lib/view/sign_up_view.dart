@@ -198,6 +198,7 @@ class _SignUpViewState extends State<SignUpView> {
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text('Account created successfully!'),
                               ));
+                              Navigator.pushReplacementNamed(context, '/login');
                             } else {
                               // Account creation failed
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
