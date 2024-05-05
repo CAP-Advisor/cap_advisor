@@ -1,23 +1,11 @@
+import 'package:cap_advisor/view-model/firebase_service.dart';
 import 'package:cap_advisor/view/home_view.dart';
-import 'package:cap_advisor/view/login_view.dart';
-import 'package:cap_advisor/view/sign_up_view.dart';
 import 'package:flutter/material.dart';
-void main() {
-  runApp(MyApp());
-}
+import './view/reset_password_view.dart'; // Ensure the path is correct
+import '../services/database_service.dart';
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CAP Advisor',
-      theme: ThemeData(
-      ),
-      home: HomeView(),
-      routes: {
-        '/login': (context) => LoginView(),
-        '/joinUs': (context) => JoinUsView(),
-      },
-    );
-  }
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FirebaseService.initialize(); // Call the initialization function
+  runApp(MaterialApp(home: HomeView()));
 }
