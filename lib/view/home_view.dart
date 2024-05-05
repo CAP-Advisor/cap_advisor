@@ -45,7 +45,7 @@ class HomeView extends StatelessWidget {
                     SizedBox(height: 50),
                     OutlinedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/joinUs');
+                        Navigator.pushNamed(context, '/SignUp');
                       },
                       style: OutlinedButton.styleFrom(
                         fixedSize: Size(225, 50),
