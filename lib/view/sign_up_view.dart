@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-//for testing(to change)
-class JoinUsView extends StatelessWidget {
+
+class SignUpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Join Us'),
-      ),
+      appBar: AppBar(title: Text("Sign Up")),
       body: Center(
-        child: Text(
-          'Join Us Screen',
-          style: TextStyle(fontSize: 24),
-        ),
+        child: Text("Sign Up Page"),
       ),
     );
   }
