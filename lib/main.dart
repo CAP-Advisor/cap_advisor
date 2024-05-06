@@ -1,6 +1,10 @@
+import 'package:cap_advisor/view/HR_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
+import 'package:cap_advisor/view/instructor_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
+import 'package:cap_advisor/view/student_view.dart';
+import 'package:cap_advisor/view/supervisor_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 void main() async{
@@ -31,6 +35,10 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
+        '/HR':(context) => HRView(),
+        '/Supervisor':(context) => SupervisorView(),
+        '/Instructor':(context) => InstructorView(),
+        '/Student':(context) => StudentView(),
       },
     );
   }

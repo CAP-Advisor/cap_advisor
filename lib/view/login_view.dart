@@ -1,8 +1,24 @@
+
 import 'package:flutter/material.dart';
+import '../utils/validation_utils.dart';
+import '../view-model/login_viewmodel.dart';
 import 'reset_password_view.dart';
 import 'sign_up_view.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget{
+  @override
+  _LoginViewState createState()=>_LoginViewState();
+}
+class _LoginViewState extends State<LoginView> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final LoginViewModel viewModel = LoginViewModel();
+  final _formKey =GlobalKey<FormState>();
+
+  String? emailError;
+  String? passwordError;
+  String? loginError;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,7 +27,9 @@ class LoginView extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: SingleChildScrollView(
-            child: Column(
+            child: Form(
+              key: _formKey,
+              child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -19,9 +37,25 @@ class LoginView extends StatelessWidget {
                   child: Image.asset('assets/images/login_logo.png'),
                 ),
                 const SizedBox(height: 40),
-                usernameField(),
+                emailField(),
+                if(emailError!=null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0,left: 30.0),
+                      child: Text(
+                        emailError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
                 const SizedBox(height: 30),
                 passwordField(),
+                if(passwordError!=null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0,left: 30.0),
+                      child: Text(
+                        passwordError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
                 const SizedBox(height: 60),
                 loginButton(context),
                 const SizedBox(height: 20),
@@ -33,10 +67,10 @@ class LoginView extends StatelessWidget {
           ),
         ),
       ),
+      )
     );
   }
-
-  Widget usernameField() {
+  Widget emailField() {
     return Center(
       child: Container(
         width: 360,
@@ -46,12 +80,31 @@ class LoginView extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextFormField(
+          controller: emailController,
           keyboardType: TextInputType.emailAddress,
           decoration: const InputDecoration(
-            hintText: 'Username',
+            hintText: 'Email',
             hintStyle: TextStyle(color: Color(0xFF9A9A9A)),
             border: InputBorder.none,
           ),
+          validator: (value){
+            if(value==null || value.isEmpty){
+              setState(() {
+                emailError = 'Please enter an Email';
+              });
+              return null;
+            }
+    // Check email format
+            if (!ValidationUtils.isValidEmail(value)) {
+              setState(() {
+                emailError = 'Please enter a valid Email';
+              });
+              return null;            }
+            },
+          onChanged: (_)=> setState(() {
+            emailError = null;
+            loginError = null;
+          }),
         ),
       ),
     );
@@ -67,14 +120,24 @@ class LoginView extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextFormField(
+          controller: passwordController,
           obscureText: true,
           decoration: InputDecoration(
             hintText: 'Password',
             hintStyle: TextStyle(color: Color(0xFF9A9A9A)),
             border: InputBorder.none,
-            suffixIcon: Icon(Icons.remove_red_eye),
           ),
-        ),
+          validator: (value){
+            if(value==null|| value.isEmpty){
+              setState(() {
+                passwordError = 'Please enter Password';
+              });            }
+            return null;
+          },
+          onChanged: (_)=> setState(() {
+            passwordError = null;
+            loginError = null;
+          }),        ),
       ),
     );
   }
@@ -83,7 +146,30 @@ class LoginView extends StatelessWidget {
     return Center(
       child: ElevatedButton(
         onPressed: () {
-          null;
+          if(_formKey.currentState!.validate()) {
+            String email = emailController.text.trim();
+            String password = passwordController.text.trim();
+            viewModel.login(email, password).then((success) {
+              if (success) {
+                print("login successful");
+
+                redirectUser(context, viewModel.userType);
+              }
+              else {
+                setState(() {
+                  loginError =
+                  'Failed to login. Please check your credentials.';
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(loginError!),
+                      backgroundColor: Colors.red,
+                    ),
+                );
+              }
+
+            });
+          }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Color(0xFF427D9D),
@@ -132,5 +218,23 @@ class LoginView extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+void redirectUser(BuildContext context, String userType) {
+  switch (userType) {
+    case 'HR':
+      Navigator.pushReplacementNamed(context, '/HR');
+      break;
+    case 'Supervisor':
+      Navigator.pushReplacementNamed(context, '/Supervisor');
+      break;
+    case 'Instructor':
+      Navigator.pushReplacementNamed(context, '/Instructor');
+      break;
+    case 'Student':
+      Navigator.pushReplacementNamed(context, '/Student');
+      break;
+    default:
+    // Handle unknown user type
   }
 }
