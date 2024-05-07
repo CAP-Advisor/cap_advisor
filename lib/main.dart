@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized(); // Ensure that Flutter is initialized
     WidgetsFlutterBinding.ensureInitialized();
+
     await Firebase.initializeApp(
       options: FirebaseOptions(
         apiKey: "AIzaSyAQYRsFz0D1RzD693QMsmkzA645-pSQ1_c",

@@ -153,7 +153,7 @@ class _LoginViewState extends State<LoginView> {
               if (success) {
                 print("login successful");
 
-                redirectUser(context, viewModel.userType);
+                viewModel.redirectUser(context, viewModel.userType);
               }
               else {
                 setState(() {
@@ -218,23 +218,5 @@ class _LoginViewState extends State<LoginView> {
         ),
       ),
     );
-  }
-}
-void redirectUser(BuildContext context, String userType) {
-  switch (userType) {
-    case 'HR':
-      Navigator.pushReplacementNamed(context, '/HR');
-      break;
-    case 'Supervisor':
-      Navigator.pushReplacementNamed(context, '/Supervisor');
-      break;
-    case 'Instructor':
-      Navigator.pushReplacementNamed(context, '/Instructor');
-      break;
-    case 'Student':
-      Navigator.pushReplacementNamed(context, '/Student');
-      break;
-    default:
-    // Handle unknown user type
   }
 }

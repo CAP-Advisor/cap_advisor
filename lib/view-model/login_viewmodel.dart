@@ -1,4 +1,11 @@
 import 'package:cap_advisor/utils/validation_utils.dart';
+import 'package:cap_advisor/view/HR_view.dart';
+import 'package:cap_advisor/view/instructor_view.dart';
+import 'package:cap_advisor/view/student_view.dart';
+import 'package:cap_advisor/view/supervisor_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import '../service/firebase_service.dart';
 
 class LoginViewModel {
@@ -12,35 +19,45 @@ class LoginViewModel {
         return false;
       }
 
-      // Check if email exists
-      bool emailExists = await _firebaseService.checkEmailExists(email);
-      if (!emailExists) {
-        return false; // Email does not exist
+      // Authenticate user with Firebase
+      User? user = await _firebaseService.signInWithEmailAndPassword(email, password);
+
+      if (user == null) {
+        // Authentication failed
+        return false;
       }
       Map<String, dynamic>? userData = await _firebaseService.getUserData(email);
       if (userData != null) {
         userType = userData['userType']; // Store user type
-        // Get hashed password from Firestore
-        String hashedPassword = await _firebaseService.getHashedPassword(email);
-
-        // Hash the entered password
-        String enteredPasswordHashed = _firebaseService.hashPassword(password);
-
-        // Check if passwords match
-        if (hashedPassword == enteredPasswordHashed) {
-          // Passwords match, login successful
           return true;
         } else {
           return false; // Passwords do not match
         }
-      }else{
-        print('user data not found');
-        return false;
-      }
 
     } catch (e) {
       print('Error during login: $e');
       return false;
+    }
+  }
+
+  void redirectUser(BuildContext context, String userType) {
+    switch (userType) {
+      case 'HR':
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HRView()));
+        break;
+      case 'Supervisor':
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SupervisorView()));
+        break;
+      case 'Instructor':
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => InstructorView()));
+        break;
+      case 'Student':
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StudentView()));
+        break;
+      default:
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Unknown user type')),
+    );
     }
   }
 }

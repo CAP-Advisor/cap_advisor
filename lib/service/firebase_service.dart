@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   Future<bool> checkEmailExists(String email) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
@@ -84,7 +84,7 @@ class FirebaseService {
             'userType': userType
           };
         } else {
-          print('User type is null');
+          print('User type is null for user: $email');
           return null;
         }
       } else {
@@ -95,5 +95,16 @@ class FirebaseService {
       return null;
     }
   }
-
+  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } catch (e) {
+      print('Error signing in: $e');
+      return null;
+    }
+  }
 }
