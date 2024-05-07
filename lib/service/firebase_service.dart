@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import '../model/student_model.dart';
+
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -18,7 +20,8 @@ class FirebaseService {
     }
   }
 
-  Future<void> storeUserData(String userType, String name, String username, String email, String password) async {
+  Future<void> storeUserData(String userType, String name, String username,
+      String email, String password) async {
     try {
       String hashedPassword = _hashPassword(password);
 
@@ -43,5 +46,18 @@ class FirebaseService {
 
   String _hashPassword(String password) {
     return sha256.convert(utf8.encode(password)).toString();
+  }
+
+  Future<List<Student>> fetchStudents() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _firestore.collection('Student').get();
+      List<Student> students =
+          querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+      return students;
+    } catch (e) {
+      print('Error fetching students: $e');
+      return [];
+    }
   }
 }

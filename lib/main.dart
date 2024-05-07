@@ -3,19 +3,21 @@ import 'package:cap_advisor/view/login_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-void main() async{
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure that Flutter is initialized
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-      options: FirebaseOptions(
-        apiKey: "AIzaSyAQYRsFz0D1RzD693QMsmkzA645-pSQ1_c",
-        authDomain: "cap-advisor-a1c2.firebaseapp.com",
-        projectId: "cap-advisor-a1c2d",
-        storageBucket: "cap-advisor-a1c2d.appspot.com",
-        messagingSenderId: "1076600979829",
-        appId: "1:1076600979829:android:eaa83474f8326c47b2933c",
-      ),
-    );
+
+void main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure that Flutter is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: "AIzaSyAQYRsFz0D1RzD693QMsmkzA645-pSQ1_c",
+      authDomain: "cap-advisor-a1c2.firebaseapp.com",
+      projectId: "cap-advisor-a1c2d",
+      storageBucket: "cap-advisor-a1c2d.appspot.com",
+      messagingSenderId: "1076600979829",
+      appId: "1:1076600979829:android:eaa83474f8326c47b2933c",
+    ),
+  );
   runApp(MyApp());
 }
 
@@ -25,8 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'CAP Advisor',
-      theme: ThemeData(
-      ),
+      theme: ThemeData(),
       home: HomeView(),
       routes: {
         '/login': (context) => LoginView(),
