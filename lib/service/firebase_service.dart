@@ -113,7 +113,6 @@ class FirebaseService {
   }
 
   Future<void> storeUserData(String userType, String name, String username,
-
       String email, String password, String uid) async {
     try {
 
@@ -148,6 +147,16 @@ class FirebaseService {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
+  Future<List<Student>> fetchStudents() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _firestore.collection('Student').get();
+      List<Student> students =
+          querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+      return students;
+    } catch (e) {
+      print('Error fetching students: $e');
+      return [];
   Future<String> getHashedPassword(String email) async {
     try {
       DocumentSnapshot snapshot = await _firestore
@@ -214,6 +223,3 @@ class FirebaseService {
       return false;
     }
   }
-
-
-
