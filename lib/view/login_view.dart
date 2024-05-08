@@ -1,19 +1,21 @@
-
 import 'package:flutter/material.dart';
 import '../utils/validation_utils.dart';
 import '../view-model/login_viewmodel.dart';
 import 'reset_password_view.dart';
 import 'sign_up_view.dart';
+import 'package:firebase_admin/firebase_admin.dart';
 
-class LoginView extends StatefulWidget{
+class LoginView extends StatefulWidget {
+
   @override
-  _LoginViewState createState()=>_LoginViewState();
+  _LoginViewState createState() => _LoginViewState();
 }
+
 class _LoginViewState extends State<LoginView> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final LoginViewModel viewModel = LoginViewModel();
-  final _formKey =GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   String? emailError;
   String? passwordError;
@@ -30,46 +32,47 @@ class _LoginViewState extends State<LoginView> {
             child: Form(
               key: _formKey,
               child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Center(
-                  child: Image.asset('assets/images/login_logo.png'),
-                ),
-                const SizedBox(height: 40),
-                emailField(),
-                if(emailError!=null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0,left: 30.0),
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Center(
+                    child: Image.asset('assets/images/login_logo.png'),
+                  ),
+                  const SizedBox(height: 40),
+                  emailField(),
+                  if (emailError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0, left: 30.0),
                       child: Text(
                         emailError!,
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
-                const SizedBox(height: 30),
-                passwordField(),
-                if(passwordError!=null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0,left: 30.0),
+                  const SizedBox(height: 30),
+                  passwordField(),
+                  if (passwordError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0, left: 30.0),
                       child: Text(
                         passwordError!,
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
-                const SizedBox(height: 60),
-                loginButton(context),
-                const SizedBox(height: 20),
-                forgotPasswordButton(context),
-                const SizedBox(height: 10),
-                signUpButton(context),
-              ],
+                  const SizedBox(height: 60),
+                  loginButton(context),
+                  const SizedBox(height: 20),
+                  forgotPasswordButton(context),
+                  const SizedBox(height: 10),
+                  signUpButton(context),
+                ],
+              ),
             ),
           ),
         ),
       ),
-      )
     );
   }
+
   Widget emailField() {
     return Center(
       child: Container(
@@ -87,21 +90,22 @@ class _LoginViewState extends State<LoginView> {
             hintStyle: TextStyle(color: Color(0xFF9A9A9A)),
             border: InputBorder.none,
           ),
-          validator: (value){
-            if(value==null || value.isEmpty){
+          validator: (value) {
+            if (value == null || value.isEmpty) {
               setState(() {
                 emailError = 'Please enter an Email';
               });
               return null;
             }
-    // Check email format
+            // Check email format
             if (!ValidationUtils.isValidEmail(value)) {
               setState(() {
                 emailError = 'Please enter a valid Email';
               });
-              return null;            }
-            },
-          onChanged: (_)=> setState(() {
+              return null;
+            }
+          },
+          onChanged: (_) => setState(() {
             emailError = null;
             loginError = null;
           }),
@@ -127,47 +131,43 @@ class _LoginViewState extends State<LoginView> {
             hintStyle: TextStyle(color: Color(0xFF9A9A9A)),
             border: InputBorder.none,
           ),
-          validator: (value){
-            if(value==null|| value.isEmpty){
+          validator: (value) {
+            if (value == null || value.isEmpty) {
               setState(() {
                 passwordError = 'Please enter Password';
-              });            }
+              });
+            }
             return null;
           },
-          onChanged: (_)=> setState(() {
+          onChanged: (_) => setState(() {
             passwordError = null;
             loginError = null;
-          }),        ),
+          }),
+        ),
       ),
     );
   }
-
   Widget loginButton(BuildContext context) {
     return Center(
       child: ElevatedButton(
         onPressed: () {
-          if(_formKey.currentState!.validate()) {
+          if (_formKey.currentState!.validate()) {
             String email = emailController.text.trim();
             String password = passwordController.text.trim();
-            viewModel.login(email, password).then((success) {
-              if (success) {
-                print("login successful");
-
-                viewModel.redirectUser(context, viewModel.userType);
-              }
-              else {
+            viewModel.login(email, password).then((user) {
+              if (user != null) {
+                viewModel.redirectUser(context,user.userType); // Redirect based on userType
+              } else {
                 setState(() {
-                  loginError =
-                  'Failed to login. Please check your credentials.';
+                  loginError = 'Failed to login. Please check your credentials.';
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(loginError!),
-                      backgroundColor: Colors.red,
-                    ),
+                  SnackBar(
+                    content: Text(loginError!),
+                    backgroundColor: Colors.red,
+                  ),
                 );
               }
-
             });
           }
         },
@@ -185,6 +185,7 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
+
 
   Widget forgotPasswordButton(BuildContext context) {
     return Center(
