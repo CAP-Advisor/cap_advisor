@@ -3,7 +3,6 @@ import '../utils/validation_utils.dart';
 import '../view-model/login_viewmodel.dart';
 import 'reset_password_view.dart';
 import 'sign_up_view.dart';
-import 'package:firebase_admin/firebase_admin.dart';
 
 class LoginView extends StatefulWidget {
 

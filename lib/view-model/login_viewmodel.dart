@@ -1,12 +1,6 @@
-import 'dart:js_util';
-
 import 'package:cap_advisor/model/firebaseuser.dart';
 import 'package:cap_advisor/utils/role_factory.dart';
 import 'package:cap_advisor/utils/validation_utils.dart';
-import 'package:cap_advisor/view/HR_view.dart';
-import 'package:cap_advisor/view/instructor_view.dart';
-import 'package:cap_advisor/view/student_view.dart';
-import 'package:cap_advisor/view/supervisor_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,12 +9,12 @@ import '../view/login_view.dart';
 
 class LoginViewModel {
   final FirebaseService _firebaseService = FirebaseService();
-   String userType = ''; // Initialize userType with an empty string
+   String userType = '';
    final storage = const FlutterSecureStorage();
 
 
 
-  void redirectUser(BuildContext context, String userType) {
+  void redirectUser(BuildContext context, String? userType) {
     var requestedView=roleFactory(userType);
     if(requestedView!=null){
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => requestedView));
@@ -38,7 +32,7 @@ class LoginViewModel {
     }
   }
 
-  Future<firebaseuser?> login(String email, String password) async {
+  Future<FireBaseUser?> login(String email, String password) async {
     try {
       if (!ValidationUtils.isValidEmail(email)) {
         return null;
@@ -51,14 +45,14 @@ class LoginViewModel {
       }
 
       User? user = FirebaseAuth.instance.currentUser;
-      firebaseuser userObj=newObject();
+      FireBaseUser userObj = FireBaseUser();
       if (user != null) {
         String? token = await user.getIdToken();
         if (token != null) {
           print('Login Successful! Token: $token');
 
           Map<String, dynamic>? userdata=await _firebaseService.getUserData(email);
-          userObj=firebaseuser.fromMap(userdata!);
+          userObj=FireBaseUser.fromMap(userdata!);
           // await storage.write(key: 'session_token', value: token);
           return userObj;
         }

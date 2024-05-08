@@ -10,7 +10,6 @@ import 'package:cap_advisor/view/student_view.dart';
 import 'package:cap_advisor/view/supervisor_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -33,7 +32,7 @@ void main() async {
     FirebaseService firebaseService = FirebaseService();
     var userMap = await firebaseService.getUserData(user.email!);
     if (userMap != null) {
-      var userObj = firebaseuser.fromMap(userMap);
+      var userObj = FireBaseUser.fromMap(userMap);
       runApp(MyApp(
         isAuthenticated: true,
         userType: userObj.userType,
