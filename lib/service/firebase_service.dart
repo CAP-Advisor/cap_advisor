@@ -100,6 +100,7 @@ class FirebaseService {
     await prefs.setString('session_token', token ?? '');
   }
 
+
   Future<bool> checkEmailExists(String email) async {
     try {
       QuerySnapshot querySnapshot = await _firestore.collection('Users').where(
@@ -112,7 +113,8 @@ class FirebaseService {
   }
 
   Future<void> storeUserData(String userType, String name, String username,
-      String email, String password) async {
+
+      String email, String password, String uid) async {
     try {
 
       String hashedPassword = hashPassword(password);
@@ -120,7 +122,7 @@ class FirebaseService {
       UserCredential userData = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
-      await _firestore.collection(userType).add({
+      await _firestore.collection(userType).doc(uid).set({
         'userType': userType,
         'name': name,
         'username': username,
@@ -134,7 +136,6 @@ class FirebaseService {
         'username':username,
         'name':name,
         'Uid':userData.user?.uid
-
       });
 
       print('User data stored successfully in Firestore');
