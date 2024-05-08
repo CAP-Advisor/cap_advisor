@@ -1,12 +1,19 @@
+import 'package:cap_advisor/model/firebaseuser.dart';
+import 'package:cap_advisor/service/firebase_service.dart';
+import 'package:cap_advisor/utils/role_factory.dart';
+import 'package:cap_advisor/view/HR_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
+import 'package:cap_advisor/view/instructor_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
+import 'package:cap_advisor/view/student_view.dart';
+import 'package:cap_advisor/view/supervisor_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() async {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Ensure that Flutter is initialized
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: FirebaseOptions(
@@ -18,21 +25,57 @@ void main() async {
       appId: "1:1076600979829:android:eaa83474f8326c47b2933c",
     ),
   );
-  runApp(MyApp());
+
+  FirebaseAuth auth = FirebaseAuth.instance;
+  var user = auth.currentUser;
+  if (user != null) {
+    FirebaseService firebaseService = FirebaseService();
+    var userMap = await firebaseService.getUserData(user.email!);
+    if (userMap != null) {
+      var userObj = FireBaseUser.fromMap(userMap);
+      runApp(MyApp(
+        isAuthenticated: true,
+        userType: userObj.userType,
+      ));
+    } else {
+      runApp(const MyApp(
+        isAuthenticated: false,
+        userType: null,
+      ));
+    }
+  } else {
+    runApp(const MyApp(
+      isAuthenticated: false,
+      userType: null,
+    ));
+  }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final bool isAuthenticated;
+  final String? userType;
+
+  const MyApp({Key? key, required this.isAuthenticated, this.userType}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+
+    var homeView =isAuthenticated ? roleFactory(userType!) : HomeView();
     return MaterialApp(
       title: 'CAP Advisor',
       theme: ThemeData(),
-      home: HomeView(),
+      home: homeView ,
       routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
+        '/HR': (context) => HRView(),
+        '/Supervisor': (context) => SupervisorView(),
+        '/Instructor': (context) => InstructorView(),
+        '/Student': (context) => StudentView(),
+        '/home': (context) => HomeView(),
       },
+
     );
+
   }
 }

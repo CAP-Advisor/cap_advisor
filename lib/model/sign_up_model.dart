@@ -27,27 +27,27 @@ class SignUpModel {
   String? get password => _password;
   String? get confirmPassword => _confirmPassword;
 
-   set userType(String? userType) {
+  set userType(String? userType) {
     _userType = userType;
   }
 
-   set name(String? name) {
+  set name(String? name) {
     _name = name;
   }
 
-   set username(String? username) {
+  set username(String? username) {
     _username = username;
   }
 
-   set email(String? email) {
+  set email(String? email) {
     _email = email;
   }
 
-   set password(String? password) {
+  set password(String? password) {
     _password = password;
   }
 
-   set confirmPassword(String? confirmPassword) {
+  set confirmPassword(String? confirmPassword) {
     _confirmPassword = confirmPassword;
   }
 }

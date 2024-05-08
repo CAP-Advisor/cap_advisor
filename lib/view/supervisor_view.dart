@@ -2,9 +2,25 @@ import 'package:flutter/material.dart';
 import '../model/student_model.dart';
 import '../view-model/supervisor_viewmodel.dart';
 import '../view/add_task_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SupervisorView extends StatelessWidget {
   final SupervisorViewModel _viewModel = SupervisorViewModel();
+
+  Widget logoutBtn(BuildContext context) {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          FirebaseAuth.instance.signOut();
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
+        },
+        child: const Text(
+          'Logout', // Changed the text to indicate the action clearly
+          style: TextStyle(color: Color(0xFF427D9D)),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

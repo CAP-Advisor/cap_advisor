@@ -4,6 +4,21 @@ import 'package:cap_advisor/view/student_experience_view.dart';
 
 class StudentView extends StatelessWidget {
   const StudentView({Key? key}) : super(key: key);
+  
+  Widget logoutBtn(BuildContext context) {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          FirebaseAuth.instance.signOut();
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
+        },
+        child: const Text(
+          'Logout', // Changed the text to indicate the action clearly
+          style: TextStyle(color: Color(0xFF427D9D)),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,3 +224,4 @@ class StudentView extends StatelessWidget {
     );
   }
 }
+  

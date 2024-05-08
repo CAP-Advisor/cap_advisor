@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'sign_up_view.dart';
+import 'login_view.dart';
 
 class HomeView extends StatelessWidget {
   @override
@@ -23,7 +25,10 @@ class HomeView extends StatelessWidget {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/login');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginView()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         fixedSize: Size(225, 50),
