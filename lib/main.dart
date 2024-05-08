@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    var homeView =isAuthenticated ? roleFactory(userType!) : LoginView();
+    var homeView =isAuthenticated ? roleFactory(userType!) : HomeView();
     return MaterialApp(
       title: 'CAP Advisor',
       theme: ThemeData(),

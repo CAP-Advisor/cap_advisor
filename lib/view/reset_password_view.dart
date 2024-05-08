@@ -2,10 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../view-model/reset_password_viewmodel.dart';
 
-class ResetPasswordPage extends StatelessWidget {
+class ResetPasswordView extends StatelessWidget {
   final ResetPasswordViewModel viewModel = ResetPasswordViewModel();
 
-  ResetPasswordPage({super.key});
+  ResetPasswordView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +81,6 @@ void main() async {
   await Firebase.initializeApp();
 
   // Run the app
-  runApp(MaterialApp(home: ResetPasswordPage()));
+  runApp(MaterialApp(home: ResetPasswordView()));
 }
 

@@ -33,8 +33,6 @@ dependencies:
   provider: ^6.1.2
   http: ^0.13.3
   flutter_native_splash: ^1.2.0
-  flutter:
-    sdk: flutter
   flutter_secure_storage: ^5.0.2
   firebase_admin: ^0.2.0
 
