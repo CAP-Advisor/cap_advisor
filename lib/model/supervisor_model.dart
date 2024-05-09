@@ -1,15 +1,23 @@
 class Supervisor {
-  String companyName;
-  String email;
-  String name;
-  List<String> studentList;
-  String password;
+  final String name;
+  final String email;
 
   Supervisor({
-    required this.companyName,
     required this.name,
     required this.email,
-    required this.password,
-    required this.studentList,
   });
+
+  factory Supervisor.fromMap(Map<String, dynamic> map) {
+    return Supervisor(
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'email': email,
+    };
+  }
 }
