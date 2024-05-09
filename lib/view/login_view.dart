@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../utils/validation_utils.dart';
 import '../view-model/login_viewmodel.dart';
+import '../widgets/custom_submit_button.dart';
+import '../widgets/custom_text_field.dart';
 import 'reset_password_view.dart';
 import 'sign_up_view.dart';
 
 class LoginView extends StatefulWidget {
-
   @override
   _LoginViewState createState() => _LoginViewState();
 }
@@ -16,9 +17,21 @@ class _LoginViewState extends State<LoginView> {
   final LoginViewModel viewModel = LoginViewModel();
   final _formKey = GlobalKey<FormState>();
 
+  bool isSubmitted = false;
+  bool isValidEmail = false;
+  bool isValidPassword = false;
+  bool isValidForm = false;
+  bool emailExists = false;
   String? emailError;
   String? passwordError;
   String? loginError;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,33 +45,81 @@ class _LoginViewState extends State<LoginView> {
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Center(
                     child: Image.asset('assets/images/login_logo.png'),
                   ),
                   const SizedBox(height: 40),
-                  emailField(),
-                  if (emailError != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0, left: 30.0),
-                      child: Text(
-                        emailError!,
-                        style: TextStyle(color: Colors.red),
-                      ),
+                  SizedBox(
+                    width: 390,
+                    child: CustomTextField(
+                      hintText: "Email",
+                      controller: emailController,
+                      onChanged: (value) {
+                        viewModel.setEmail(value);
+                        setState(() {
+                          isValidEmail = value.isNotEmpty &&
+                              ValidationUtils.isValidEmail(value);
+                          isValidForm = validateForm();
+                        });
+                      },
+                      errorMessage: "Please enter a valid email",
+                      isValid: isValidEmail,
+                      showError: isSubmitted,
+                      keyboardType: TextInputType.emailAddress,
                     ),
+                  ),
                   const SizedBox(height: 30),
-                  passwordField(),
-                  if (passwordError != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0, left: 30.0),
-                      child: Text(
-                        passwordError!,
-                        style: TextStyle(color: Colors.red),
-                      ),
+                  SizedBox(
+                    width: 390,
+                    child: CustomTextField(
+                      hintText: "Password",
+                      controller: passwordController,
+                      onChanged: (value) {
+                        viewModel.setPassword(value);
+                        setState(() {
+                          isValidPassword = value.isNotEmpty &&
+                              ValidationUtils.isValidPassword(value);
+                          isValidForm = validateForm();
+                        });
+                      },
+                      errorMessage: "Please enter a valid password",
+                      isValid: isValidPassword,
+                      showError: isSubmitted,
+                      obscureText: true,
                     ),
+                  ),
                   const SizedBox(height: 60),
-                  loginButton(context),
+                  CustomButton(
+                    onPressed: () async {
+                      setState(() {
+                        isSubmitted = true;
+                        emailExists = false;
+                      });
+                      if (isValidForm) {
+                        String email = emailController.text.trim();
+                        String password = passwordController.text.trim();
+                        viewModel.login(email, password).then((user) {
+                          if (user != null) {
+                            viewModel.redirectUser(
+                                context, user.userType); // Redirect based on userType
+                          } else {
+                            setState(() {
+                              loginError =
+                              'Failed to login. Please check your credentials.';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(loginError!),
+                                  backgroundColor: Colors.red,
+                                ));
+                          }
+                        });
+                      }
+                    },
+                    text: "Submit",
+                  ),
                   const SizedBox(height: 20),
                   forgotPasswordButton(context),
                   const SizedBox(height: 10),
@@ -71,121 +132,6 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
-
-  Widget emailField() {
-    return Center(
-      child: Container(
-        width: 360,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F8F9),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: TextFormField(
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            hintText: 'Email',
-            hintStyle: TextStyle(color: Color(0xFF9A9A9A)),
-            border: InputBorder.none,
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              setState(() {
-                emailError = 'Please enter an Email';
-              });
-              return null;
-            }
-            // Check email format
-            if (!ValidationUtils.isValidEmail(value)) {
-              setState(() {
-                emailError = 'Please enter a valid Email';
-              });
-              return null;
-            }
-          },
-          onChanged: (_) => setState(() {
-            emailError = null;
-            loginError = null;
-          }),
-        ),
-      ),
-    );
-  }
-
-  Widget passwordField() {
-    return Center(
-      child: Container(
-        width: 360,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F8F9),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: TextFormField(
-          controller: passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            hintText: 'Password',
-            hintStyle: TextStyle(color: Color(0xFF9A9A9A)),
-            border: InputBorder.none,
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              setState(() {
-                passwordError = 'Please enter Password';
-              });
-            }
-            return null;
-          },
-          onChanged: (_) => setState(() {
-            passwordError = null;
-            loginError = null;
-          }),
-        ),
-      ),
-    );
-  }
-  Widget loginButton(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            String email = emailController.text.trim();
-            String password = passwordController.text.trim();
-            viewModel.login(email, password).then((user) {
-              if (user != null) {
-                viewModel.redirectUser(context,user.userType); // Redirect based on userType
-              } else {
-                setState(() {
-                  loginError = 'Failed to login. Please check your credentials.';
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(loginError!),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            });
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF427D9D),
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        child: const Text(
-          'Login',
-          style: TextStyle(fontSize: 23, color: Colors.white),
-        ),
-      ),
-    );
-  }
-
-
   Widget forgotPasswordButton(BuildContext context) {
     return Center(
       child: TextButton(
@@ -218,5 +164,9 @@ class _LoginViewState extends State<LoginView> {
         ),
       ),
     );
+  }
+
+  bool validateForm() {
+    return isValidEmail && isValidPassword;
   }
 }
