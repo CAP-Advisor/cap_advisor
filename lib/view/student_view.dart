@@ -1,29 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cap_advisor/view/student_skills_view.dart';
 import 'package:cap_advisor/view/student_experience_view.dart';
 
+import 'login_view.dart';
+
 class StudentView extends StatelessWidget {
   const StudentView({Key? key}) : super(key: key);
-  
-  Widget logoutBtn(BuildContext context) {
-    return Center(
-      child: TextButton(
-        onPressed: () {
-          FirebaseAuth.instance.signOut();
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
-        },
-        child: const Text(
-          'Logout', // Changed the text to indicate the action clearly
-          style: TextStyle(color: Color(0xFF427D9D)),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -35,7 +23,7 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  AppBar _buildAppBar() {
+  AppBar _buildAppBar(context) {
     return AppBar(
       backgroundColor: const Color(0xFF164863),
       title: const Text("CAP Advisor",
@@ -61,7 +49,8 @@ class StudentView extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
-            // Define what happens when this is pressed
+              FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
           },
         ),
       ],

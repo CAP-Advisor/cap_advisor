@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../model/firebaseuser.dart';
+import '../model/student_model.dart';
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -117,10 +117,6 @@ class FirebaseService {
     try {
 
       String hashedPassword = hashPassword(password);
-
-      UserCredential userData = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
-
       await _firestore.collection(userType).doc(uid).set({
         'userType': userType,
         'name': name,
@@ -129,12 +125,10 @@ class FirebaseService {
         'password': hashedPassword,
       });
 
-      await _firestore.collection('Users').add({
+      await _firestore.collection('Users').doc(uid).set({
+        'Uid':uid,
         'email': email,
         'userType': userType,
-        'username':username,
-        'name':name,
-        'Uid':userData.user?.uid
       });
 
       print('User data stored successfully in Firestore');
@@ -150,13 +144,15 @@ class FirebaseService {
   Future<List<Student>> fetchStudents() async {
     try {
       QuerySnapshot querySnapshot =
-          await _firestore.collection('Student').get();
+      await _firestore.collection('Student').get();
       List<Student> students =
-          querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+      querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
       return students;
     } catch (e) {
       print('Error fetching students: $e');
       return [];
+    }
+  }
   Future<String> getHashedPassword(String email) async {
     try {
       DocumentSnapshot snapshot = await _firestore
