@@ -201,6 +201,20 @@ class FirebaseService {
       return null;
     }
   }
+  Future<Map<String, dynamic>?> fetchStudentData(String? userId) async {
+    if (userId == null) return null;
+    try {
+      DocumentSnapshot studentDoc =
+      await _firestore.collection('Student').doc(userId).get();
+      if (studentDoc.exists) {
+        return studentDoc.data() as Map<String, dynamic>?;
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching student data: $e');
+      return null;
+    }
+  }
 }
 
   Future<bool> verifyIdToken(String idToken) async {
