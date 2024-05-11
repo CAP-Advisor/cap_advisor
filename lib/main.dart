@@ -1,7 +1,12 @@
 import 'package:cap_advisor/model/firebaseuser.dart';
 import 'package:cap_advisor/service/firebase_service.dart';
 import 'package:cap_advisor/utils/role_factory.dart';
+import 'package:cap_advisor/view-model/add_task_viewmodel.dart';
+import 'package:cap_advisor/view-model/assigning_feedback_viewmodel.dart';
 import 'package:cap_advisor/view/HR_view.dart';
+import 'package:cap_advisor/view/add_task_view.dart';
+import 'package:cap_advisor/view/assigning_feedback_view.dart';
+import 'package:cap_advisor/view/display_feedback_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
 import 'package:cap_advisor/view/instructor_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
@@ -12,6 +17,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,22 +65,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var homeView =isAuthenticated ? roleFactory(userType!) : HomeView();
-    return MaterialApp(
-      title: 'CAP Advisor',
-      theme: ThemeData(),
-      home: homeView ,
-      routes: {
+    return MultiProvider(
+        providers: [
+        ChangeNotifierProvider(create: (_) => AssigningFeedbackViewModel()),
+
+          // Add more providers if needed
+    ],
+    child: MaterialApp(
+    title: 'Your App Title',
+    theme: ThemeData(),
+    home: AssigningFeedbackView(),
+
+        routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
         '/HR': (context) => HRView(),
         '/Supervisor': (context) => SupervisorView(),
         '/Instructor': (context) => InstructorView(),
-        '/Student': (context) => StudentView(),
         '/home': (context) => HomeView(),
+        '/assign-feedback':(context) => AssigningFeedbackView(),
       },
 
+    ),
     );
 
   }
