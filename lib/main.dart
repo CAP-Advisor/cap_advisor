@@ -5,6 +5,7 @@ import 'package:cap_advisor/view/HR_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
 import 'package:cap_advisor/view/instructor_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
+import 'package:cap_advisor/view/post_position_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:cap_advisor/view/supervisor_view.dart';
@@ -64,7 +65,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CAP Advisor',
       theme: ThemeData(),
-      home: homeView ,
+      home: PostPositionView() ,
       routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
