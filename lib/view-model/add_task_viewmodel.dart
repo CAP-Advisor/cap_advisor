@@ -15,7 +15,7 @@ class AddTaskViewModel extends ChangeNotifier {
     taskDescriptionController = TextEditingController();
   }
 
-  Future<void> addTask(String studentId) async {
+  Future<void> addTask(BuildContext context, String studentId) async {
     // Reset error flags
     showTitleError = false;
     showDescriptionError = false;
@@ -48,8 +48,22 @@ class AddTaskViewModel extends ChangeNotifier {
         studentId: studentId,
         taskData: task.toMap(),
       );
+      // Show success Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Task added successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
       notifyListeners();
     } catch (error) {
+      // Show error Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error adding task: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
       print("Error adding task: $error");
     }
   }

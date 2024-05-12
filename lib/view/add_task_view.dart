@@ -73,7 +73,7 @@ class AddTaskView extends StatelessWidget {
                   ),
                   SizedBox(height: 30),
                   CustomButton(
-                    onPressed: () => model.addTask(studentId),
+                    onPressed: () => model.addTask(context,studentId),
                     text: "Submit",
                   ),
                 ],
