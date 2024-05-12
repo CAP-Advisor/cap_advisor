@@ -4,9 +4,11 @@ import '../view-model/add_task_viewmodel.dart';
 
 class CustomDeadline extends StatelessWidget {
   final AddTaskViewModel model;
+  final bool showError;
 
   const CustomDeadline({
     required this.model,
+    this.showError = false,
   });
 
   @override
@@ -22,8 +24,9 @@ class CustomDeadline extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: Color(0xFFF5F8F9),
+              color: showError ? Colors.red.withOpacity(0.2) : Color(0xFFF5F8F9),
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: showError ? Colors.red : Colors.transparent),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -46,6 +49,14 @@ class CustomDeadline extends StatelessWidget {
             ),
           ),
         ),
+        if (showError)
+          Padding(
+            padding: EdgeInsets.only(left: 16, top: 4),
+            child: Text(
+              "Please select a deadline",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
       ],
     );
   }

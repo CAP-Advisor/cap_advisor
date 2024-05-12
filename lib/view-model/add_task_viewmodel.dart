@@ -6,6 +6,9 @@ class AddTaskViewModel extends ChangeNotifier {
   late TextEditingController taskTitleController;
   late TextEditingController taskDescriptionController;
   DateTime? selectedDeadline;
+  bool showTitleError = false;
+  bool showDescriptionError = false;
+  bool showDeadlineError = false;
 
   AddTaskViewModel() {
     taskTitleController = TextEditingController();
@@ -13,10 +16,25 @@ class AddTaskViewModel extends ChangeNotifier {
   }
 
   Future<void> addTask(String studentId) async {
-    if (taskTitleController.text.isEmpty ||
-        taskDescriptionController.text.isEmpty ||
-        selectedDeadline == null) {
-      return;
+    // Reset error flags
+    showTitleError = false;
+    showDescriptionError = false;
+    showDeadlineError = false;
+
+    if (taskTitleController.text.isEmpty) {
+      showTitleError = true;
+    }
+    if (taskDescriptionController.text.isEmpty) {
+      showDescriptionError = true;
+    }
+    if (selectedDeadline == null) {
+      showDeadlineError = true;
+    }
+
+    // Check if any error flag is set
+    if (showTitleError || showDescriptionError || showDeadlineError) {
+      notifyListeners();
+      return; // Exit early if there are errors
     }
 
     TaskModel task = TaskModel(

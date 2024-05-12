@@ -1,7 +1,6 @@
 import 'package:cap_advisor/widgets/custom_deadline.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../view-model/add_task_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/custom_submit_button.dart';
@@ -21,7 +20,7 @@ class AddTaskView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => AddTaskViewModel(),
-      child: Consumer<AddTaskViewModel>(
+      child:Consumer<AddTaskViewModel>(
         builder: (context, model, _) {
           return Scaffold(
             appBar: CustomAppBar(
@@ -55,7 +54,8 @@ class AddTaskView extends StatelessWidget {
                     controller: model.taskTitleController,
                     onChanged: (value) {},
                     errorMessage: "Please enter a valid title",
-                    isValid: true, // Set to true/false based on validation
+                    isValid: !model.showTitleError,
+                    showError: model.showTitleError,
                   ),
                   SizedBox(height: 20),
                   CustomTextField(
@@ -63,13 +63,16 @@ class AddTaskView extends StatelessWidget {
                     controller: model.taskDescriptionController,
                     onChanged: (value) {},
                     errorMessage: "Please enter a valid description",
-                    isValid: true, // Set to true/false based on validation
+                    isValid: !model.showDescriptionError,
+                    showError: model.showDescriptionError,
                   ),
                   SizedBox(height: 20),
-                  CustomDeadline(model: model),
+                  CustomDeadline(
+                    model: model,
+                    showError: model.showDeadlineError,
+                  ),
                   SizedBox(height: 30),
                   CustomButton(
-                    // Use the custom button widget
                     onPressed: () => model.addTask(studentId),
                     text: "Submit",
                   ),
