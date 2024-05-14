@@ -8,12 +8,14 @@ import '../view-model/student_viewmodel.dart';
 import 'login_view.dart';
 
 class StudentView extends StatelessWidget {
-  StudentView({Key? key}) : super(key: key);
+  final String uid;
+
+  const StudentView({Key? key, required this.uid}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<StudentViewModel>(
-      create: (_) => StudentViewModel()..getStudentData(),
+      create: (_) => StudentViewModel(uid: uid)..getStudentData(),
       child: Consumer<StudentViewModel>(
         builder: (context, model, child) {
           if (model.studentData == null) {

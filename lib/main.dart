@@ -55,27 +55,29 @@ class MyApp extends StatelessWidget {
   final bool isAuthenticated;
   final String? userType;
 
-  const MyApp({Key? key, required this.isAuthenticated, this.userType}) : super(key: key);
+  const MyApp({Key? key, required this.isAuthenticated, this.userType})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
-    var homeView =isAuthenticated ? roleFactory(userType!) : HomeView();
+    var homeView = isAuthenticated ? roleFactory(userType!) : HomeView();
     return MaterialApp(
       title: 'CAP Advisor',
       theme: ThemeData(),
-      home: homeView ,
+      home: homeView,
       routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
         '/HR': (context) => HRView(),
-        '/Supervisor': (context) => SupervisorView(),
+        '/Supervisor': (context) => SupervisorView(
+              uid: '',
+            ),
         '/Instructor': (context) => InstructorView(),
-        '/Student': (context) => StudentView(),
+        '/Student': (context) => StudentView(
+              uid: '',
+            ),
         '/home': (context) => HomeView(),
       },
-
     );
-
   }
 }
