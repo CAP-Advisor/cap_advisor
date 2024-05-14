@@ -12,7 +12,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -28,27 +27,22 @@ void main() async {
 
   FirebaseAuth auth = FirebaseAuth.instance;
   var user = auth.currentUser;
-  if (user != null) {
+  bool isAuthenticated = user != null;
+
+  String? userType;
+  if (isAuthenticated) {
     FirebaseService firebaseService = FirebaseService();
-    var userMap = await firebaseService.getUserData(user.email!);
+    var userMap = await firebaseService.getUserData(user!.email!);
     if (userMap != null) {
       var userObj = FireBaseUser.fromMap(userMap);
-      runApp(MyApp(
-        isAuthenticated: true,
-        userType: userObj.userType,
-      ));
-    } else {
-      runApp(const MyApp(
-        isAuthenticated: false,
-        userType: null,
-      ));
+      userType = userObj.userType;
     }
-  } else {
-    runApp(const MyApp(
-      isAuthenticated: false,
-      userType: null,
-    ));
   }
+
+  runApp(MyApp(
+    isAuthenticated: isAuthenticated,
+    userType: userType,
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -59,12 +53,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget? homeView = isAuthenticated ? roleFactory(userType!) : HomeView();
 
-    var homeView =isAuthenticated ? roleFactory(userType!) : HomeView();
     return MaterialApp(
       title: 'CAP Advisor',
       theme: ThemeData(),
-      home: homeView ,
+      home: homeView,
       routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
@@ -74,8 +68,6 @@ class MyApp extends StatelessWidget {
         '/Student': (context) => StudentView(),
         '/home': (context) => HomeView(),
       },
-
     );
-
   }
 }

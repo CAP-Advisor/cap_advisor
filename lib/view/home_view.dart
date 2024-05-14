@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'sign_up_view.dart';
 import 'login_view.dart';
@@ -73,11 +74,27 @@ class HomeView extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
+                )
+                ,
                 SizedBox(height: 120),
+
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+  Widget logoutBtn(BuildContext context) {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          FirebaseAuth.instance.signOut();
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
+        },
+        child: const Text(
+          'Logout', // Changed the text to indicate the action clearly
+          style: TextStyle(color: Color(0xFF427D9D)),
         ),
       ),
     );

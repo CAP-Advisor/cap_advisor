@@ -6,7 +6,7 @@ import '../view/instructor_view.dart';
 import '../view/student_view.dart';
 import '../view/supervisor_view.dart';
 
-StatelessWidget? roleFactory(String ?userType){
+Widget? roleFactory(String ?userType){
   switch (userType) {
     case 'HR':
       return HRView();
