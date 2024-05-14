@@ -4,42 +4,25 @@ import '../view-model/supervisor_viewmodel.dart';
 import '../view/add_task_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../widgets/custom_appbar.dart';
 import 'login_view.dart';
 
 class SupervisorView extends StatelessWidget {
-  final SupervisorViewModel _viewModel = SupervisorViewModel();
+  final String uid;
+  SupervisorView({required this.uid});
 
+  final SupervisorViewModel _viewModel = SupervisorViewModel();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF164863),
-        title: Text(
-          "CAP Advisor",
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Roboto',
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
-            },
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: "CAP Advisor",
+        onNotificationPressed: () {},
+        onFeedback: () {},
+        onMenuPressed: () {
+          Navigator.of(context).pushNamed('/menu');
+        },
       ),
       body: FutureBuilder<List<Student>>(
         future: _viewModel.fetchStudents(),

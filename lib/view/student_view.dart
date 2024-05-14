@@ -2,11 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cap_advisor/view/student_skills_view.dart';
 import 'package:cap_advisor/view/student_experience_view.dart';
-
 import 'login_view.dart';
 
 class StudentView extends StatelessWidget {
-  const StudentView({Key? key}) : super(key: key);
+  final String uid;
+  const StudentView({Key? key, required this.uid}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +49,9 @@ class StudentView extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
+            FirebaseAuth.instance.signOut();
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => LoginView()));
           },
         ),
       ],
@@ -213,4 +214,3 @@ class StudentView extends StatelessWidget {
     );
   }
 }
-  

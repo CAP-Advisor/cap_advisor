@@ -5,10 +5,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/student_model.dart';
+
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final storage = const FlutterSecureStorage();
+
+  User? get currentUser => _auth.currentUser;
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile(
+      String uid) async {
+    return await _firestore.collection('Users').doc(uid).get();
+  }
 
   Future<String?> generateCustomToken(String uid) async {
     try {
@@ -29,8 +37,8 @@ class FirebaseService {
 
   Future<bool> verifyCustomToken(String customToken) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithCustomToken(customToken);
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCustomToken(customToken);
       User? user = userCredential.user;
       if (user != null) {
         // Check if user is authenticated
@@ -58,8 +66,8 @@ class FirebaseService {
         throw Exception('User not authenticated');
       }
 
-      DocumentSnapshot snapshot = await _firestore.collection('Users').doc(
-          user.uid).get();
+      DocumentSnapshot snapshot =
+          await _firestore.collection('Users').doc(user.uid).get();
 
       if (snapshot.exists) {
         return snapshot.data() as Map<String, dynamic>;
@@ -79,7 +87,6 @@ class FirebaseService {
 
   Future<bool> signInWithEmailAndPassword(String email, String password) async {
     try {
-
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -88,7 +95,6 @@ class FirebaseService {
       var user = userCredential.user;
 
       return user != null;
-
     } catch (e) {
       print('Error signing in: $e');
       return false;
@@ -100,11 +106,12 @@ class FirebaseService {
     await prefs.setString('session_token', token ?? '');
   }
 
-
   Future<bool> checkEmailExists(String email) async {
     try {
-      QuerySnapshot querySnapshot = await _firestore.collection('Users').where(
-          'email', isEqualTo: email).get();
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('Users')
+          .where('email', isEqualTo: email)
+          .get();
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       print('Error checking email existence: $e');
@@ -115,7 +122,6 @@ class FirebaseService {
   Future<void> storeUserData(String userType, String name, String username,
       String email, String password, String uid) async {
     try {
-
       String hashedPassword = hashPassword(password);
       await _firestore.collection(userType).doc(uid).set({
         'userType': userType,
@@ -126,7 +132,7 @@ class FirebaseService {
       });
 
       await _firestore.collection('Users').doc(uid).set({
-        'Uid':uid,
+        'Uid': uid,
         'email': email,
         'userType': userType,
       });
@@ -144,15 +150,16 @@ class FirebaseService {
   Future<List<Student>> fetchStudents() async {
     try {
       QuerySnapshot querySnapshot =
-      await _firestore.collection('Student').get();
+          await _firestore.collection('Student').get();
       List<Student> students =
-      querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+          querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
       return students;
     } catch (e) {
       print('Error fetching students: $e');
       return [];
     }
   }
+
   Future<String> getHashedPassword(String email) async {
     try {
       DocumentSnapshot snapshot = await _firestore
@@ -174,21 +181,18 @@ class FirebaseService {
 
   Future<Map<String, dynamic>?> getUserData(String email) async {
     try {
-      QuerySnapshot querySnapshot = await _firestore.collection('Users').where(
-          'email', isEqualTo: email).get();
-
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('Users')
+          .where('email', isEqualTo: email)
+          .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        Map<String, dynamic> userData = querySnapshot.docs.first.data() as Map<
-            String,
-            dynamic>;
+        Map<String, dynamic> userData =
+            querySnapshot.docs.first.data() as Map<String, dynamic>;
         String? userType = userData['userType'];
 
         if (userType != null) {
-          return {
-            'userData': userData,
-            'userType': userType
-          };
+          return {'userData': userData, 'userType': userType};
         } else {
           print('User type is null for user: $email');
           return null;
@@ -203,19 +207,20 @@ class FirebaseService {
   }
 }
 
-  Future<bool> verifyIdToken(String idToken) async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCustomToken(idToken);
-      User? user = userCredential.user;
-      if (user != null) {
-        // Token is valid
-        return true;
-      } else {
-        // Token is invalid
-        return false;
-      }
-    } catch (e) {
-      print('Error verifying ID token: $e');
+Future<bool> verifyIdToken(String idToken) async {
+  try {
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCustomToken(idToken);
+    User? user = userCredential.user;
+    if (user != null) {
+      // Token is valid
+      return true;
+    } else {
+      // Token is invalid
       return false;
     }
+  } catch (e) {
+    print('Error verifying ID token: $e');
+    return false;
   }
+}

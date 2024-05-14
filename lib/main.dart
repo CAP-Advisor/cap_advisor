@@ -5,6 +5,7 @@ import 'package:cap_advisor/view/HR_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
 import 'package:cap_advisor/view/instructor_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
+import 'package:cap_advisor/view/menu_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:cap_advisor/view/supervisor_view.dart';
@@ -55,27 +56,34 @@ class MyApp extends StatelessWidget {
   final bool isAuthenticated;
   final String? userType;
 
-  const MyApp({Key? key, required this.isAuthenticated, this.userType}) : super(key: key);
+  const MyApp({Key? key, required this.isAuthenticated, this.userType})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
-    var homeView =isAuthenticated ? roleFactory(userType!) : HomeView();
+    var homeView = isAuthenticated ? roleFactory(userType!) : HomeView();
     return MaterialApp(
       title: 'CAP Advisor',
       theme: ThemeData(),
-      home: homeView ,
+      home: homeView,
       routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
-        '/HR': (context) => HRView(),
-        '/Supervisor': (context) => SupervisorView(),
-        '/Instructor': (context) => InstructorView(),
-        '/Student': (context) => StudentView(),
+        '/HR': (context) => HRView(
+              uid: '',
+            ),
+        '/Supervisor': (context) => SupervisorView(
+              uid: '',
+            ),
+        '/Instructor': (context) => InstructorView(
+              uid: '',
+            ),
+        '/Student': (context) => StudentView(
+              uid: '',
+            ),
         '/home': (context) => HomeView(),
+        '/menu': (context) => MenuView(),
       },
-
     );
-
   }
 }
