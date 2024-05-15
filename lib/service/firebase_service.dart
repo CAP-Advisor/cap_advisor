@@ -145,7 +145,7 @@ class FirebaseService {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
-  Future<List<Student>> fetchStudents() async {
+  Future<List<Student>> fetchStudents(String supervisorId) async {
     try {
       QuerySnapshot querySnapshot =
           await _firestore.collection('Student').get();
@@ -313,7 +313,9 @@ class FirebaseService {
       } else {
         print("No supervisor found with email $email to update");
         return false;
+
       }
+      return null;
     } catch (e) {
       print("Error updating supervisor name by email: $e");
       return false;
@@ -399,10 +401,60 @@ class FirebaseService {
   }
 }
 
+      print('Error fetching student data: $e');
+      return null;
+    }
+  }
+  Future<void> addFeedback({
+    required String studentId,
+    required String feedbackType,
+    required Map<String, dynamic> feedbackData,
+  }) async {
+    try {
+      // Reference to the student document
+      DocumentReference studentRef = FirebaseFirestore.instance.collection('Student').doc(studentId);
+
+      // Reference to the collection based on feedback type
+      CollectionReference feedbackCollection = studentRef.collection(feedbackType);
+
+      // Add feedback document to the collection
+      await feedbackCollection.add(feedbackData);
+
+      print('Feedback added successfully');
+    } catch (error) {
+      // Handle error
+      print("Error adding feedback: $error");
+      throw error; // Rethrow the error for error handling in UI
+    }
+  }
+
+  Future<void> addTask({
+    required String studentId,
+    required Map<String, dynamic> taskData,
+  }) async {
+    try {
+      // Reference to the student document
+      DocumentReference studentRef = FirebaseFirestore.instance.collection('Student').doc(studentId);
+
+      // Reference to the collection based on feedback type
+
+      // Add feedback document to the collection
+      await studentRef.collection('Task').add(taskData);
+      print('Task added successfully');
+    } catch (error) {
+      // Handle error
+      print("Error adding Task: $error");
+      throw error; // Rethrow the error for error handling in UI
+    }
+  }
+}
+
+
+
+
 Future<bool> verifyIdToken(String idToken) async {
   try {
-    UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithCustomToken(idToken);
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithCustomToken(idToken);
     User? user = userCredential.user;
     if (user != null) {
       // Token is valid
