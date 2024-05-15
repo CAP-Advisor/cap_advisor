@@ -10,6 +10,7 @@ import 'package:cap_advisor/view/display_feedback_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
 import 'package:cap_advisor/view/instructor_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
+import 'package:cap_advisor/view/post_position_view.dart';
 import 'package:cap_advisor/view/menu_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
 import 'package:cap_advisor/view/student_view.dart';
@@ -94,6 +95,7 @@ class MyApp extends StatelessWidget {
               uid: '',
             ),
         '/home': (context) => HomeView(),
+        'job-and-training-posting':(context)=> PostPositionView(),
         '/menu': (context) => MenuView(),
         '/assign-feedback':(context) => AssigningFeedbackView(),
       },

@@ -48,6 +48,7 @@ dependencies:
   firebase_auth: ^4.19.4
   cloud_firestore: ^4.17.2
   shared_preferences: ^2.0.15
+  multi_dropdown: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
