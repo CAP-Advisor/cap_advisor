@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
     child: MaterialApp(
     title: 'CAP Advisor',
     theme: ThemeData(),
-    home: homeView,
+    home: homeview,
 
         routes: {
         '/login': (context) => LoginView(),
