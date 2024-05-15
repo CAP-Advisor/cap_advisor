@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 
 import '../view/HR_view.dart';
@@ -6,19 +5,26 @@ import '../view/instructor_view.dart';
 import '../view/student_view.dart';
 import '../view/supervisor_view.dart';
 
-StatelessWidget? roleFactory(String ?userType){
+StatelessWidget? roleFactory(String? userType) {
   switch (userType) {
     case 'HR':
-      return HRView();
+      return HRView(
+        uid: '',
+      );
     case 'Supervisor':
-      return  SupervisorView();
+      return SupervisorView(
+        uid: '',
+      );
     case 'Instructor':
-     return InstructorView();
+      return InstructorView(
+        uid: '',
+      );
     case 'Student':
-      return StudentView();
+      return StudentView(
+        uid: '',
+      );
 
     default:
       return null;
   }
-
 }
