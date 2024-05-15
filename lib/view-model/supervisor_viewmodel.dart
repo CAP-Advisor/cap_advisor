@@ -10,10 +10,8 @@ import 'package:flutter/material.dart';
 class SupervisorViewModel extends ChangeNotifier {
   final FirebaseService _firebaseService = FirebaseService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseService _imageService = FirebaseService();
-  final FirebaseService _firestoreService = FirebaseService();
-
   TextEditingController searchController = TextEditingController();
+
   List<Student> students = [];
   List<Student> filteredStudents = [];
   SupervisorModel? currentSupervisor;
@@ -21,17 +19,8 @@ class SupervisorViewModel extends ChangeNotifier {
   String? get supervisorEmail => currentSupervisor?.email;
   String? get supervisorPhotoUrl => currentSupervisor?.photoUrl;
 
-  SupervisorViewModel();
-
-  Future<bool> updateSupervisorName(String newName) async {
-    if (currentSupervisor?.email == null) {
-      print("No email available for the current supervisor.");
-      return false;
-    }
-    await _firebaseService.updateSupervisorName(
-        currentSupervisor!.email!, newName);
-    currentSupervisor?.name = newName;
-    return true;
+  SupervisorViewModel() {
+    loadStudentsForSupervisor();
   }
 
   Future<bool> setCurrentSupervisor() async {
@@ -41,22 +30,17 @@ class SupervisorViewModel extends ChangeNotifier {
         print("No user is currently logged in.");
         return false;
       }
-
-      // Adjusting the query to match based on the 'email' field
       QuerySnapshot querySnapshot = await _firestore
           .collection('Supervisor')
           .where('email', isEqualTo: email)
           .limit(1)
           .get();
-
       if (querySnapshot.docs.isEmpty) {
         print("No supervisor found for email $email");
         return false;
       }
-
       DocumentSnapshot docSnapshot = querySnapshot.docs.first;
       currentSupervisor = SupervisorModel.fromDocSnapshot(docSnapshot);
-
       print(
           "Supervisor set: ${currentSupervisor?.name}, ${currentSupervisor?.email}, ${currentSupervisor?.photoUrl}, ${currentSupervisor?.coverPhotoUrl}");
       return true;
@@ -66,98 +50,51 @@ class SupervisorViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateProfileImage() async {
-    try {
-      String? imageUrl = await _imageService.uploadImage();
-      if (imageUrl == null) {
-        print("Image upload failed or was cancelled.");
-        return false;
-      }
-
-      String userId = FirebaseAuth.instance.currentUser!.uid;
-      DocumentReference supervisorRef =
-          FirebaseFirestore.instance.collection('Supervisor').doc(userId);
-
-      DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
-
-      if (supervisorSnapshot.exists) {
-        await supervisorRef.update({'photoUrl': imageUrl});
-        print("Profile photo updated successfully.");
-        return true;
-      } else {
-        await supervisorRef.set({
-          'photoUrl': imageUrl,
-        });
-        print("Profile photo set successfully in new document.");
-        return true;
-      }
-    } catch (e) {
-      print("Error updating profile image: $e");
+  Future<bool> updateSupervisorName(String newName) async {
+    if (currentSupervisor?.email == null) {
+      print("No email available for the current supervisor.");
+      return false;
+    }
+    bool updateResult = await _firebaseService.updateSupervisorName(
+        currentSupervisor!.email!, newName);
+    if (updateResult) {
+      currentSupervisor?.name = newName;
+      print("Name updated successfully to $newName.");
+      notifyListeners();
+      return true;
+    } else {
+      print("Failed to update name.");
       return false;
     }
   }
 
-  Future<List<Student>> fetchStudentsForSupervisor() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user == null || user.email == null) {
-        print('User not logged in or email is null');
-        return [];
-      }
-      DocumentSnapshot supervisorSnapshot = await _firestore
-          .collection('Supervisor')
-          .where('email', isEqualTo: user.email)
-          .limit(1)
-          .get()
-          .then((snapshot) => snapshot.docs.first);
+  Future<bool> updateSupervisorProfileImage() async {
+    bool result = await _firebaseService.updateProfileImage();
+    if (result) {
+      print("Profile image updated successfully.");
+    } else {
+      print("Failed to update profile image.");
+    }
+    return result;
+  }
 
-      if (!supervisorSnapshot.exists) {
-        print('Supervisor not found');
+  Future<bool> updateSupervisorCoverPhoto() async {
+    bool result = await _firebaseService.updateCoverPhoto();
+    if (result) {
+      print("Cover photo updated successfully.");
+    } else {
+      print("Failed to update cover photo.");
+    }
+    return result;
+  }
 
-        return [];
-      }
-
-      List<dynamic> studentRefs = supervisorSnapshot.get('studentList');
-      List<Student> students = [];
-      for (var ref in studentRefs) {
-        DocumentSnapshot studentSnapshot =
-            await _firestore.collection('Student').doc(ref.id).get();
-        if (studentSnapshot.exists) {
-          students.add(Student.fromFirestore(studentSnapshot));
-        }
-      }
-      return students;
-    } catch (e) {
-      print('Error fetching students: $e');
+  Future<List<Student>> loadStudentsForSupervisor() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.email == null) {
+      print('User not logged in or email is null');
       return [];
     }
-  }
-
-  Future<bool> updateCoverPhoto() async {
-    try {
-      String? imageUrl = await _imageService.uploadImage();
-      if (imageUrl == null) {
-        print("Image upload failed or was cancelled.");
-        return false;
-      }
-
-      String userId = FirebaseAuth.instance.currentUser!.uid;
-      DocumentReference supervisorRef =
-          FirebaseFirestore.instance.collection('Supervisor').doc(userId);
-
-      DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
-      if (supervisorSnapshot.exists) {
-        await supervisorRef.update({'coverPhotoUrl': imageUrl});
-        print("Cover photo updated successfully.");
-        return true;
-      } else {
-        print("Supervisor document does not exist.");
-        return false;
-      }
-    } catch (e) {
-      print("Error updating cover photo: $e");
-      return false;
-    }
+    return await _firebaseService.fetchStudentsForSupervisor(user.email!);
   }
 
   void filterStudents(String query) {
@@ -170,7 +107,7 @@ class SupervisorViewModel extends ChangeNotifier {
             student.email.toLowerCase().contains(query);
       }).toList();
     }
-    notifyListeners(); // Ensures UI updates with the new filtered list
+    notifyListeners();
   }
 
   List<Student> filterStudentsList(List<Student> students, String query) {
@@ -185,6 +122,65 @@ class SupervisorViewModel extends ChangeNotifier {
   }
 
   notifyListeners();
+
+  Future<void> handleProfileAction(BuildContext context, String value) async {
+    switch (value) {
+      case 'view_profile_photo':
+        if (currentSupervisor?.photoUrl != null) {
+          _showImageDialog(
+              context, currentSupervisor!.photoUrl!, 'Profile Photo');
+        }
+        break;
+      case 'view_cover_photo':
+        if (currentSupervisor?.coverPhotoUrl != null) {
+          _showImageDialog(
+              context, currentSupervisor!.coverPhotoUrl!, 'Cover Photo');
+        }
+        break;
+      case 'choose_profile_photo':
+        var result = await updateSupervisorProfileImage();
+        _showSnackBar(context, result, 'Profile photo updated successfully!',
+            'Failed to update profile photo.');
+        break;
+      case 'choose_cover_photo':
+        var result = await updateSupervisorCoverPhoto();
+        _showSnackBar(context, result, 'Cover photo updated successfully!',
+            'Failed to update cover photo.');
+        break;
+    }
+  }
+
+  void _showSnackBar(BuildContext context, bool result, String successMessage,
+      String errorMessage) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(result ? successMessage : errorMessage),
+      ),
+    );
+  }
+
+  void _showImageDialog(BuildContext context, String imageUrl, String title) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Image.network(
+            imageUrl,
+            errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+            fit: BoxFit.contain,
+            width: double.maxFinite,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // Future<List<Student>> fetchStudents() async {
   //   return _firestoreService.fetchStudents("FWxIs1fcI3TnYGjmRQfsbgSuxbn1");

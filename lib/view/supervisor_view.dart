@@ -1,5 +1,6 @@
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../model/student_model.dart';
 import '../view-model/supervisor_viewmodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,14 +55,13 @@ class SupervisorView extends StatelessWidget {
                   controller: _viewModel.searchController,
                   onChanged: (value) {
                     _viewModel.filterStudents(value);
-                    _viewModel.notifyListeners();
                   },
                 ),
               ),
               SizedBox(height: 20),
               Expanded(
                 child: FutureBuilder<List<Student>>(
-                  future: _viewModel.fetchStudentsForSupervisor(),
+                  future: _viewModel.loadStudentsForSupervisor(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
@@ -120,46 +120,8 @@ class SupervisorView extends StatelessWidget {
             right: 16,
             bottom: 16,
             child: PopupMenuButton<String>(
-              onSelected: (String value) async {
-                switch (value) {
-                  case 'view_profile_photo':
-                    if (_viewModel.currentSupervisor?.photoUrl != null) {
-                      _showImageDialog(
-                          context,
-                          _viewModel.currentSupervisor!.photoUrl!,
-                          'Profile Photo');
-                    }
-                    break;
-                  case 'view_cover_photo':
-                    if (_viewModel.currentSupervisor?.coverPhotoUrl != null) {
-                      _showImageDialog(
-                          context,
-                          _viewModel.currentSupervisor!.coverPhotoUrl!,
-                          'Cover Photo');
-                    }
-                    break;
-                  case 'choose_profile_photo':
-                    bool result = await _viewModel.updateProfileImage();
-                    if (result) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content:
-                              Text('Profile photo updated successfully!')));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Failed to update profile photo.')));
-                    }
-                    break;
-                  case 'choose_cover_photo':
-                    bool result = await _viewModel.updateCoverPhoto();
-                    if (result) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Cover photo updated successfully!')));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Failed to update cover photo.')));
-                    }
-                    break;
-                }
+              onSelected: (String value) {
+                _viewModel.handleProfileAction(context, value);
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                 const PopupMenuItem<String>(
@@ -183,31 +145,8 @@ class SupervisorView extends StatelessWidget {
                 backgroundColor: Colors.grey[800],
                 child: const Icon(Icons.add_a_photo, color: Colors.white),
               ),
-            )),
+            ))
       ],
-    );
-  }
-
-  void _showImageDialog(BuildContext context, String imageUrl, String title) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Image.network(
-            imageUrl,
-            errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
-            fit: BoxFit.contain,
-            width: double.maxFinite,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Close'),
-            ),
-          ],
-        );
-      },
     );
   }
 

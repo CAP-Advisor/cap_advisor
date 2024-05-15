@@ -182,6 +182,37 @@ class FirebaseService {
     }
   }
 
+  Future<List<Student>> fetchStudentsForSupervisor(
+      String supervisorEmail) async {
+    try {
+      QuerySnapshot supervisorQuery = await _firestore
+          .collection('Supervisor')
+          .where('email', isEqualTo: supervisorEmail)
+          .limit(1)
+          .get();
+
+      if (supervisorQuery.docs.isEmpty) {
+        print('Supervisor not found');
+        return [];
+      }
+
+      DocumentSnapshot supervisorSnapshot = supervisorQuery.docs.first;
+      List<dynamic> studentRefs = supervisorSnapshot['studentList'] ?? [];
+      List<Student> students = [];
+      for (String studentId in studentRefs) {
+        DocumentSnapshot studentSnapshot =
+            await _firestore.collection('Student').doc(studentId).get();
+        if (studentSnapshot.exists) {
+          students.add(Student.fromFirestore(studentSnapshot));
+        }
+      }
+      return students;
+    } catch (e) {
+      print('Error fetching students: $e');
+      return [];
+    }
+  }
+
   Future<String> getHashedPassword(String email) async {
     try {
       DocumentSnapshot snapshot = await _firestore
@@ -268,7 +299,7 @@ class FirebaseService {
     }
   }
 
-  Future<void> updateSupervisorName(String email, String newName) async {
+  Future<bool> updateSupervisorName(String email, String newName) async {
     try {
       QuerySnapshot query = await _firestore
           .collection('Supervisor')
@@ -278,11 +309,14 @@ class FirebaseService {
       if (query.docs.isNotEmpty) {
         await query.docs.first.reference.update({'name': newName});
         print("Updated supervisor name for email $email to $newName");
+        return true;
       } else {
         print("No supervisor found with email $email to update");
+        return false;
       }
     } catch (e) {
       print("Error updating supervisor name by email: $e");
+      return false;
     }
   }
 
@@ -302,6 +336,65 @@ class FirebaseService {
       }
     } else {
       return null;
+    }
+  }
+
+  Future<bool> updateProfileImage() async {
+    try {
+      String? imageUrl = await uploadImage();
+      if (imageUrl == null) {
+        print("Image upload failed or was cancelled.");
+        return false;
+      }
+
+      String userId = _auth.currentUser!.uid;
+      DocumentReference supervisorRef =
+          _firestore.collection('Supervisor').doc(userId);
+
+      DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
+
+      if (supervisorSnapshot.exists) {
+        await supervisorRef.update({'photoUrl': imageUrl});
+        print("Profile photo updated successfully.");
+        return true;
+      } else {
+        await supervisorRef.set({
+          'photoUrl': imageUrl,
+        }, SetOptions(merge: true));
+        print("Profile photo set successfully in new document.");
+        return true;
+      }
+    } catch (e) {
+      print("Error updating profile image: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateCoverPhoto() async {
+    try {
+      String? imageUrl = await uploadImage();
+      if (imageUrl == null) {
+        print("Image upload failed or was cancelled.");
+        return false;
+      }
+
+      String userId = _auth.currentUser!.uid;
+      DocumentReference supervisorRef =
+          _firestore.collection('Supervisor').doc(userId);
+
+      DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
+
+      if (supervisorSnapshot.exists) {
+        await supervisorRef.update({'coverPhotoUrl': imageUrl});
+        print("Cover photo updated successfully.");
+        return true;
+      } else {
+        print("Supervisor document does not exist.");
+        return false;
+      }
+    } catch (e) {
+      print("Error updating cover photo: $e");
+      return false;
     }
   }
 }
