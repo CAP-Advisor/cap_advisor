@@ -60,9 +60,28 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> submitFeedback() async {
+  Future<void> submitFeedback(BuildContext context) async {
     if (formKey.currentState!.validate()) {
+      // Check if any field or dropdown is empty or null
+      if (selectedFeedbackType == null ||
+          (selectedFeedbackType == "Task Feedback" &&
+              (selectedTaskTitle == null ||
+                  taskFeedbackController.text.isEmpty)) ||
+          (selectedFeedbackType == "Final Feedback" &&
+              (finalFeedbackController.text.isEmpty ||
+                  selectedTraining == null))) {
+        // Show snackbar if any field or dropdown is empty or null
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Please fill all fields'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return; // Exit early if any field is empty or null
+      }
+
       try {
+        // Proceed with feedback submission
         String feedbackTypeCollection =
         selectedFeedbackType == 'Task Feedback' ? 'Task' : 'Training';
         if (selectedFeedbackType == 'Task Feedback') {
@@ -93,6 +112,12 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
         }
 
         // Feedback added successfully
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Feedback Added Successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
         // You may navigate back or show a confirmation message
       } catch (error) {
         // Handle error
@@ -100,7 +125,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       }
     }
   }
-
   Future<void> updateFeedback({
     required String studentId,
     required String feedbackType,
@@ -142,6 +166,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       return '';
     }
   }
+
   void updateSelectedFeedbackType(String? newValue) {
     selectedFeedbackType = newValue;
     feedbackText = newValue == "Task Feedback" ? "Task Feedback" : "Final Feedback";
@@ -149,5 +174,4 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
     selectedTraining = null;
     notifyListeners(); // Notify listeners to update the UI
   }
-
 }

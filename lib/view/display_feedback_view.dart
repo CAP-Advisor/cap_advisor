@@ -101,7 +101,9 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
                   SizedBox(height: 30),
                 ],
                 CustomButton(
-                  onPressed: widget.viewModel.submitFeedback,
+                  onPressed: () {
+                    widget.viewModel.submitFeedback(context);
+                  },
                   text: "Submit",
                 ),
               ],
