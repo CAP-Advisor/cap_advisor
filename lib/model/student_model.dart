@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+  import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Student {
   final String name;
@@ -6,6 +6,7 @@ class Student {
   final String major;
   final String additionalInfo;
   final String uid;
+  bool isApproved = false;
 
   Student({
     required this.name,
