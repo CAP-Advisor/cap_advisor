@@ -16,6 +16,13 @@ class FirebaseService {
   final ImagePicker _picker = ImagePicker();
   final storage = const FlutterSecureStorage();
 
+  User? get currentUser => _auth.currentUser;
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile(
+      String uid) async {
+    return await _firestore.collection('Users').doc(uid).get();
+  }
+
   Future<String?> generateCustomToken(String uid) async {
     try {
       User? user = _auth.currentUser;

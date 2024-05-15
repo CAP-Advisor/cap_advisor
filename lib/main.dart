@@ -10,6 +10,7 @@ import 'package:cap_advisor/view/display_feedback_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
 import 'package:cap_advisor/view/instructor_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
+import 'package:cap_advisor/view/menu_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:cap_advisor/view/supervisor_view.dart';
@@ -77,19 +78,23 @@ class MyApp extends StatelessWidget {
     title: 'CAP Advisor',
     theme: ThemeData(),
     home: homeView,
-
         routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
-        '/HR': (context) => HRView(),
+        '/HR': (context) => HRView(
+          uid: '',
+        ),
         '/Supervisor': (context) => SupervisorView(
               uid: '',
             ),
-        '/Instructor': (context) => InstructorView(),
+'/Instructor': (context) => InstructorView(
+              uid: '',
+            ),
         '/Student': (context) => StudentView(
               uid: '',
             ),
         '/home': (context) => HomeView(),
+        '/menu': (context) => MenuView(),
         '/assign-feedback':(context) => AssigningFeedbackView(),
       },
     );

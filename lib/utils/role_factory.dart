@@ -8,13 +8,17 @@ import '../view/supervisor_view.dart';
 StatelessWidget? roleFactory(String? userType) {
   switch (userType) {
     case 'HR':
-      return HRView();
+      return HRView(
+        uid: '',
+      );
     case 'Supervisor':
       return SupervisorView(
         uid: '',
       );
     case 'Instructor':
-      return InstructorView();
+      return InstructorView(
+        uid: '',
+      );
     case 'Student':
       return StudentView(
         uid: '',

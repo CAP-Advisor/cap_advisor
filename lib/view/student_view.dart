@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:cap_advisor/view/student_skills_view.dart';
 import 'package:cap_advisor/view/student_experience_view.dart';
 import 'package:provider/provider.dart';
-
 import '../view-model/student_viewmodel.dart';
 import 'login_view.dart';
 
 class StudentView extends StatelessWidget {
   final String uid;
-
   const StudentView({Key? key, required this.uid}) : super(key: key);
 
   @override

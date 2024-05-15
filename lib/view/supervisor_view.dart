@@ -26,10 +26,7 @@ class SupervisorView extends StatelessWidget {
         onNotificationPressed: () {},
         onFeedback: () {},
         onMenuPressed: () {
-          //Navigator.of(context).pushNamed('/menu');
-          FirebaseAuth.instance.signOut();
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => LoginView()));
+          Navigator.of(context).pushNamed('/menu');
         },
       ),
       body: FutureBuilder<bool>(
