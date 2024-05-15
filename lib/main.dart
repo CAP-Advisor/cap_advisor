@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CAP Advisor',
       theme: ThemeData(),
-      home: PostPositionView() ,
+      home: homeView,
       routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),

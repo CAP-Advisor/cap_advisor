@@ -5,6 +5,7 @@ import 'package:cap_advisor/widgets/custom_text_field.dart';
 import 'package:cap_advisor/widgets/custom_appbar.dart';
 import 'package:cap_advisor/widgets/custom_submit_button.dart';
 import 'package:cap_advisor/view-model/post_position_viewmodel.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 
 class PostPositionView extends StatefulWidget {
   PostPositionView({
@@ -20,7 +21,14 @@ class _PostPositionViewState extends State<PostPositionView> {
   TextEditingController positionDescriptionController = TextEditingController();
   List<String>? selectedSkills = [];
   PostPositionViewModel viewModel = PostPositionViewModel();
-  bool _isLoading = false; // Add a loading indicator
+  bool _isLoading = false;
+  String hrId='';
+
+  // Method to get the HR ID
+  Future<String?> getHrId() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    return user?.uid; // Assuming the HR ID is the user's UID
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,21 +140,27 @@ class _PostPositionViewState extends State<PostPositionView> {
                     _isLoading = true; // Show loading indicator
                   });
                   try {
-                    await viewModel.savePosition(
-                        positionTitleController.text,
-                        positionDescriptionController.text,
-                        selectedSkills);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Position saved successfully'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    //String? hrId = await getHrId(); // Get HR ID
+                    if (hrId != null) {
+                      await viewModel.savePosition(
+                          positionTitleController.text,
+                          positionDescriptionController.text,
+                          selectedSkills,
+                          hrId);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Position saved successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      throw Exception('HR ID not found');
+                    }
                   } catch (error) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
-                            'Failed to save position make sure to fill all fields'),
+                            'Failed to save position: ${error.toString()}'),
                         backgroundColor: Colors.red,
                       ),
                     );

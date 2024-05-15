@@ -23,7 +23,7 @@ class PostPositionViewModel {
   }
 
   Future<void> savePosition(String positionTitle, String positionDescription,
-      List<String>? skills) async {
+      List<String>? skills, String hrId) async {
     String positionType = model.positionType ?? '';
     model.positionTitle = positionTitle;
     model.positionDescription = positionDescription;
@@ -31,10 +31,10 @@ class PostPositionViewModel {
     String? collectionName;
 
     try {
-      if(model.positionType=="Job Position")
-        collectionName=model.positionType;
-      else if(model.positionType=='Training')
-        collectionName=model.positionType;
+      if (model.positionType == "Job Position")
+        collectionName = model.positionType;
+      else if (model.positionType == 'Training')
+        collectionName = model.positionType;
       collectionName ??= '';
       positionTitle ??= '';
       positionDescription ?? '';
@@ -42,6 +42,7 @@ class PostPositionViewModel {
         'title': model.positionTitle,
         'description': model.positionDescription,
         'skills': model.skillList,
+        'hrId': hrId, // Add HR ID field
       });
       // Reset model fields after saving
       model.positionTitle = '';
