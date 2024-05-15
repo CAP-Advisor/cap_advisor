@@ -64,7 +64,7 @@ class _AssigningFeedbackViewState extends State<AssigningFeedbackView> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  StudentView(studentId: feedback.uid),
+                                  StudentView( uid:feedback.uid),
                             ),
                           );
                         },

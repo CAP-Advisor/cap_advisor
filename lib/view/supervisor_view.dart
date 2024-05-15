@@ -24,7 +24,9 @@ class SupervisorView extends StatelessWidget {
       appBar: CustomAppBar(
         title: "CAP Advisor",
         onNotificationPressed: () {},
-        onFeedback: () {},
+        onFeedback: () {
+          Navigator.of(context).pushNamed('/assign-feedback');
+        },
         onMenuPressed: () {
           Navigator.of(context).pushNamed('/menu');
         },
@@ -208,10 +210,10 @@ class SupervisorView extends StatelessWidget {
             subtitle: Text(student.email),
             trailing: ElevatedButton(
               onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => AddTaskView(studentId:student.uid,studentName:student.name)),
-                // );
+                 Navigator.push(
+                   context,
+                  MaterialPageRoute(builder: (context) => AddTaskView(studentId:student.uid,studentName:student.name)),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF164863),

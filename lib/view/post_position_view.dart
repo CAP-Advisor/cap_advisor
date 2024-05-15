@@ -140,7 +140,7 @@ class _PostPositionViewState extends State<PostPositionView> {
                     _isLoading = true; // Show loading indicator
                   });
                   try {
-                    //String? hrId = await getHrId(); // Get HR ID
+                    String? hrId = await getHrId(); // Get HR ID
                     if (hrId != null) {
                       await viewModel.savePosition(
                           positionTitleController.text,

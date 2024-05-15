@@ -17,7 +17,7 @@ class AssigningFeedbackViewModel extends ChangeNotifier {
     User? user = FirebaseAuth.instance.currentUser;
     String supervisorId = user!.uid;
     List<Student> students =
-        await FirebaseService().fetchStudents(supervisorId);
+        await FirebaseService().fetchStudentsId(supervisorId);
     feedbacks = students
         .map((student) => AssigningFeedbackModel(
               studentName: student.name,

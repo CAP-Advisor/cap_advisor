@@ -1,27 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
- /* factory Supervisor.fromMap(String id, Map<String, dynamic> map) {
-    return Supervisor(
-      id: id,
-      name: map['name'] ?? '',
-      email: map['email'] ?? '',
-      hrId: map['hrId'] ?? '',
-      studentList: List<String>.from(map['studentList'] ?? []),
-    );
-  }*/
 
- /* Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'email': email,
-      'studentList': studentList,
-      'hrId': hrId,
-    };
-  }*/
-
-  /*factory Supervisor.fromFirestore(DocumentSnapshot doc) {
-    return Supervisor.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-  }*/
 class SupervisorModel {
   String name;
   final String email;
@@ -54,4 +33,27 @@ class SupervisorModel {
       studentList: List<String>.from(data['studentList'] ?? []),
     );
   }
+  factory SupervisorModel.fromMap(String id, Map<String, dynamic> map) {
+    return SupervisorModel(
+      uid: id,
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+      hrId: map['hrId'] ?? '',
+      studentList: List<String>.from(map['studentList'] ?? []),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'email': email,
+      'studentList': studentList,
+      'hrId': hrId,
+    };
+  }
+
+  factory SupervisorModel.fromFirestore(DocumentSnapshot doc) {
+    return SupervisorModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+  }
+
 }

@@ -152,18 +152,6 @@ class FirebaseService {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
-  Future<List<Student>> fetchStudents(String supervisorId) async {
-    try {
-      QuerySnapshot querySnapshot =
-          await _firestore.collection('Student').get();
-      List<Student> students =
-          querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
-      return students;
-    } catch (e) {
-      print('Error fetching students: $e');
-      return [];
-    }
-  }
 
   Future<List<Student>> fetchStudentsId(String supervisorId) async {
     try {
@@ -320,9 +308,7 @@ class FirebaseService {
       } else {
         print("No supervisor found with email $email to update");
         return false;
-
       }
-      return null;
     } catch (e) {
       print("Error updating supervisor name by email: $e");
       return false;
@@ -406,12 +392,7 @@ class FirebaseService {
       return false;
     }
   }
-}
 
-      print('Error fetching student data: $e');
-      return null;
-    }
-  }
   Future<void> addFeedback({
     required String studentId,
     required String feedbackType,
@@ -419,10 +400,12 @@ class FirebaseService {
   }) async {
     try {
       // Reference to the student document
-      DocumentReference studentRef = FirebaseFirestore.instance.collection('Student').doc(studentId);
+      DocumentReference studentRef =
+          FirebaseFirestore.instance.collection('Student').doc(studentId);
 
       // Reference to the collection based on feedback type
-      CollectionReference feedbackCollection = studentRef.collection(feedbackType);
+      CollectionReference feedbackCollection =
+          studentRef.collection(feedbackType);
 
       // Add feedback document to the collection
       await feedbackCollection.add(feedbackData);
@@ -441,7 +424,8 @@ class FirebaseService {
   }) async {
     try {
       // Reference to the student document
-      DocumentReference studentRef = FirebaseFirestore.instance.collection('Student').doc(studentId);
+      DocumentReference studentRef =
+          FirebaseFirestore.instance.collection('Student').doc(studentId);
 
       // Reference to the collection based on feedback type
 
@@ -456,12 +440,10 @@ class FirebaseService {
   }
 }
 
-
-
-
 Future<bool> verifyIdToken(String idToken) async {
   try {
-    UserCredential userCredential = await FirebaseAuth.instance.signInWithCustomToken(idToken);
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCustomToken(idToken);
     User? user = userCredential.user;
     if (user != null) {
       // Token is valid

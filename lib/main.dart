@@ -73,7 +73,7 @@ class MyApp extends StatelessWidget {
     child: MaterialApp(
     title: 'CAP Advisor',
     theme: ThemeData(),
-    home: homeView,
+    home: PostPositionView(),
         routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
@@ -94,6 +94,7 @@ class MyApp extends StatelessWidget {
         '/menu': (context) => MenuView(),
         '/assign-feedback':(context) => AssigningFeedbackView(),
       },
+    ),
     );
   }
 }

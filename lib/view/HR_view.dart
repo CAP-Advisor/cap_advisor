@@ -8,6 +8,8 @@ import '../view-model/HR_viewmodel.dart';
 class HRView extends StatefulWidget {
   @override
   _HRViewState createState() => _HRViewState();
+  final String uid;
+  const HRView({Key? key, required this.uid}) : super(key: key);
 }
 
 class _HRViewState extends State<HRView> {
@@ -209,7 +211,7 @@ class _HRViewState extends State<HRView> {
   Widget _buildToggleButton(String text, PositionType positionType, HRViewModel model) {
     bool isSelected = model.currentType == positionType;
     return Container(
-      width: 250,
+      width: 220,
       height: 52,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(9),

@@ -33,7 +33,7 @@ class PostPositionViewModel {
     try {
       if (model.positionType == "Job Position")
         collectionName = model.positionType;
-      else if (model.positionType == 'Training')
+      else if (model.positionType == 'Training Position')
         collectionName = model.positionType;
       collectionName ??= '';
       positionTitle ??= '';

@@ -5,7 +5,7 @@ import '../model/supervisor_model.dart';
 
 class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
   List<Student> applicants = [];
-  List<Supervisor> supervisors = [];
+  List<SupervisorModel> supervisors = [];
   List<Student> filteredApplicants = [];
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -67,7 +67,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
           .where('hrId', isEqualTo: hrId)
           .get();
       supervisors =
-          snapshot.docs.map((doc) => Supervisor.fromFirestore(doc)).toList();
+          snapshot.docs.map((doc) => SupervisorModel.fromFirestore(doc)).toList();
       notifyListeners();
     }
   }
@@ -92,11 +92,11 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
 
   Future<void> rejectApplicant(int index) async {
     final student = filteredApplicants[index];
-    applicants.removeWhere((applicant) => applicant.id == student.id);
+    applicants.removeWhere((applicant) => applicant.uid == student.uid);
     filteredApplicants.removeAt(index);
 
-    await _updateApplicantInCollection('Training', student.id);
-    await _updateApplicantInCollection('Job Position', student.id);
+    await _updateApplicantInCollection('Training', student.uid);
+    await _updateApplicantInCollection('Job Position', student.uid);
 
     notifyListeners();
   }
@@ -131,12 +131,12 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
   }
 
   Future<void> _assignStudentToSupervisor(
-      int applicantIndex, Supervisor supervisor) async {
+      int applicantIndex, SupervisorModel supervisor) async {
     final student = filteredApplicants[applicantIndex];
-    final supervisorRef = _db.collection('Supervisor').doc(supervisor.id);
+    final supervisorRef = _db.collection('Supervisor').doc(supervisor.uid);
 
     await supervisorRef.update({
-      'studentList': FieldValue.arrayUnion([student.id])
+      'studentList': FieldValue.arrayUnion([student.uid])
     });
 
     notifyListeners();
