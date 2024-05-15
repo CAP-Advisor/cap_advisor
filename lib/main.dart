@@ -74,6 +74,7 @@ class MyApp extends StatelessWidget {
         '/Instructor': (context) => InstructorView(),
         '/Student': (context) => StudentView(),
         '/home': (context) => HomeView(),
+        'job-and-training-posting':(context)=> PostPositionView(),
       },
 
     );
