@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 class ResetPasswordViewModel {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool showWarning = false;
@@ -20,7 +21,9 @@ class ResetPasswordViewModel {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password reset email sent.'), backgroundColor: Colors.green),
+        const SnackBar(
+            content: Text('Password reset email sent.'),
+            backgroundColor: Colors.green),
       );
     } catch (error) {
       String errorMessage = 'An error occurred';

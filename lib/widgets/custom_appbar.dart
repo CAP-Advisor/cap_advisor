@@ -18,14 +18,39 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
   @override
   Widget build(BuildContext context) {
+    List<Widget> actions = [];
+
+    if (onFeedback != null) {
+      actions.add(
+        IconButton(
+          icon: Icon(Icons.feedback),
+          onPressed: onFeedback!,
+          color: Colors.white,
+        ),
+      );
+    }
+
+    actions.addAll([
+      IconButton(
+        icon: Icon(Icons.notifications),
+        onPressed: onNotificationPressed,
+        color: Colors.white,
+      ),
+      IconButton(
+        icon: Icon(Icons.menu),
+        onPressed: onMenuPressed,
+        color: Colors.white,
+      ),
+    ]);
+
     return AppBar(
       backgroundColor: Color(0xFF164863),
       leading: onBack != null
           ? IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: onBack,
-        color: Colors.white,
-      )
+              icon: Icon(Icons.arrow_back),
+              onPressed: onBack,
+              color: Colors.white,
+            )
           : null,
       title: Text(
         title,
@@ -36,23 +61,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: Colors.white,
         ),
       ),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.notifications),
-          onPressed: onNotificationPressed,
-          color: Colors.white,
-        ),
-        IconButton(
-          icon: Icon(Icons.feedback),
-          onPressed: onFeedback,
-          color: Colors.white,
-        ),
-        IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: onMenuPressed,
-          color: Colors.white,
-        ),
-      ],
+      actions: actions,
     );
   }
 }

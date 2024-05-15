@@ -24,12 +24,17 @@ class AddTaskView extends StatelessWidget {
         builder: (context, model, _) {
           return Scaffold(
             appBar: CustomAppBar(
-              title: 'CAP Advisor',
+              title: 'ADD TASK',
               onBack: () {
                 Navigator.of(context).pop();
               },
+              onFeedback: (){
+                Navigator.of(context).pushNamed('/assign-feedback');
+              },
               onNotificationPressed: () {},
-              onMenuPressed: () {},
+              onMenuPressed: () {
+                Navigator.of(context).pushNamed('/menu');
+              },
             ),
             body: SingleChildScrollView(
               padding: EdgeInsets.all(20),
@@ -37,18 +42,7 @@ class AddTaskView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: 20),
-                  Center(
-                    child: Text(
-                      "ADD TASK",
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 40,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF9A9A9A),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 40),
                   CustomTextField(
                     hintText: "Task Title",
                     controller: model.taskTitleController,
@@ -57,7 +51,7 @@ class AddTaskView extends StatelessWidget {
                     isValid: !model.showTitleError,
                     showError: model.showTitleError,
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 40),
                   CustomTextField(
                     hintText: "Task Description",
                     controller: model.taskDescriptionController,
@@ -66,12 +60,12 @@ class AddTaskView extends StatelessWidget {
                     isValid: !model.showDescriptionError,
                     showError: model.showDescriptionError,
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 40),
                   CustomDeadline(
                     model: model,
                     showError: model.showDeadlineError,
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 50),
                   CustomButton(
                     onPressed: () => model.addTask(context,studentId),
                     text: "Submit",

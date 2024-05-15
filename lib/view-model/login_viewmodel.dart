@@ -14,15 +14,12 @@ class LoginViewModel {
   String userType = '';
   final storage = const FlutterSecureStorage();
 
-
   void redirectUser(BuildContext context, String? userType) {
     var requestedView = roleFactory(userType);
     if (requestedView != null) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => requestedView));
-    }
-
-    else {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Unknown user type')),
       );
@@ -40,8 +37,8 @@ class LoginViewModel {
         return null;
       }
 
-      bool isLoginSuccessful = await _firebaseService
-          .signInWithEmailAndPassword(email, password);
+      bool isLoginSuccessful =
+          await _firebaseService.signInWithEmailAndPassword(email, password);
       if (!isLoginSuccessful) {
         print('Authentication failed');
         return null;
@@ -54,8 +51,8 @@ class LoginViewModel {
         if (token != null) {
           print('Login Successful! Token: $token');
 
-          Map<String, dynamic>? userdata = await _firebaseService.getUserData(
-              email);
+          Map<String, dynamic>? userdata =
+              await _firebaseService.getUserData(email);
           userObj = FireBaseUser.fromMap(userdata!);
           // await storage.write(key: 'session_token', value: token);
           return userObj;
@@ -76,5 +73,4 @@ class LoginViewModel {
   void setPassword(String? password) {
     model.password = password;
   }
-
 }

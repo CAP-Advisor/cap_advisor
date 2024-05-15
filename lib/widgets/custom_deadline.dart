@@ -24,9 +24,11 @@ class CustomDeadline extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: showError ? Colors.red.withOpacity(0.2) : Color(0xFFF5F8F9),
+              color:
+                  showError ? Colors.red.withOpacity(0.2) : Color(0xFFF5F8F9),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: showError ? Colors.red : Colors.transparent),
+              border: Border.all(
+                  color: showError ? Colors.red : Colors.transparent),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

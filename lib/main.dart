@@ -73,7 +73,7 @@ class MyApp extends StatelessWidget {
     child: MaterialApp(
     title: 'CAP Advisor',
     theme: ThemeData(),
-    home: PostPositionView(),
+    home: AddTaskView(studentName: '', studentId: '',),
         routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
@@ -93,6 +93,7 @@ class MyApp extends StatelessWidget {
         'job-and-training-posting':(context)=> PostPositionView(),
         '/menu': (context) => MenuView(),
         '/assign-feedback':(context) => AssigningFeedbackView(),
+          '/add-task':(context) => AddTaskView(studentId: '', studentName: ''),
       },
     ),
     );

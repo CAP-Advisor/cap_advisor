@@ -16,14 +16,15 @@ class ResetPasswordView extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
-          tooltip: 'Back',  // Tooltip added for better accessibility
+          tooltip: 'Back', // Tooltip added for better accessibility
         ),
       ),
       body: Container(
         padding: EdgeInsets.all(20),
         child: Form(
           key: viewModel.formKey,
-          child: SingleChildScrollView(  // Use SingleChildScrollView to avoid overflow when keyboard appears
+          child: SingleChildScrollView(
+            // Use SingleChildScrollView to avoid overflow when keyboard appears
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -49,7 +50,8 @@ class ResetPasswordView extends StatelessWidget {
                   onSaved: (value) => viewModel.email = value!,
                 ),
                 SizedBox(height: 20),
-                Center( // Wrap ElevatedButton with Center widget
+                Center(
+                  // Wrap ElevatedButton with Center widget
                   child: ElevatedButton(
                     onPressed: () => viewModel.validateAndSubmit(context),
                     child: Text(
@@ -57,7 +59,8 @@ class ResetPasswordView extends StatelessWidget {
                       style: TextStyle(fontSize: 18),
                     ),
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Color(0xFF427D9D),
+                      foregroundColor: Colors.white,
+                      backgroundColor: Color(0xFF427D9D),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -83,4 +86,3 @@ void main() async {
   // Run the app
   runApp(MaterialApp(home: ResetPasswordView()));
 }
-
