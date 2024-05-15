@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cap_advisor/view/student_skills_view.dart';
 import 'package:cap_advisor/view/student_experience_view.dart';
+import 'package:provider/provider.dart';
+import '../view-model/student_viewmodel.dart';
 import 'login_view.dart';
 
 class StudentView extends StatelessWidget {
@@ -10,15 +12,28 @@ class StudentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            _buildProfilePictureSection(context),
-            _buildInfoSection(context),
-          ],
-        ),
+    return ChangeNotifierProvider<StudentViewModel>(
+      create: (_) => StudentViewModel(uid: uid)..getStudentData(),
+      child: Consumer<StudentViewModel>(
+        builder: (context, model, child) {
+          if (model.studentData == null) {
+            return Scaffold(
+              appBar: _buildAppBar(context),
+              body: CircularProgressIndicator(),
+            );
+          }
+          return Scaffold(
+            appBar: _buildAppBar(context),
+            body: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  _buildProfilePictureSection(context),
+                  _buildInfoSection(context, model.studentData!),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -121,14 +136,17 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoSection(BuildContext context) {
+  Widget _buildInfoSection(
+      BuildContext context, Map<String, dynamic> studentData) {
     return Padding(
       padding: const EdgeInsets.only(top: 80.0, left: 20, right: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _editableTextRow("Student Name", Icons.edit, context),
-          _editableTextRow("Email", Icons.edit, context),
+          _editableTextRow("Student Name", Icons.edit,
+              studentData['name'] ?? 'Not Available', context),
+          _editableTextRow("Email", Icons.edit,
+              studentData['email'] ?? 'Not Available', context),
           const SizedBox(height: 20),
           _buildTextFieldRow(
               Icons.edit, 'Enter your GitHub URL', 14, FontWeight.w500),
@@ -146,11 +164,12 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  Widget _editableTextRow(String label, IconData icon, BuildContext context) {
+  Widget _editableTextRow(
+      String label, IconData icon, String value, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label,
+        Text(value,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
         IconButton(
           icon: Icon(icon, color: Colors.black),
