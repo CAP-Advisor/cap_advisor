@@ -36,27 +36,22 @@ void main() async {
 
   FirebaseAuth auth = FirebaseAuth.instance;
   var user = auth.currentUser;
-  if (user != null) {
+  bool isAuthenticated = user != null;
+
+  String? userType;
+  if (isAuthenticated) {
     FirebaseService firebaseService = FirebaseService();
-    var userMap = await firebaseService.getUserData(user.email!);
+    var userMap = await firebaseService.getUserData(user!.email!);
     if (userMap != null) {
       var userObj = FireBaseUser.fromMap(userMap);
-      runApp(MyApp(
-        isAuthenticated: true,
-        userType: userObj.userType,
-      ));
-    } else {
-      runApp(const MyApp(
-        isAuthenticated: false,
-        userType: null,
-      ));
+      userType = userObj.userType;
     }
-  } else {
-    runApp(const MyApp(
-      isAuthenticated: false,
-      userType: null,
-    ));
   }
+
+  runApp(MyApp(
+    isAuthenticated: isAuthenticated,
+    userType: userType,
+  ));
 }
 
 class MyApp extends StatelessWidget {
