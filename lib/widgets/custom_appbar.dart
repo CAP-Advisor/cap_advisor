@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final VoidCallback onBack;
+  final VoidCallback? onBack;
   final VoidCallback onNotificationPressed;
   final VoidCallback onMenuPressed;
   const CustomAppBar({
     Key? key,
     required this.title,
-    required this.onBack,
+    this.onBack,
     required this.onNotificationPressed,
     required this.onMenuPressed,
   }) : super(key: key);
@@ -17,11 +17,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Color(0xFF164863),
-      leading: IconButton(
+      leading: onBack != null
+          ? IconButton(
         icon: Icon(Icons.arrow_back),
         onPressed: onBack,
         color: Colors.white,
-      ),
+      )
+          : null,
       title: Text(
         title,
         style: TextStyle(
