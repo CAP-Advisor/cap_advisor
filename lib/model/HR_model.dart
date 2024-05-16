@@ -1,7 +1,7 @@
 class HR {
   String companyName;
   String email;
-  List<String> jobsList;
+  List<String>? jobsList;
   String name;
   String userType;
   String password;
@@ -11,7 +11,7 @@ class HR {
     required this.companyName,
     required this.email,
     required this.password,
-    required this.jobsList,
+    this.jobsList,
     required this.userType,
   });
 }

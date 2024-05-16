@@ -35,8 +35,11 @@ dependencies:
   flutter_native_splash: ^1.2.0
   flutter_secure_storage: ^5.0.2
   firebase_admin: ^0.2.0
+  image_picker: ^1.1.1
+  firebase_storage: ^11.7.5
+  syncfusion_flutter_datepicker: ^25.2.3
 
-
+  flutter_svg: ^1.0.3  # Check for the latest version on pub.dev
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
@@ -44,6 +47,7 @@ dependencies:
   firebase_auth: ^4.19.4
   cloud_firestore: ^4.17.2
   shared_preferences: ^2.0.15
+  multi_dropdown: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -8,6 +8,7 @@ class CustomTextField extends StatefulWidget {
   final bool isValid;
   final bool showError;
   final TextInputType? keyboardType;
+  final bool readOnly;
   final bool obscureText;
 
   const CustomTextField({
@@ -18,6 +19,7 @@ class CustomTextField extends StatefulWidget {
     required this.isValid,
     this.showError = false,
     this.keyboardType,
+    this.readOnly = false,
     this.obscureText = false,
   });
 
@@ -36,6 +38,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           onChanged: widget.onChanged,
           keyboardType: widget.keyboardType,
           obscureText: widget.obscureText,
+          readOnly: widget.readOnly,
           decoration: InputDecoration(
             hintText: widget.hintText,
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 22),

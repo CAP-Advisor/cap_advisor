@@ -102,18 +102,17 @@ class _LoginViewState extends State<LoginView> {
                         String password = passwordController.text.trim();
                         viewModel.login(email, password).then((user) {
                           if (user != null) {
-                            viewModel.redirectUser(
-                                context, user.userType); // Redirect based on userType
+                            viewModel.redirectUser(context,
+                                user.userType); // Redirect based on userType
                           } else {
                             setState(() {
                               loginError =
-                              'Failed to login. Please check your credentials.';
+                                  'Failed to login. Please check your credentials.';
                             });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(loginError!),
-                                  backgroundColor: Colors.red,
-                                ));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(loginError!),
+                              backgroundColor: Colors.red,
+                            ));
                           }
                         });
                       }
@@ -132,6 +131,7 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
+
   Widget forgotPasswordButton(BuildContext context) {
     return Center(
       child: TextButton(

@@ -1,16 +1,45 @@
-class Supervisor {
-  final String name;
-  final String email;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-  Supervisor({
+
+class SupervisorModel {
+  String name;
+  final String email;
+  final String uid;
+  final String? photoUrl;
+  final String? coverPhotoUrl;
+  final List<String>? studentList;
+  final String hrId;
+
+  SupervisorModel({
     required this.name,
     required this.email,
+    required this.uid,
+    this.photoUrl,
+    this.coverPhotoUrl,
+    this.studentList,
+    required this.hrId,
+
   });
 
-  factory Supervisor.fromMap(Map<String, dynamic> map) {
-    return Supervisor(
+  factory SupervisorModel.fromDocSnapshot(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return SupervisorModel(
+      name: data['name'] as String,
+      email: data['email'] as String,
+      uid: doc.id,
+      photoUrl: data['photoUrl'] as String?,
+      coverPhotoUrl: data['coverPhotoUrl'] as String?,
+      hrId: data['hrId'] ?? '',
+      studentList: List<String>.from(data['studentList'] ?? []),
+    );
+  }
+  factory SupervisorModel.fromMap(String id, Map<String, dynamic> map) {
+    return SupervisorModel(
+      uid: id,
       name: map['name'] ?? '',
       email: map['email'] ?? '',
+      hrId: map['hrId'] ?? '',
+      studentList: List<String>.from(map['studentList'] ?? []),
     );
   }
 
@@ -18,6 +47,13 @@ class Supervisor {
     return {
       'name': name,
       'email': email,
+      'studentList': studentList,
+      'hrId': hrId,
     };
   }
+
+  factory SupervisorModel.fromFirestore(DocumentSnapshot doc) {
+    return SupervisorModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+  }
+
 }

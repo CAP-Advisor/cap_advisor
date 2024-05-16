@@ -1,10 +1,19 @@
 import 'package:cap_advisor/model/firebaseuser.dart';
 import 'package:cap_advisor/service/firebase_service.dart';
 import 'package:cap_advisor/utils/role_factory.dart';
+import 'package:cap_advisor/view-model/add_task_viewmodel.dart';
+import 'package:cap_advisor/view-model/assigning_feedback_viewmodel.dart';
+import 'package:cap_advisor/view-model/job-and-training_applicants_viewmodel.dart';
 import 'package:cap_advisor/view/HR_view.dart';
+import 'package:cap_advisor/view/add_task_view.dart';
+import 'package:cap_advisor/view/assigning_feedback_view.dart';
+import 'package:cap_advisor/view/display_feedback_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
 import 'package:cap_advisor/view/instructor_view.dart';
+import 'package:cap_advisor/view/job-and-training_applicants_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
+import 'package:cap_advisor/view/post_position_view.dart';
+import 'package:cap_advisor/view/menu_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:cap_advisor/view/supervisor_view.dart';
@@ -12,6 +21,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,54 +38,58 @@ void main() async {
 
   FirebaseAuth auth = FirebaseAuth.instance;
   var user = auth.currentUser;
-  if (user != null) {
+  bool isAuthenticated = user != null;
+
+  String? userType;
+  if (isAuthenticated) {
     FirebaseService firebaseService = FirebaseService();
-    var userMap = await firebaseService.getUserData(user.email!);
+    var userMap = await firebaseService.getUserData(user!.email!);
     if (userMap != null) {
       var userObj = FireBaseUser.fromMap(userMap);
-      runApp(MyApp(
-        isAuthenticated: true,
-        userType: userObj.userType,
-      ));
-    } else {
-      runApp(const MyApp(
-        isAuthenticated: false,
-        userType: null,
-      ));
+      userType = userObj.userType;
     }
-  } else {
-    runApp(const MyApp(
-      isAuthenticated: false,
-      userType: null,
-    ));
   }
+
+  runApp(MyApp(
+    isAuthenticated: isAuthenticated,
+    userType: userType,
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final bool isAuthenticated;
   final String? userType;
 
-  const MyApp({Key? key, required this.isAuthenticated, this.userType}) : super(key: key);
+  const MyApp({Key? key, required this.isAuthenticated, this.userType})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     var homeView =isAuthenticated ? roleFactory(userType!) : HomeView();
-    return MaterialApp(
-      title: 'CAP Advisor',
-      theme: ThemeData(),
-      home: homeView ,
-      routes: {
+    return MultiProvider(
+        providers: [
+        ChangeNotifierProvider(create: (_) => AssigningFeedbackViewModel()),
+          // Add more providers if needed
+    ],
+    child: MaterialApp(
+    title: 'CAP Advisor',
+    theme: ThemeData(),
+    home: JobAndTrainingApplicantsView(hrDocumentId: 'wDMeZOB4KSdEr9ma8hCrsHWGGSk2',),
+        routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
-        '/HR': (context) => HRView(),
-        '/Supervisor': (context) => SupervisorView(),
-        '/Instructor': (context) => InstructorView(),
-        '/Student': (context) => StudentView(),
+        '/HR': (context) => HRView(uid: ''),
+        '/Supervisor': (context) => SupervisorView(uid: '',),
+          '/Instructor': (context) => InstructorView(uid: '',),
+        '/Student': (context) => StudentView(uid: '',),
         '/home': (context) => HomeView(),
+        '/job-and-training-posting':(context)=> PostPositionView(),
+        '/menu': (context) => MenuView(),
+        '/assign-feedback':(context) => AssigningFeedbackView(),
+          '/add-task':(context) => AddTaskView(studentId: '', studentName: ''),
+          'job-and-training-applicants':(context)=>JobAndTrainingApplicantsView(hrDocumentId: ''),
       },
-
+    ),
     );
-
   }
 }
