@@ -4,7 +4,6 @@ import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
 import '../service/firebase_service.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 class SupervisorViewModel extends ChangeNotifier {
@@ -20,7 +19,15 @@ class SupervisorViewModel extends ChangeNotifier {
   String? get supervisorPhotoUrl => currentSupervisor?.photoUrl;
 
   SupervisorViewModel() {
-    loadStudentsForSupervisor();
+    _init();
+  }
+
+  void _init() async {
+    await setCurrentSupervisor();
+    await loadStudentsForSupervisor();
+    searchController.addListener(() {
+      filterStudents(searchController.text);
+    });
   }
 
   Future<bool> setCurrentSupervisor() async {
@@ -41,13 +48,36 @@ class SupervisorViewModel extends ChangeNotifier {
       }
       DocumentSnapshot docSnapshot = querySnapshot.docs.first;
       currentSupervisor = SupervisorModel.fromDocSnapshot(docSnapshot);
-      print(
-          "Supervisor set: ${currentSupervisor?.name}, ${currentSupervisor?.email}, ${currentSupervisor?.photoUrl}, ${currentSupervisor?.coverPhotoUrl}");
+      notifyListeners();
       return true;
     } catch (e) {
       print("Error setting current supervisor: $e");
       return false;
     }
+  }
+
+  Future<void> loadStudentsForSupervisor() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.email == null) {
+      print('User not logged in or email is null');
+      return;
+    }
+    students = await _firebaseService.fetchStudentsForSupervisor(user.email!);
+    filteredStudents = List<Student>.from(students);
+    notifyListeners();
+  }
+
+  void filterStudents(String query) {
+    if (query.isEmpty) {
+      filteredStudents = List<Student>.from(students);
+    } else {
+      query = query.toLowerCase();
+      filteredStudents = students.where((student) {
+        return student.name.toLowerCase().contains(query) ||
+            student.email.toLowerCase().contains(query);
+      }).toList();
+    }
+    notifyListeners();
   }
 
   Future<bool> updateSupervisorName(String newName) async {
@@ -87,41 +117,6 @@ class SupervisorViewModel extends ChangeNotifier {
     }
     return result;
   }
-
-  Future<List<Student>> loadStudentsForSupervisor() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null || user.email == null) {
-      print('User not logged in or email is null');
-      return [];
-    }
-    return await _firebaseService.fetchStudentsForSupervisor(user.email!);
-  }
-
-  void filterStudents(String query) {
-    if (query.isEmpty) {
-      filteredStudents = List<Student>.from(students);
-    } else {
-      query = query.toLowerCase();
-      filteredStudents = students.where((student) {
-        return student.name.toLowerCase().contains(query) ||
-            student.email.toLowerCase().contains(query);
-      }).toList();
-    }
-    notifyListeners();
-  }
-
-  List<Student> filterStudentsList(List<Student> students, String query) {
-    if (query.isEmpty) {
-      return students;
-    }
-    return students
-        .where((student) =>
-            student.name.toLowerCase().contains(query.toLowerCase()) ||
-            student.email.toLowerCase().contains(query.toLowerCase()))
-        .toList();
-  }
-
-  notifyListeners();
 
   Future<void> handleProfileAction(BuildContext context, String value) async {
     switch (value) {
@@ -181,8 +176,4 @@ class SupervisorViewModel extends ChangeNotifier {
       },
     );
   }
-
-  // Future<List<Student>> fetchStudents() async {
-  //   return _firestoreService.fetchStudents("FWxIs1fcI3TnYGjmRQfsbgSuxbn1");
-  // }
 }

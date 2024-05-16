@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../view-model/job-and-training_applicants_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 
@@ -92,7 +94,7 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "CAP Advisor",
+        title: "Training Applicants",
         onBack: () {
           Navigator.of(context).pop();
         },
@@ -100,7 +102,7 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
           // Handle notifications
         },
         onMenuPressed: () {
-          // Handle menu
+          Navigator.of(context).pushNamed('/menu');          // Handle menu
         },
       ),
       body: SingleChildScrollView(
@@ -109,15 +111,6 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 20),
-            Text(
-              "Training Applicants",
-              style: TextStyle(
-                fontFamily: 'Roboto',
-                fontSize: 40,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF9A9A9A),
-              ),
-            ),
             SizedBox(height: 8),
             Text(
               "Gain hands-on experience, enhance skills, and contribute to real-world projects in a collaborative environment. Your gateway to growth and innovation in software development.",

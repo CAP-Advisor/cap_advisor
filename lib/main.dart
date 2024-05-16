@@ -3,12 +3,14 @@ import 'package:cap_advisor/service/firebase_service.dart';
 import 'package:cap_advisor/utils/role_factory.dart';
 import 'package:cap_advisor/view-model/add_task_viewmodel.dart';
 import 'package:cap_advisor/view-model/assigning_feedback_viewmodel.dart';
+import 'package:cap_advisor/view-model/job-and-training_applicants_viewmodel.dart';
 import 'package:cap_advisor/view/HR_view.dart';
 import 'package:cap_advisor/view/add_task_view.dart';
 import 'package:cap_advisor/view/assigning_feedback_view.dart';
 import 'package:cap_advisor/view/display_feedback_view.dart';
 import 'package:cap_advisor/view/home_view.dart';
 import 'package:cap_advisor/view/instructor_view.dart';
+import 'package:cap_advisor/view/job-and-training_applicants_view.dart';
 import 'package:cap_advisor/view/login_view.dart';
 import 'package:cap_advisor/view/post_position_view.dart';
 import 'package:cap_advisor/view/menu_view.dart';
@@ -67,33 +69,25 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
         providers: [
         ChangeNotifierProvider(create: (_) => AssigningFeedbackViewModel()),
-
           // Add more providers if needed
     ],
     child: MaterialApp(
     title: 'CAP Advisor',
     theme: ThemeData(),
-    home: AddTaskView(studentName: '', studentId: '',),
+    home: JobAndTrainingApplicantsView(hrDocumentId: 'wDMeZOB4KSdEr9ma8hCrsHWGGSk2',),
         routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
-        '/HR': (context) => HRView(
-          uid: '',
-        ),
-        '/Supervisor': (context) => SupervisorView(
-              uid: '',
-            ),
-'/Instructor': (context) => InstructorView(
-              uid: '',
-            ),
-        '/Student': (context) => StudentView(
-              uid: '',
-            ),
+        '/HR': (context) => HRView(uid: ''),
+        '/Supervisor': (context) => SupervisorView(uid: '',),
+          '/Instructor': (context) => InstructorView(uid: '',),
+        '/Student': (context) => StudentView(uid: '',),
         '/home': (context) => HomeView(),
-        'job-and-training-posting':(context)=> PostPositionView(),
+        '/job-and-training-posting':(context)=> PostPositionView(),
         '/menu': (context) => MenuView(),
         '/assign-feedback':(context) => AssigningFeedbackView(),
           '/add-task':(context) => AddTaskView(studentId: '', studentName: ''),
+          'job-and-training-applicants':(context)=>JobAndTrainingApplicantsView(hrDocumentId: ''),
       },
     ),
     );

@@ -17,12 +17,14 @@ class DisplayFeedbackView extends StatelessWidget {
       create: (_) => DisplayFeedbackViewModel(feedback),
       child: Scaffold(
         appBar: CustomAppBar(
-          title: "CAP Advisor",
+          title: "Feedback",
           onBack: () {
             Navigator.pop(context);
           },
           onNotificationPressed: () {},
-          onMenuPressed: () {},
+          onMenuPressed: () {
+            Navigator.of(context).pushNamed('/menu');
+          },
           // Other app bar actions
         ),
         body: Consumer<DisplayFeedbackViewModel>(
@@ -56,16 +58,6 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-              SizedBox(height: 20),
-              Text(
-                widget.viewModel.feedbackText,
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontSize: 40,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF9A9A9A),
-                ),
-              ),
               SizedBox(height: 30),
               _buildDropDown(context),
               SizedBox(height: 30),
@@ -74,6 +66,7 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
                   CustomTextField(
                     controller: widget.viewModel.nameController,
                     hintText: "Student Name",
+                    readOnly: true,
                     onChanged: (String) {},
                     isValid: widget.viewModel.nameController.text.isNotEmpty,
                     errorMessage: 'Please enter the student name',
@@ -84,6 +77,7 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
                   CustomTextField(
                     controller: widget.viewModel.nameController,
                     hintText: "Student Name",
+                    readOnly: true,
                     onChanged: (value) {
                       // Handle onChanged event
                     },
@@ -250,6 +244,7 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
           CustomTextField(
             controller: widget.viewModel.taskDescriptionController,
             hintText: "Task Description",
+            readOnly:true,
             onChanged: (String) {},
             errorMessage: 'Please fill the task description',
             isValid: widget.viewModel.nameController.text.isNotEmpty,

@@ -14,75 +14,115 @@ class SupervisorView extends StatelessWidget {
   final String uid;
   SupervisorView({required this.uid});
 
-  final SupervisorViewModel _viewModel = SupervisorViewModel();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        title: "CAP Advisor",
-        onNotificationPressed: () {},
-        onFeedback: () {
-          Navigator.of(context).pushNamed('/assign-feedback');
-        },
-        onMenuPressed: () {
-          Navigator.of(context).pushNamed('/menu');
-        },
-      ),
-      body: FutureBuilder<bool>(
-        future: _viewModel.setCurrentSupervisor(),
-        builder: (context, supervisorSnapshot) {
-          if (supervisorSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (supervisorSnapshot.hasError ||
-              !supervisorSnapshot.hasData ||
-              !supervisorSnapshot.data!) {
-            return Center(
-                child: Text("Failed to load supervisor details or no data."));
-          }
-
-          return Column(
-            children: [
-              _buildProfileHeader(context),
-              _buildSupervisorDetails(context),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: CustomSearchField(
-                  controller: _viewModel.searchController,
-                  onChanged: (value) {
-                    _viewModel.filterStudents(value);
-                  },
+    return ChangeNotifierProvider(
+      create: (_) => SupervisorViewModel(),
+      child: Consumer<SupervisorViewModel>(
+        builder: (context, _viewModel, child) {
+          return Scaffold(
+            appBar: CustomAppBar(
+              title: "CAP Advisor",
+              onNotificationPressed: () {},
+              onFeedback: () {
+                Navigator.of(context).pushNamed('/assign-feedback');
+              },
+              onMenuPressed: () {
+                Navigator.of(context).pushNamed('/menu');
+              },
+            ),
+            body: _viewModel.currentSupervisor == null
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+              children: [
+                _buildProfileHeader(context, _viewModel),
+                _buildSupervisorDetails(context, _viewModel),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomSearchField(
+                    controller: _viewModel.searchController,
+                    onChanged: (value) {
+                      _viewModel.filterStudents(value);
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Expanded(
-                child: FutureBuilder<List<Student>>(
-                  future: _viewModel.loadStudentsForSupervisor(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    }
-                    if (snapshot.data == null || snapshot.data!.isEmpty) {
-                      return Text('No students found');
-                    }
-                    return _buildStudentList(snapshot.data!);
-                  },
+                SizedBox(height: 20),
+                Expanded(
+                  child: _viewModel.filteredStudents.isEmpty
+                      ? Center(child: Text('No students found'))
+                      : ListView.builder(
+                    itemCount: _viewModel.filteredStudents.length,
+                    itemBuilder: (context, index) {
+                      final student =
+                      _viewModel.filteredStudents[index];
+                      return Container(
+                        margin: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFCFE0E9),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.grey[200],
+                            child: Text(student.name[0]),
+                          ),
+                          title: Text(student.name),
+                          subtitle: Text(student.email),
+                          trailing: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        AddTaskView(
+                                            studentId: student.uid,
+                                            studentName:
+                                            student.name)),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF164863),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Text(
+                              'Add Task',
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    StudentView(uid: student.uid),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(
+      BuildContext context, SupervisorViewModel _viewModel) {
     return Stack(
       clipBehavior: Clip.none,
       children: <Widget>[
@@ -92,9 +132,9 @@ class SupervisorView extends StatelessWidget {
           decoration: BoxDecoration(
             image: (_viewModel.currentSupervisor?.coverPhotoUrl != null)
                 ? DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                        _viewModel.currentSupervisor!.coverPhotoUrl!))
+                fit: BoxFit.cover,
+                image: NetworkImage(
+                    _viewModel.currentSupervisor!.coverPhotoUrl!))
                 : null,
             color: Colors.grey[300],
           ),
@@ -110,8 +150,8 @@ class SupervisorView extends StatelessWidget {
                 : null,
             child: _viewModel.currentSupervisor?.photoUrl == null
                 ? Text(
-                    _viewModel.currentSupervisor?.name.substring(0, 1) ?? 'A',
-                    style: TextStyle(fontSize: 40))
+                _viewModel.currentSupervisor?.name.substring(0, 1) ?? 'A',
+                style: TextStyle(fontSize: 40))
                 : null,
           ),
         ),
@@ -149,7 +189,8 @@ class SupervisorView extends StatelessWidget {
     );
   }
 
-  Widget _buildSupervisorDetails(BuildContext context) {
+  Widget _buildSupervisorDetails(
+      BuildContext context, SupervisorViewModel _viewModel) {
     return Padding(
       padding: const EdgeInsets.only(top: 70.0, left: 20, right: 20),
       child: Column(
@@ -162,7 +203,7 @@ class SupervisorView extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
               IconButton(
                 icon: Icon(Icons.edit, color: Colors.black),
-                onPressed: () => _showNameDialog(context),
+                onPressed: () => _showNameDialog(context, _viewModel),
               ),
             ],
           ),
@@ -180,72 +221,8 @@ class SupervisorView extends StatelessWidget {
     );
   }
 
-  Widget _buildStudentList(List<Student> students) {
-    List<Student> filteredList =
-        _viewModel.filterStudentsList(students, _searchController.text);
-    if (filteredList.isEmpty) {
-      return Center(
-        child: Text('No students found'),
-      );
-    }
-    return ListView.builder(
-      //itemCount: _viewModel.filteredStudents.length,
-      itemCount: filteredList.length,
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        //final student = _viewModel.filteredStudents[index];
-        final student = filteredList[index];
-        return Container(
-          margin: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Color(0xFFCFE0E9),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.grey[200],
-              child: Text(student.name[0]),
-            ),
-            title: Text(student.name),
-            subtitle: Text(student.email),
-            trailing: ElevatedButton(
-              onPressed: () {
-                 Navigator.push(
-                   context,
-                  MaterialPageRoute(builder: (context) => AddTaskView(studentId:student.uid,studentName:student.name)),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF164863),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Text(
-                'Add Task',
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => StudentView(uid: student.uid),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  void _showNameDialog(BuildContext context) {
+  void _showNameDialog(
+      BuildContext context, SupervisorViewModel _viewModel) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -262,7 +239,7 @@ class SupervisorView extends StatelessWidget {
           TextButton(
             onPressed: () async {
               bool success =
-                  await _viewModel.updateSupervisorName(_nameController.text);
+              await _viewModel.updateSupervisorName(_nameController.text);
               if (success) {
                 Navigator.pop(context);
               } else {

@@ -15,8 +15,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     fetchApplicants();
     fetchSupervisors();
   }
-  String filterType =
-      ''; // Store selected filter type (e.g., 'gpa', 'address', 'skill')
+  String filterType = ''; // Store selected filter type (e.g., 'gpa', 'address', 'skill')
   String filterValue = ''; // Store selected filter value
 
   // Method to apply filtering logic based on filter options

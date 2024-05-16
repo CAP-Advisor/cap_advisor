@@ -35,7 +35,9 @@ class _HRViewState extends State<HRView> {
             ),
             IconButton(
               icon: Icon(Icons.menu, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).pushNamed('/menu');
+              },
             ),
           ],
         ),

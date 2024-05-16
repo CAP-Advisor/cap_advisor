@@ -18,9 +18,14 @@ class _AssigningFeedbackViewState extends State<AssigningFeedbackView> {
     return SafeArea(
       child: Scaffold(
         appBar: CustomAppBar(
-          title: "CAP Advisor",
+          title: "Feedback",
           onNotificationPressed: () {},
-          onMenuPressed: () {},
+          onMenuPressed: () {
+            Navigator.of(context).pushNamed('/menu');
+          },
+          onBack: () {
+            Navigator.of(context).pop();
+          },
         ),
         body: Consumer<AssigningFeedbackViewModel>(
           builder: (context, viewModel, _) {
@@ -33,15 +38,6 @@ class _AssigningFeedbackViewState extends State<AssigningFeedbackView> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 10.0),
-                      child: Text(
-                        "Feedback",
-                        style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontSize: 40,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF9A9A9A),
-                        ),
-                      ),
                     ),
                   ),
                 ),

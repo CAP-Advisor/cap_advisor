@@ -43,7 +43,7 @@ class FirebaseService {
   Future<bool> verifyCustomToken(String customToken) async {
     try {
       UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCustomToken(customToken);
+      await FirebaseAuth.instance.signInWithCustomToken(customToken);
       User? user = userCredential.user;
       if (user != null) {
         // Check if user is authenticated
@@ -72,7 +72,7 @@ class FirebaseService {
       }
 
       DocumentSnapshot snapshot =
-          await _firestore.collection('Users').doc(user.uid).get();
+      await _firestore.collection('Users').doc(user.uid).get();
 
       if (snapshot.exists) {
         return snapshot.data() as Map<String, dynamic>;
@@ -156,7 +156,7 @@ class FirebaseService {
   Future<List<Student>> fetchStudentsId(String supervisorId) async {
     try {
       DocumentSnapshot supervisorSnapshot =
-          await _firestore.collection('Supervisor').doc(supervisorId).get();
+      await _firestore.collection('Supervisor').doc(supervisorId).get();
       if (!supervisorSnapshot.exists) {
         print('Supervisor not found');
         return [];
@@ -169,7 +169,7 @@ class FirebaseService {
           .where(FieldPath.documentId, whereIn: studentList)
           .get();
       List<Student> students =
-          querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+      querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
       return students;
     } catch (e) {
       print('Error fetching students: $e');
@@ -196,7 +196,7 @@ class FirebaseService {
       List<Student> students = [];
       for (String studentId in studentRefs) {
         DocumentSnapshot studentSnapshot =
-            await _firestore.collection('Student').doc(studentId).get();
+        await _firestore.collection('Student').doc(studentId).get();
         if (studentSnapshot.exists) {
           students.add(Student.fromFirestore(studentSnapshot));
         }
@@ -236,7 +236,7 @@ class FirebaseService {
 
       if (querySnapshot.docs.isNotEmpty) {
         Map<String, dynamic> userData =
-            querySnapshot.docs.first.data() as Map<String, dynamic>;
+        querySnapshot.docs.first.data() as Map<String, dynamic>;
         String? userType = userData['userType'];
 
         if (userType != null) {
@@ -258,7 +258,7 @@ class FirebaseService {
     if (userId == null) return null;
     try {
       DocumentSnapshot studentDoc =
-          await _firestore.collection('Student').doc(userId).get();
+      await _firestore.collection('Student').doc(userId).get();
       if (studentDoc.exists) {
         return studentDoc.data() as Map<String, dynamic>?;
       }
@@ -344,7 +344,7 @@ class FirebaseService {
 
       String userId = _auth.currentUser!.uid;
       DocumentReference supervisorRef =
-          _firestore.collection('Supervisor').doc(userId);
+      _firestore.collection('Supervisor').doc(userId);
 
       DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
 
@@ -375,7 +375,7 @@ class FirebaseService {
 
       String userId = _auth.currentUser!.uid;
       DocumentReference supervisorRef =
-          _firestore.collection('Supervisor').doc(userId);
+      _firestore.collection('Supervisor').doc(userId);
 
       DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
 
@@ -401,11 +401,11 @@ class FirebaseService {
     try {
       // Reference to the student document
       DocumentReference studentRef =
-          FirebaseFirestore.instance.collection('Student').doc(studentId);
+      FirebaseFirestore.instance.collection('Student').doc(studentId);
 
       // Reference to the collection based on feedback type
       CollectionReference feedbackCollection =
-          studentRef.collection(feedbackType);
+      studentRef.collection(feedbackType);
 
       // Add feedback document to the collection
       await feedbackCollection.add(feedbackData);
@@ -425,7 +425,7 @@ class FirebaseService {
     try {
       // Reference to the student document
       DocumentReference studentRef =
-          FirebaseFirestore.instance.collection('Student').doc(studentId);
+      FirebaseFirestore.instance.collection('Student').doc(studentId);
 
       // Reference to the collection based on feedback type
 
@@ -443,7 +443,7 @@ class FirebaseService {
 Future<bool> verifyIdToken(String idToken) async {
   try {
     UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithCustomToken(idToken);
+    await FirebaseAuth.instance.signInWithCustomToken(idToken);
     User? user = userCredential.user;
     if (user != null) {
       // Token is valid
