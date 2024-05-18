@@ -35,7 +35,7 @@ class StudentTasksView extends StatelessWidget {
                 controller: viewModel.searchController,
                 hintText: "Search by task name",
                 onChanged: (value) {
-                  viewModel.filterTasks(value); // Update tasks based on search query
+                  viewModel.filterTasks(value);
                 },
               ),
             ),
@@ -53,7 +53,7 @@ class StudentTasksView extends StatelessWidget {
                           _showTaskDetailsDialog(
                               context, viewModel.tasks[index]);
                         },
-                        buttonTitle: "Details", // Dynamic button title
+                        buttonTitle: "Details",
                       );
                     },
                   );
@@ -76,7 +76,7 @@ class StudentTasksView extends StatelessWidget {
           taskData: taskData,
           showFeedback: false,
           onClose: () {
-            Navigator.of(context).pop(); // Close the dialog
+            Navigator.of(context).pop();
           },
         );
       },

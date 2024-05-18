@@ -36,7 +36,7 @@ class CustomDialog extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Text(
-              "Deadline: $formattedDeadline", // Display formatted deadline
+              "Deadline: $formattedDeadline",
               style: TextStyle(
                 fontSize: 16.0,
                 color: Colors.grey,
@@ -44,7 +44,7 @@ class CustomDialog extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Text(
-              "Description:", // Display "Description" above task description
+              "Description:",
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
@@ -52,19 +52,19 @@ class CustomDialog extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              taskData['Task Description'] ?? "", // Display task description
+              taskData['Task Description'] ?? "",
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.w400,
               ),
               textAlign: TextAlign.center,
             ),
-            if (showFeedback && taskData['Task Feedback'] != null && taskData['Task Feedback'].isNotEmpty) // Display feedback only if showFeedback is true and feedback is available
+            if (showFeedback && taskData['Task Feedback'] != null && taskData['Task Feedback'].isNotEmpty)
               Column(
                 children: [
                   SizedBox(height: 16),
                   Text(
-                    "Feedback:", // Display "Feedback" instead of "Description"
+                    "Feedback:",
                     style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
@@ -72,7 +72,7 @@ class CustomDialog extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    taskData['Task Feedback'] ?? "", // Display task feedback
+                    taskData['Task Feedback'] ?? "",
                     style: TextStyle(
                       fontSize: 16.0,
                     ),

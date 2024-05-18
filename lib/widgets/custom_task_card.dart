@@ -4,19 +4,17 @@ import 'package:intl/intl.dart';
 class CustomTaskCard extends StatelessWidget {
   final Map<String, dynamic> taskData;
   final VoidCallback onPressed;
-  final String buttonTitle; // Add buttonTitle parameter
+  final String buttonTitle;
 
   const CustomTaskCard({
     Key? key,
     required this.taskData,
     required this.onPressed,
-    required this.buttonTitle, // Initialize buttonTitle
+    required this.buttonTitle,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String formattedDeadline = DateFormat('MMMM dd, yyyy').format(taskData['deadline'].toDate());
-
     return Card(
       color: Color(0xFFDDF2FD),
       shape: RoundedRectangleBorder(
@@ -32,12 +30,12 @@ class CustomTaskCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  taskData['Task Title'] ?? "", // Display task title
+                  taskData['Task Title'] ?? "",
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 SizedBox(height: 8),
                 Text(
-                  "Assigned By: ${taskData['Supervisor Name'] ?? ""}", // Display assigned by
+                  "Assigned By: ${taskData['Supervisor Name'] ?? ""}",
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -53,13 +51,13 @@ class CustomTaskCard extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0XFF164863), // Change button color here
+        backgroundColor: Color(0XFF164863),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
       ),
       child: Text(
-        buttonTitle, // Use dynamic button title
+        buttonTitle,
         style: TextStyle(color: Colors.white),
       ),
     );

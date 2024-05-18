@@ -15,7 +15,7 @@ class AddTaskViewModel extends ChangeNotifier {
   AddTaskViewModel() {
     taskTitleController = TextEditingController();
     taskDescriptionController = TextEditingController();
-    fetchSupervisorName(); // Call fetchSupervisorName to fetch supervisor's name
+    fetchSupervisorName();
   }
   Future<void> fetchSupervisorName() async {
     try {
@@ -49,10 +49,9 @@ class AddTaskViewModel extends ChangeNotifier {
       showDeadlineError = true;
     }
 
-    // Check if any error flag is set
     if (showTitleError || showDescriptionError || showDeadlineError) {
       notifyListeners();
-      return; // Exit early if there are errors
+      return;
     }
     TaskModel task = TaskModel(
       title: taskTitleController.text,
@@ -67,7 +66,6 @@ class AddTaskViewModel extends ChangeNotifier {
         studentId: studentId,
         taskData: task.toMap(),
       );
-      // Show success Snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Task added successfully'),
@@ -76,7 +74,6 @@ class AddTaskViewModel extends ChangeNotifier {
       );
       notifyListeners();
     } catch (error) {
-      // Show error Snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error adding task: $error'),
