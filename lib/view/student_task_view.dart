@@ -74,7 +74,7 @@ class StudentTasksView extends StatelessWidget {
       builder: (BuildContext context) {
         return CustomDialog(
           taskData: taskData,
-          showFeedback: false,
+          showFeedback: true,
           onClose: () {
             Navigator.of(context).pop();
           },
