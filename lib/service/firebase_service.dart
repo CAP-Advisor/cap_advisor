@@ -438,6 +438,15 @@ class FirebaseService {
       throw error; // Rethrow the error for error handling in UI
     }
   }
+  Future<QuerySnapshot<Map<String, dynamic>>> getTasks(String userId) {
+    return _firestore
+        .collection('Student')
+        .doc(userId)
+        .collection('Task')
+        .get();
+  }
+
+
 }
 
 Future<bool> verifyIdToken(String idToken) async {

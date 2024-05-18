@@ -45,6 +45,7 @@ class _AssigningFeedbackViewState extends State<AssigningFeedbackView> {
                   padding: const EdgeInsets.all(8.0),
                   child: CustomSearchField(
                     controller: viewModel.searchController,
+                    hintText: "Search by student name",
                     onChanged: viewModel.filterFeedbacks,
                   ),
                 ),

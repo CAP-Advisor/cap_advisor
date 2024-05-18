@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../model/add_task_model.dart';
 import '../service/firebase_service.dart';
@@ -9,14 +10,31 @@ class AddTaskViewModel extends ChangeNotifier {
   bool showTitleError = false;
   bool showDescriptionError = false;
   bool showDeadlineError = false;
+  String? supervisorName;
 
   AddTaskViewModel() {
     taskTitleController = TextEditingController();
     taskDescriptionController = TextEditingController();
+    fetchSupervisorName(); // Call fetchSupervisorName to fetch supervisor's name
   }
-
+  Future<void> fetchSupervisorName() async {
+    try {
+      String? supervisorEmail = FirebaseAuth.instance.currentUser?.email;
+      if (supervisorEmail != null) {
+        Map<String, dynamic>? supervisorData =
+        await FirebaseService().getSupervisorData(supervisorEmail);
+        if (supervisorData != null) {
+          supervisorName = supervisorData['name'];
+          print('Supervisor Name: $supervisorName');
+        } else {
+          print('Supervisor data not found');
+        }
+      }
+    } catch (error) {
+      print('Error fetching supervisor name: $error');
+    }
+  }
   Future<void> addTask(BuildContext context, String studentId) async {
-    // Reset error flags
     showTitleError = false;
     showDescriptionError = false;
     showDeadlineError = false;
@@ -36,11 +54,12 @@ class AddTaskViewModel extends ChangeNotifier {
       notifyListeners();
       return; // Exit early if there are errors
     }
-
     TaskModel task = TaskModel(
       title: taskTitleController.text,
       description: taskDescriptionController.text,
       deadline: selectedDeadline!,
+      supervisorName: supervisorName,
+
     );
 
     try {
@@ -73,4 +92,5 @@ class AddTaskViewModel extends ChangeNotifier {
     taskDescriptionController.dispose();
     super.dispose();
   }
+
 }
