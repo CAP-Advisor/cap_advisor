@@ -9,13 +9,9 @@ class StudentViewModel with ChangeNotifier {
 
   StudentViewModel({required this.uid});
 
-  // Future<void> getStudentData() async {
-  //   String? userId = FirebaseAuth.instance.currentUser?.uid;
-  //   studentData = await _firebaseService.fetchStudentData(userId);
-  //   notifyListeners();
-  // }
-  Future<void> getStudentData() async {
-    studentData = await _firebaseService.fetchStudentData(uid);
-    notifyListeners();
-  }
+   Future<void> getStudentData() async {
+     String? userId = FirebaseAuth.instance.currentUser?.uid;
+     studentData = await _firebaseService.fetchStudentData(userId);
+     notifyListeners();
+   }
 }

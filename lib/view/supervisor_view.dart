@@ -43,6 +43,7 @@ class SupervisorView extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: CustomSearchField(
                     controller: _viewModel.searchController,
+                    hintText: "Search by student name",
                     onChanged: (value) {
                       _viewModel.filterStudents(value);
                     },
