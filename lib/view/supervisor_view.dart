@@ -1,14 +1,10 @@
-import 'package:cap_advisor/view/student_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../model/student_model.dart';
 import '../view-model/supervisor_viewmodel.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/custom_search_field.dart';
 import 'add_task_view.dart';
-import 'login_view.dart';
-import '../view/menu_view.dart';
+import 'student_view.dart';
 
 class SupervisorView extends StatelessWidget {
   final String uid;
@@ -36,85 +32,86 @@ class SupervisorView extends StatelessWidget {
             body: _viewModel.currentSupervisor == null
                 ? Center(child: CircularProgressIndicator())
                 : Column(
-              children: [
-                _buildProfileHeader(context, _viewModel),
-                _buildSupervisorDetails(context, _viewModel),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CustomSearchField(
-                    controller: _viewModel.searchController,
-                    onChanged: (value) {
-                      _viewModel.filterStudents(value);
-                    },
-                  ),
-                ),
-                SizedBox(height: 20),
-                Expanded(
-                  child: _viewModel.filteredStudents.isEmpty
-                      ? Center(child: Text('No students found'))
-                      : ListView.builder(
-                    itemCount: _viewModel.filteredStudents.length,
-                    itemBuilder: (context, index) {
-                      final student =
-                      _viewModel.filteredStudents[index];
-                      return Container(
-                        margin: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFCFE0E9),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.grey[200],
-                            child: Text(student.name[0]),
-                          ),
-                          title: Text(student.name),
-                          subtitle: Text(student.email),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        AddTaskView(
-                                            studentId: student.uid,
-                                            studentName:
-                                            student.name)),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF164863),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: Text(
-                              'Add Task',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    StudentView(uid: student.uid),
-                              ),
-                            );
+                    children: [
+                      _buildProfileHeader(context, _viewModel),
+                      _buildSupervisorDetails(context, _viewModel),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: CustomSearchField(
+                          controller: _viewModel.searchController,
+                          onChanged: (value) {
+                            _viewModel.filterStudents(value);
                           },
                         ),
-                      );
-                    },
+                      ),
+                      SizedBox(height: 20),
+                      Expanded(
+                        child: _viewModel.filteredStudents.isEmpty
+                            ? Center(child: Text('No students found'))
+                            : ListView.builder(
+                                itemCount: _viewModel.filteredStudents.length,
+                                itemBuilder: (context, index) {
+                                  final student =
+                                      _viewModel.filteredStudents[index];
+                                  return Container(
+                                    margin: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFCFE0E9),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: Colors.grey[200],
+                                        child: Text(student.name[0]),
+                                      ),
+                                      title: Text(student.name),
+                                      subtitle: Text(student.email),
+                                      trailing: ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AddTaskView(
+                                                  studentId: student.uid,
+                                                  studentName: student.name),
+                                            ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xFF164863),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Add Task',
+                                          style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => StudentView(
+                                              uid: student.uid,
+                                              isSupervisor: true,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           );
         },
       ),
@@ -132,9 +129,9 @@ class SupervisorView extends StatelessWidget {
           decoration: BoxDecoration(
             image: (_viewModel.currentSupervisor?.coverPhotoUrl != null)
                 ? DecorationImage(
-                fit: BoxFit.cover,
-                image: NetworkImage(
-                    _viewModel.currentSupervisor!.coverPhotoUrl!))
+                    fit: BoxFit.cover,
+                    image: NetworkImage(
+                        _viewModel.currentSupervisor!.coverPhotoUrl!))
                 : null,
             color: Colors.grey[300],
           ),
@@ -150,41 +147,42 @@ class SupervisorView extends StatelessWidget {
                 : null,
             child: _viewModel.currentSupervisor?.photoUrl == null
                 ? Text(
-                _viewModel.currentSupervisor?.name.substring(0, 1) ?? 'A',
-                style: TextStyle(fontSize: 40))
+                    _viewModel.currentSupervisor?.name.substring(0, 1) ?? 'A',
+                    style: TextStyle(fontSize: 40))
                 : null,
           ),
         ),
         Positioned(
-            right: 16,
-            bottom: 16,
-            child: PopupMenuButton<String>(
-              onSelected: (String value) {
-                _viewModel.handleProfileAction(context, value);
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'view_profile_photo',
-                  child: Text('View Profile Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'choose_profile_photo',
-                  child: Text('Choose Profile Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'view_cover_photo',
-                  child: Text('View Cover Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'choose_cover_photo',
-                  child: Text('Choose Cover Photo'),
-                ),
-              ],
-              child: CircleAvatar(
-                backgroundColor: Colors.grey[800],
-                child: const Icon(Icons.add_a_photo, color: Colors.white),
+          right: 16,
+          bottom: 16,
+          child: PopupMenuButton<String>(
+            onSelected: (String value) {
+              _viewModel.handleProfileAction(context, value);
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'view_profile_photo',
+                child: Text('View Profile Photo'),
               ),
-            ))
+              const PopupMenuItem<String>(
+                value: 'choose_profile_photo',
+                child: Text('Choose Profile Photo'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'view_cover_photo',
+                child: Text('View Cover Photo'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'choose_cover_photo',
+                child: Text('Choose Cover Photo'),
+              ),
+            ],
+            child: CircleAvatar(
+              backgroundColor: Colors.grey[800],
+              child: const Icon(Icons.add_a_photo, color: Colors.white),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -221,8 +219,7 @@ class SupervisorView extends StatelessWidget {
     );
   }
 
-  void _showNameDialog(
-      BuildContext context, SupervisorViewModel _viewModel) {
+  void _showNameDialog(BuildContext context, SupervisorViewModel _viewModel) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -239,7 +236,7 @@ class SupervisorView extends StatelessWidget {
           TextButton(
             onPressed: () async {
               bool success =
-              await _viewModel.updateSupervisorName(_nameController.text);
+                  await _viewModel.updateSupervisorName(_nameController.text);
               if (success) {
                 Navigator.pop(context);
               } else {
