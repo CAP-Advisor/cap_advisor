@@ -268,6 +268,27 @@ class FirebaseService {
     }
   }
 
+  Future<bool> updateStudentGpa(String email, double newGpa) async {
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('Student')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+      if (snapshot.docs.isEmpty) {
+        return false;
+      }
+      DocumentSnapshot doc = snapshot.docs.first;
+      await _firestore
+          .collection('Student')
+          .doc(doc.id)
+          .update({'gpa': newGpa});
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<Student?> getStudentDataByEmail() async {
     String? email = FirebaseAuth.instance.currentUser?.email;
     if (email == null) {
@@ -633,7 +654,7 @@ class FirebaseService {
     }
   }
 
-  Future<bool> addGpa(String gpa) async {
+  Future<bool> addGpa(double gpa) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
       return false;
@@ -642,7 +663,7 @@ class FirebaseService {
       await _firestore.collection('Student').doc(userId).update({'gpa': gpa});
       return true;
     } catch (e) {
-      print("Failed to add GPA");
+      print("Failed to add GPA: $e");
       return false;
     }
   }

@@ -134,9 +134,18 @@ class SectionViewModel extends ChangeNotifier {
     }
 
     if (hasGpa) {
-      bool success = await _firebaseService.addGpa(gpaController.text);
-      if (!success) {
-        gpaError = "Failed to add GPA.";
+      try {
+        double gpaValue = double.parse(gpaController.text);
+        bool success = await _firebaseService.addGpa(gpaValue);
+        if (!success) {
+          gpaError = "Failed to add GPA.";
+          isGpaValid = false;
+          notifyListeners();
+          showFeedback(context, gpaError);
+          return;
+        }
+      } catch (e) {
+        gpaError = "Invalid GPA value.";
         isGpaValid = false;
         notifyListeners();
         showFeedback(context, gpaError);
@@ -150,7 +159,9 @@ class SectionViewModel extends ChangeNotifier {
     // Navigate to StudentView
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => StudentView(uid: 'uid'),
+        builder: (context) => StudentView(
+          uid: '',
+        ),
       ),
     );
   }
