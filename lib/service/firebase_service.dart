@@ -541,7 +541,7 @@ class FirebaseService {
       throw error; // Rethrow the error for error handling in UI
     }
   }
-
+  
   Future<bool> addExperience(String experience) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
@@ -679,6 +679,14 @@ class FirebaseService {
       print("Failed to add Address");
       return false;
     }
+  }
+  
+  Future<QuerySnapshot<Map<String, dynamic>>> getTasks(String userId) {
+    return _firestore
+        .collection('Student')
+        .doc(userId)
+        .collection('Task')
+        .get();
   }
 }
 
