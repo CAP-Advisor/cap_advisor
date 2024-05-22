@@ -71,26 +71,25 @@ class HRViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-
       String collectionName = currentType == PositionType.job ? 'Job Position' : 'Training Position';
-
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(collectionName).get();
       var positions = querySnapshot.docs.map((doc) => Job.fromFirestore(doc)).toList();
+
+      final User? user = firebaseAuth.currentUser;
+      if (user != null) {
+        positions = positions.where((job) => job.hrId == user.uid).toList();
+      }
 
       allPositions = positions;
       filteredPositions = positions;
       errorMessage = null;
-
     } catch (e) {
-
       errorMessage = 'Error fetching positions: $e';
-
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
-
   Future<String> fetchImageUrl({required ImageType type}) async {
 
       String userId = firebaseAuth.currentUser?.uid ?? '';
@@ -231,19 +230,6 @@ class HRViewModel extends ChangeNotifier {
                 Navigator.of(context).pop();
               },
               child: Text('Save'),
-            ),
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF427D9D)), // Set the background color to #427D9D
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.white), // Set the text color to white
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => JobAndTrainingApplicantsView(hrDocumentId: job.id)),
-                );
-              },
-              child: Text('Applicants'),
             ),
           ],
         );

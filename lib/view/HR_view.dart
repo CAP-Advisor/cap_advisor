@@ -4,7 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../model/job_model.dart';
 import '../view-model/HR_viewmodel.dart';
-import '../view/student_search_view.dart';  // Ensure this import is correct based on your file structure
+import '../view/student_search_view.dart';
+import 'job-and-training_applicants_view.dart';
 
 class HRView extends StatefulWidget {
   @override
@@ -304,36 +305,52 @@ class _HRViewState extends State<HRView> {
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  job.title,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      job.title,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    if (model.is_account_owner(job.hrId))
+                      IconButton(
+                        icon: Icon(Icons.edit, size: 20),
+                        onPressed: () => model.editJobDescription(context, job),
+                      ),
+                  ],
                 ),
-                if (model.is_account_owner(job.hrId))
-                  IconButton(
-                    icon: Icon(Icons.edit, size: 20),
-                    onPressed: () => model.editJobDescription(context, job),
-                  ),
+                Text(
+                  job.description,
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                Text(
+                  'Posted # hour ago',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
               ],
             ),
-            Text(
-              job.description,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => JobAndTrainingApplicantsView(hrDocumentId: job.hrId)),
+                );
+              },
+              child: Text('View Applicants'),
             ),
-            Text(
-              'Posted # hour ago',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

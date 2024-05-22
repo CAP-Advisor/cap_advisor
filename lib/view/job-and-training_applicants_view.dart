@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../view-model/job-and-training_applicants_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 
@@ -15,6 +14,7 @@ class JobAndTrainingApplicantsView extends StatefulWidget {
 
 class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsView> {
   late JobAndTrainingApplicantsViewModel viewModel;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -24,9 +24,14 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
   }
 
   void fetchData(String hrDocumentId) async {
+    setState(() {
+      _isLoading = true;
+    });
     await viewModel.fetchApplicants(hrDocumentId);
     await viewModel.fetchSupervisors();
-    setState(() {});
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _onSearchChanged(String query) {
@@ -104,7 +109,9 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
           Navigator.of(context).pushNamed('/menu');
         },
       ),
-      body: SingleChildScrollView(
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
