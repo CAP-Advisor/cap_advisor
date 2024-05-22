@@ -13,6 +13,7 @@ import 'package:cap_advisor/view/login_view.dart';
 import 'package:cap_advisor/view/post_position_view.dart';
 import 'package:cap_advisor/view/menu_view.dart';
 import 'package:cap_advisor/view/sign_up_view.dart';
+import 'package:cap_advisor/view/student_position_search_view.dart';
 import 'package:cap_advisor/view/student_task_view.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:cap_advisor/view/supervisor_view.dart';
@@ -86,6 +87,7 @@ class MyApp extends StatelessWidget {
         '/assign-feedback':(context) => AssigningFeedbackView(),
           '/add-task':(context) => AddTaskView(studentId: '', studentName: ''),
           'job-and-training-applicants':(context)=>JobAndTrainingApplicantsView(hrDocumentId: ''),
+          '/student_position_search':(context)=>StudentPositionSearchView(),
       },
     ),
     );

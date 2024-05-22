@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
 
@@ -12,9 +14,10 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
   final String hrDocumentId;
 
   JobAndTrainingApplicantsViewModel({required this.hrDocumentId}) {
-    fetchApplicants();
+    fetchApplicants(hrDocumentId);
     fetchSupervisors();
   }
+
   String filterType = ''; // Store selected filter type (e.g., 'gpa', 'address', 'skill')
   String filterValue = ''; // Store selected filter value
 
@@ -48,10 +51,61 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     applyFilter();
   }
 
-  Future<void> fetchApplicants() async {
-    var snapshot = await _db.collection('Student').get();
-    applicants =
-        snapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+  Future<void> fetchApplicants(String hrId) async {
+    var jobSnapshot = await _db
+        .collection('Job Position')
+        .where('hrId', isEqualTo: hrId)
+        .get();
+    var jobPositions = jobSnapshot.docs
+        .map((doc) => {
+              'id': doc.id,
+              'type': 'Job Position',
+              'studentApplicantsList':
+                  List<String>.from(doc['studentApplicantsList'] ?? []),
+            })
+        .toList();
+
+    var trainingSnapshot = await _db
+        .collection('Training Position')
+        .where('hrId', isEqualTo: hrId)
+        .get();
+    var trainingPositions = trainingSnapshot.docs
+        .map((doc) => {
+              'id': doc.id,
+              'type': 'Training Position',
+              'studentApplicantsList':
+                  List<String>.from(doc['studentApplicantsList'] ?? []),
+            })
+        .toList();
+
+    List<String> studentIds = [];
+    List<Map<String, String>> positionTypes = [];
+
+    for (var job in jobPositions) {
+      studentIds.addAll((job['studentApplicantsList'] as List<dynamic>).whereType<String>());
+      positionTypes.add({'id': job['id'].toString(), 'type': job['type'].toString()});
+    }
+
+    for (var training in trainingPositions) {
+      studentIds.addAll((training['studentApplicantsList'] as List<dynamic>).whereType<String>());
+      positionTypes.add({'id': training['id'].toString(), 'type': training['type'].toString()});
+    }
+
+
+    studentIds = studentIds.toSet().toList();
+
+    if (studentIds.isNotEmpty) {
+      var studentSnapshot = await _db
+          .collection('Student')
+          .where(FieldPath.documentId, whereIn: studentIds)
+          .get();
+      applicants = studentSnapshot.docs
+          .map((doc) => Student.fromFirestore(doc))
+          .toList();
+    } else {
+      applicants = [];
+    }
+
     filteredApplicants = List.from(applicants);
     notifyListeners();
   }
@@ -65,8 +119,9 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
           .collection('Supervisor')
           .where('hrId', isEqualTo: hrId)
           .get();
-      supervisors =
-          snapshot.docs.map((doc) => SupervisorModel.fromFirestore(doc)).toList();
+      supervisors = snapshot.docs
+          .map((doc) => SupervisorModel.fromFirestore(doc))
+          .toList();
       notifyListeners();
     }
   }
@@ -94,7 +149,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     applicants.removeWhere((applicant) => applicant.uid == student.uid);
     filteredApplicants.removeAt(index);
 
-    await _updateApplicantInCollection('Training', student.uid);
+    await _updateApplicantInCollection('Training Position', student.uid);
     await _updateApplicantInCollection('Job Position', student.uid);
 
     notifyListeners();
@@ -117,8 +172,10 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
                 return ListTile(
                   title: Text(supervisor.name),
                   onTap: () {
-                    _assignStudentToSupervisor(applicantIndex, supervisor);
-                    Navigator.of(context).pop();
+                    _assignStudentToSupervisor(applicantIndex, supervisor)
+                        .then((_) {
+                      Navigator.of(context).pop();
+                    });
                   },
                 );
               },
@@ -134,11 +191,15 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     final student = filteredApplicants[applicantIndex];
     final supervisorRef = _db.collection('Supervisor').doc(supervisor.uid);
 
-    await supervisorRef.update({
-      'studentList': FieldValue.arrayUnion([student.uid])
-    });
-
-    notifyListeners();
+    try {
+      await supervisorRef.update({
+        'studentList': FieldValue.arrayUnion([student.uid])
+      });
+      notifyListeners();
+    } catch (e) {
+      print("Failed to assign student to supervisor: $e");
+      // Handle error appropriately
+    }
   }
 
   Future<void> _updateApplicantInCollection(
@@ -146,10 +207,10 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     var snapshot = await _db.collection(collectionName).get();
 
     for (var doc in snapshot.docs) {
-      if (doc.data()['applicantList'] != null &&
-          (doc.data()['applicantList'] as List).contains(studentId)) {
+      if (doc.data()['studentApplicantsList'] != null &&
+          (doc.data()['studentApplicantsList'] as List).contains(studentId)) {
         await _db.collection(collectionName).doc(doc.id).update({
-          'applicantList': FieldValue.arrayRemove([studentId])
+          'studentApplicantsList': FieldValue.arrayRemove([studentId])
         });
       }
     }

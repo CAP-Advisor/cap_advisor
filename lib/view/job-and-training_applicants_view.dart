@@ -7,7 +7,7 @@ import '../widgets/custom_appbar.dart';
 class JobAndTrainingApplicantsView extends StatefulWidget {
   final String hrDocumentId;
 
-  JobAndTrainingApplicantsView({required this.hrDocumentId});
+  JobAndTrainingApplicantsView({super.key, required this.hrDocumentId});
 
   @override
   _JobAndTrainingApplicantsViewState createState() => _JobAndTrainingApplicantsViewState();
@@ -20,11 +20,11 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
   void initState() {
     super.initState();
     viewModel = JobAndTrainingApplicantsViewModel(hrDocumentId: widget.hrDocumentId);
-    fetchData();
+    fetchData(widget.hrDocumentId);
   }
 
-  void fetchData() async {
-    await viewModel.fetchApplicants();
+  void fetchData(String hrDocumentId) async {
+    await viewModel.fetchApplicants(hrDocumentId);
     await viewModel.fetchSupervisors();
     setState(() {});
   }
@@ -89,7 +89,6 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +101,7 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
           // Handle notifications
         },
         onMenuPressed: () {
-          Navigator.of(context).pushNamed('/menu');          // Handle menu
+          Navigator.of(context).pushNamed('/menu');
         },
       ),
       body: SingleChildScrollView(
@@ -170,8 +169,8 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
                       children: [
                         IconButton(
                           icon: Icon(Icons.check, color: Colors.green),
-                          onPressed: () {
-                            viewModel.approveApplicant(context, index);
+                          onPressed: () async {
+                            await viewModel.approveApplicant(context, index);
                             setState(() {
                               viewModel.filteredApplicants.removeAt(index);
                             });
