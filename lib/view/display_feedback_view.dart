@@ -88,6 +88,7 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
                   CustomTextField(
                     controller: widget.viewModel.finalFeedbackController,
                     hintText: "Final Feedback",
+                    maxLines: null,
                     isValid: widget.viewModel.nameController.text.isNotEmpty,
                     errorMessage: 'Please enter the final feedback',
                     onChanged: (String) {},
@@ -253,6 +254,7 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
           CustomTextField(
             controller: widget.viewModel.taskFeedbackController,
             hintText: "Task Feedback",
+            maxLines: null,
             onChanged: (String) {},
             errorMessage: 'Please fill the task feedback',
             isValid: widget.viewModel.nameController.text.isNotEmpty,
