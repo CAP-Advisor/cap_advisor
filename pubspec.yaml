@@ -38,6 +38,7 @@ dependencies:
   image_picker: ^1.1.1
   firebase_storage: ^11.7.5
   syncfusion_flutter_datepicker: ^25.2.3
+  cached_network_image: ^3.0.0
 
   flutter_svg: ^1.0.3  # Check for the latest version on pub.dev
   # The following adds the Cupertino Icons font to your application.

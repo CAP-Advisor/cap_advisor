@@ -169,7 +169,7 @@ class FirebaseService {
           .where(FieldPath.documentId, whereIn: studentList)
           .get();
       List<Student> students =
-      querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+      querySnapshot.docs.map((doc) => Student.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
       return students;
     } catch (e) {
       print('Error fetching students: $e');
@@ -227,7 +227,7 @@ class FirebaseService {
     }
   }
 
-  Future<Map<String, dynamic>?> getUserData(String email) async {
+  Future<Map<String, dynamic>?> getUserData(String ?email) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection('Users')
@@ -291,6 +291,16 @@ class FirebaseService {
     } catch (e) {
       print('Error getting supervisor data for email $email: $e');
       return null;
+    }
+  }
+  Future<List<Student>> fetchStudents() async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('Student').get();
+      List<Student> students = querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+      return students;
+    } catch (e) {
+      print('Error fetching students: $e');
+      return [];
     }
   }
 

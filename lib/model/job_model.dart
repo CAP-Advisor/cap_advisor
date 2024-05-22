@@ -7,6 +7,7 @@ class Job {
   String description;
   List<String> skills;
   String title;
+  String hrId;
 
   Job({
     required this.id,
@@ -15,6 +16,7 @@ class Job {
     required this.description,
     required this.skills,
     required this.title,
+    required this.hrId
   });
 
   factory Job.fromFirestore(DocumentSnapshot doc) {
@@ -26,6 +28,7 @@ class Job {
       description: data['description'] ?? 'No description provided',
       skills: List<String>.from(data['skills'] ?? []),
       title: data['title'] ?? 'No title provided',
+      hrId:data['hrId'] ?? 'No hr id',
     );
   }
 
