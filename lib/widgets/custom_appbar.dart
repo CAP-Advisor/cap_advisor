@@ -32,7 +32,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       );
     }
-
     actions.add(
       IconButton(
         icon: Icon(Icons.notifications),

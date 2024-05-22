@@ -288,7 +288,6 @@ class FirebaseService {
       return false;
     }
   }
-
   Future<Student?> getStudentDataByEmail() async {
     String? email = FirebaseAuth.instance.currentUser?.email;
     if (email == null) {
@@ -430,34 +429,6 @@ class FirebaseService {
     }
   }
 
-  Future<bool> updateCoverPhoto() async {
-    try {
-      String? imageUrl = await uploadImage();
-      if (imageUrl == null) {
-        print("Image upload failed or was cancelled.");
-        return false;
-      }
-
-      String userId = _auth.currentUser!.uid;
-      DocumentReference supervisorRef =
-          _firestore.collection('Supervisor').doc(userId);
-
-      DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
-
-      if (supervisorSnapshot.exists) {
-        await supervisorRef.update({'coverPhotoUrl': imageUrl});
-        print("Cover photo updated successfully.");
-        return true;
-      } else {
-        print("Supervisor document does not exist.");
-        return false;
-      }
-    } catch (e) {
-      print("Error updating cover photo: $e");
-      return false;
-    }
-  }
-
   Future<bool> updateStudentProfileImage() async {
     try {
       String? imageUrl = await uploadImage();
@@ -485,6 +456,34 @@ class FirebaseService {
       }
     } catch (e) {
       print("Error updating profile image: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateCoverPhoto() async {
+    try {
+      String? imageUrl = await uploadImage();
+      if (imageUrl == null) {
+        print("Image upload failed or was cancelled.");
+        return false;
+      }
+
+      String userId = _auth.currentUser!.uid;
+      DocumentReference supervisorRef =
+          _firestore.collection('Supervisor').doc(userId);
+
+      DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
+
+      if (supervisorSnapshot.exists) {
+        await supervisorRef.update({'coverPhotoUrl': imageUrl});
+        print("Cover photo updated successfully.");
+        return true;
+      } else {
+        print("Supervisor document does not exist.");
+        return false;
+      }
+    } catch (e) {
+      print("Error updating cover photo: $e");
       return false;
     }
   }
@@ -562,7 +561,7 @@ class FirebaseService {
       throw error; // Rethrow the error for error handling in UI
     }
   }
-
+  
   Future<QuerySnapshot<Map<String, dynamic>>> getTasks(String userId) {
     return _firestore
         .collection('Student')
