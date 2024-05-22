@@ -6,11 +6,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onNotificationPressed;
   final VoidCallback onMenuPressed;
   final VoidCallback? onFeedback;
+  final VoidCallback? onJobPressed;
+
   const CustomAppBar({
     Key? key,
     required this.title,
     this.onBack,
     this.onFeedback,
+    this.onJobPressed,
     required this.onNotificationPressed,
     required this.onMenuPressed,
   }) : super(key: key);
@@ -29,13 +32,30 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       );
     }
-
-    actions.addAll([
+    actions.add(
       IconButton(
         icon: Icon(Icons.notifications),
         onPressed: onNotificationPressed,
         color: Colors.white,
       ),
+    );
+
+    if (onJobPressed != null) {
+      actions.add(
+        IconButton(
+          icon: Icon(IconData(0xf11a, fontFamily: 'MaterialIcons')),
+          onPressed: onJobPressed!,
+          color: Colors.white,
+        ),
+      );
+    }
+
+    actions.addAll([
+      // IconButton(
+      //   icon: Icon(Icons.notifications),
+      //   onPressed: onNotificationPressed,
+      //   color: Colors.white,
+      // ),
       IconButton(
         icon: Icon(Icons.menu),
         onPressed: onMenuPressed,
