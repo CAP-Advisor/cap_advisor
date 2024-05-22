@@ -1,27 +1,29 @@
-import 'package:cap_advisor/model/firebaseuser.dart';
-import 'package:cap_advisor/service/firebase_service.dart';
-import 'package:cap_advisor/utils/role_factory.dart';
-import 'package:cap_advisor/view-model/add_task_viewmodel.dart';
-import 'package:cap_advisor/view-model/assigning_feedback_viewmodel.dart';
-import 'package:cap_advisor/view-model/job-and-training_applicants_viewmodel.dart';
-import 'package:cap_advisor/view/HR_view.dart';
-import 'package:cap_advisor/view/add_task_view.dart';
-import 'package:cap_advisor/view/assigning_feedback_view.dart';
-import 'package:cap_advisor/view/display_feedback_view.dart';
-import 'package:cap_advisor/view/home_view.dart';
-import 'package:cap_advisor/view/instructor_view.dart';
-import 'package:cap_advisor/view/job-and-training_applicants_view.dart';
-import 'package:cap_advisor/view/login_view.dart';
-import 'package:cap_advisor/view/post_position_view.dart';
-import 'package:cap_advisor/view/menu_view.dart';
-import 'package:cap_advisor/view/sign_up_view.dart';
-import 'package:cap_advisor/view/student_view.dart';
-import 'package:cap_advisor/view/supervisor_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:cap_advisor/view/student_position_search_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'view-model/student_search_viewmodel.dart';
+import 'view-model/assigning_feedback_viewmodel.dart';
+import 'view-model/student_task_viewmodel.dart';
+import 'view/student_search_view.dart';
+import 'view/HR_view.dart';
+import 'view/add_task_view.dart';
+import 'view/assigning_feedback_view.dart';
+import 'view/home_view.dart';
+import 'view/instructor_view.dart';
+import 'view/job-and-training_applicants_view.dart';
+import 'view/login_view.dart';
+import 'view/post_position_view.dart';
+import 'view/menu_view.dart';
+import 'view/sign_up_view.dart';
+import 'view/student_task_view.dart';
+import 'view/student_view.dart';
+import 'view/supervisor_view.dart';
+import 'model/firebaseuser.dart';
+import 'service/firebase_service.dart';
+import 'utils/role_factory.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,16 +67,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var homeView =isAuthenticated ? roleFactory(userType!) : HomeView();
+    var homeView = isAuthenticated ? roleFactory(userType!) : HomeView();
     return MultiProvider(
-        providers: [
+      providers: [
         ChangeNotifierProvider(create: (_) => AssigningFeedbackViewModel()),
-          // Add more providers if needed
-    ],
-    child: MaterialApp(
-    title: 'CAP Advisor',
-    theme: ThemeData(),
-    home: JobAndTrainingApplicantsView(hrDocumentId: 'wDMeZOB4KSdEr9ma8hCrsHWGGSk2',),
+        ChangeNotifierProvider(create: (_) => StudentTasksViewModel()),
+        ChangeNotifierProvider(create: (_) => StudentViewModel()),
+      ],
+      child: MaterialApp(
+        title: 'CAP Advisor',
+        theme: ThemeData(),
+        home: homeView,
         routes: {
         '/login': (context) => LoginView(),
         '/SignUp': (context) => SignUpView(),
@@ -88,6 +91,7 @@ class MyApp extends StatelessWidget {
         '/assign-feedback':(context) => AssigningFeedbackView(),
           '/add-task':(context) => AddTaskView(studentId: '', studentName: ''),
           'job-and-training-applicants':(context)=>JobAndTrainingApplicantsView(hrDocumentId: ''),
+          '/student_position_search':(context)=>StudentPositionSearchView(),
       },
     ),
     );

@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../view-model/job-and-training_applicants_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 
 class JobAndTrainingApplicantsView extends StatefulWidget {
   final String hrDocumentId;
 
-  JobAndTrainingApplicantsView({required this.hrDocumentId});
+  JobAndTrainingApplicantsView({super.key, required this.hrDocumentId});
 
   @override
   _JobAndTrainingApplicantsViewState createState() => _JobAndTrainingApplicantsViewState();
@@ -15,18 +14,24 @@ class JobAndTrainingApplicantsView extends StatefulWidget {
 
 class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsView> {
   late JobAndTrainingApplicantsViewModel viewModel;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     viewModel = JobAndTrainingApplicantsViewModel(hrDocumentId: widget.hrDocumentId);
-    fetchData();
+    fetchData(widget.hrDocumentId);
   }
 
-  void fetchData() async {
-    await viewModel.fetchApplicants();
+  void fetchData(String hrDocumentId) async {
+    setState(() {
+      _isLoading = true;
+    });
+    await viewModel.fetchApplicants(hrDocumentId);
     await viewModel.fetchSupervisors();
-    setState(() {});
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _onSearchChanged(String query) {
@@ -89,7 +94,6 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,10 +106,12 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
           // Handle notifications
         },
         onMenuPressed: () {
-          Navigator.of(context).pushNamed('/menu');          // Handle menu
+          Navigator.of(context).pushNamed('/menu');
         },
       ),
-      body: SingleChildScrollView(
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -170,8 +176,8 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
                       children: [
                         IconButton(
                           icon: Icon(Icons.check, color: Colors.green),
-                          onPressed: () {
-                            viewModel.approveApplicant(context, index);
+                          onPressed: () async {
+                            await viewModel.approveApplicant(context, index);
                             setState(() {
                               viewModel.filteredApplicants.removeAt(index);
                             });

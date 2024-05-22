@@ -43,7 +43,7 @@ class FirebaseService {
   Future<bool> verifyCustomToken(String customToken) async {
     try {
       UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithCustomToken(customToken);
+          await FirebaseAuth.instance.signInWithCustomToken(customToken);
       User? user = userCredential.user;
       if (user != null) {
         // Check if user is authenticated
@@ -72,7 +72,7 @@ class FirebaseService {
       }
 
       DocumentSnapshot snapshot =
-      await _firestore.collection('Users').doc(user.uid).get();
+          await _firestore.collection('Users').doc(user.uid).get();
 
       if (snapshot.exists) {
         return snapshot.data() as Map<String, dynamic>;
@@ -152,11 +152,10 @@ class FirebaseService {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
-
   Future<List<Student>> fetchStudentsId(String supervisorId) async {
     try {
       DocumentSnapshot supervisorSnapshot =
-      await _firestore.collection('Supervisor').doc(supervisorId).get();
+          await _firestore.collection('Supervisor').doc(supervisorId).get();
       if (!supervisorSnapshot.exists) {
         print('Supervisor not found');
         return [];
@@ -169,7 +168,8 @@ class FirebaseService {
           .where(FieldPath.documentId, whereIn: studentList)
           .get();
       List<Student> students =
-      querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+      //querySnapshot.docs.map((doc) => Student.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)).toList();
+          querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
       return students;
     } catch (e) {
       print('Error fetching students: $e');
@@ -196,7 +196,7 @@ class FirebaseService {
       List<Student> students = [];
       for (String studentId in studentRefs) {
         DocumentSnapshot studentSnapshot =
-        await _firestore.collection('Student').doc(studentId).get();
+            await _firestore.collection('Student').doc(studentId).get();
         if (studentSnapshot.exists) {
           students.add(Student.fromFirestore(studentSnapshot));
         }
@@ -227,7 +227,7 @@ class FirebaseService {
     }
   }
 
-  Future<Map<String, dynamic>?> getUserData(String email) async {
+  Future<Map<String, dynamic>?> getUserData(String ?email) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection('Users')
@@ -236,7 +236,7 @@ class FirebaseService {
 
       if (querySnapshot.docs.isNotEmpty) {
         Map<String, dynamic> userData =
-        querySnapshot.docs.first.data() as Map<String, dynamic>;
+            querySnapshot.docs.first.data() as Map<String, dynamic>;
         String? userType = userData['userType'];
 
         if (userType != null) {
@@ -258,7 +258,7 @@ class FirebaseService {
     if (userId == null) return null;
     try {
       DocumentSnapshot studentDoc =
-      await _firestore.collection('Student').doc(userId).get();
+          await _firestore.collection('Student').doc(userId).get();
       if (studentDoc.exists) {
         return studentDoc.data() as Map<String, dynamic>?;
       }
@@ -266,6 +266,50 @@ class FirebaseService {
     } catch (e) {
       print('Error fetching student data: $e');
       return null;
+    }
+  }
+
+  Future<bool> updateStudentGpa(String email, double newGpa) async {
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('Student')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+      if (snapshot.docs.isEmpty) {
+        return false;
+      }
+      DocumentSnapshot doc = snapshot.docs.first;
+      await _firestore
+          .collection('Student')
+          .doc(doc.id)
+          .update({'gpa': newGpa});
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  Future<Student?> getStudentDataByEmail() async {
+    String? email = FirebaseAuth.instance.currentUser?.email;
+    if (email == null) {
+      throw Exception("Email is not available.");
+    }
+
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('Student')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        throw Exception("No student data available for the email $email.");
+      } else {
+        DocumentSnapshot doc = snapshot.docs.first;
+        return Student.fromFirestore(doc);
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch data: ${e.toString()}");
     }
   }
 
@@ -293,6 +337,16 @@ class FirebaseService {
       return null;
     }
   }
+  Future<List<Student>> fetchStudents() async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('Student').get();
+      List<Student> students = querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
+      return students;
+    } catch (e) {
+      print('Error fetching students: $e');
+      return [];
+    }
+  }
 
   Future<bool> updateSupervisorName(String email, String newName) async {
     try {
@@ -311,6 +365,27 @@ class FirebaseService {
       }
     } catch (e) {
       print("Error updating supervisor name by email: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateStudentName(String email, String newName) async {
+    try {
+      QuerySnapshot query = await _firestore
+          .collection('Student')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+      if (query.docs.isNotEmpty) {
+        await query.docs.first.reference.update({'name': newName});
+        print("Updated student name for email $email to $newName");
+        return true;
+      } else {
+        print("No student found with email $email to update");
+        return false;
+      }
+    } catch (e) {
+      print("Error updating student name by email: $e");
       return false;
     }
   }
@@ -344,7 +419,7 @@ class FirebaseService {
 
       String userId = _auth.currentUser!.uid;
       DocumentReference supervisorRef =
-      _firestore.collection('Supervisor').doc(userId);
+          _firestore.collection('Supervisor').doc(userId);
 
       DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
 
@@ -354,6 +429,37 @@ class FirebaseService {
         return true;
       } else {
         await supervisorRef.set({
+          'photoUrl': imageUrl,
+        }, SetOptions(merge: true));
+        print("Profile photo set successfully in new document.");
+        return true;
+      }
+    } catch (e) {
+      print("Error updating profile image: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateStudentProfileImage() async {
+    try {
+      String? imageUrl = await uploadImage();
+      if (imageUrl == null) {
+        print("Image upload failed or was cancelled.");
+        return false;
+      }
+
+      String userId = _auth.currentUser!.uid;
+      DocumentReference studentRef =
+          _firestore.collection('Student').doc(userId);
+
+      DocumentSnapshot studentSnapshot = await studentRef.get();
+
+      if (studentSnapshot.exists) {
+        await studentRef.update({'photoUrl': imageUrl});
+        print("Profile photo updated successfully.");
+        return true;
+      } else {
+        await studentRef.set({
           'photoUrl': imageUrl,
         }, SetOptions(merge: true));
         print("Profile photo set successfully in new document.");
@@ -375,7 +481,7 @@ class FirebaseService {
 
       String userId = _auth.currentUser!.uid;
       DocumentReference supervisorRef =
-      _firestore.collection('Supervisor').doc(userId);
+          _firestore.collection('Supervisor').doc(userId);
 
       DocumentSnapshot supervisorSnapshot = await supervisorRef.get();
 
@@ -393,6 +499,34 @@ class FirebaseService {
     }
   }
 
+  Future<bool> updateStudentCoverPhoto() async {
+    try {
+      String? imageUrl = await uploadImage();
+      if (imageUrl == null) {
+        print("Image upload failed or was cancelled.");
+        return false;
+      }
+
+      String userId = _auth.currentUser!.uid;
+      DocumentReference studentRef =
+          _firestore.collection('Student').doc(userId);
+
+      DocumentSnapshot studentSnapshot = await studentRef.get();
+
+      if (studentSnapshot.exists) {
+        await studentRef.update({'coverPhotoUrl': imageUrl});
+        print("Cover photo updated successfully.");
+        return true;
+      } else {
+        print("Student document does not exist.");
+        return false;
+      }
+    } catch (e) {
+      print("Error updating cover photo: $e");
+      return false;
+    }
+  }
+
   Future<void> addFeedback({
     required String studentId,
     required String feedbackType,
@@ -401,11 +535,11 @@ class FirebaseService {
     try {
       // Reference to the student document
       DocumentReference studentRef =
-      FirebaseFirestore.instance.collection('Student').doc(studentId);
+          FirebaseFirestore.instance.collection('Student').doc(studentId);
 
       // Reference to the collection based on feedback type
       CollectionReference feedbackCollection =
-      studentRef.collection(feedbackType);
+          studentRef.collection(feedbackType);
 
       // Add feedback document to the collection
       await feedbackCollection.add(feedbackData);
@@ -425,7 +559,7 @@ class FirebaseService {
     try {
       // Reference to the student document
       DocumentReference studentRef =
-      FirebaseFirestore.instance.collection('Student').doc(studentId);
+          FirebaseFirestore.instance.collection('Student').doc(studentId);
 
       // Reference to the collection based on feedback type
 
@@ -438,12 +572,153 @@ class FirebaseService {
       throw error; // Rethrow the error for error handling in UI
     }
   }
-}
+  
+  Future<QuerySnapshot<Map<String, dynamic>>> getTasks(String userId) {
+    return _firestore
+        .collection('Student')
+        .doc(userId)
+        .collection('Task')
+        .get();
+  }
+
+  Future<bool> addExperience(String experience) async {
+    String? userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      return false;
+    }
+    try {
+      await _firestore.collection('Student').doc(userId).update({
+        'experience': FieldValue.arrayUnion([experience])
+      });
+      return true;
+    } catch (e) {
+      print("Failed to add experience: $e");
+      return false;
+    }
+  }
+
+  Future<bool> addSkill(String skill) async {
+    String? userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      return false;
+    }
+    try {
+      await _firestore.collection('Student').doc(userId).update({
+        'skills': FieldValue.arrayUnion([skill])
+      });
+      return true;
+    } catch (e) {
+      print("Failed to add skill: $e");
+      return false;
+    }
+  }
+
+  Future<bool> addSummary(String summary) async {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      return false;
+    }
+    try {
+      await FirebaseFirestore.instance
+          .collection('Student')
+          .doc(userId)
+          .update({'summary': summary});
+      return true;
+    } catch (e) {
+      print("Failed to add summary: $e");
+      return false;
+    }
+  }
+
+  Future<bool> addMajor(String major) async {
+    String? userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      return false;
+    }
+    try {
+      await FirebaseFirestore.instance
+          .collection('Student')
+          .doc(userId)
+          .update({'major': major});
+      return true;
+    } catch (e) {
+      print("Failed to add major");
+      return false;
+    }
+  }
+
+  Future<bool> addGithub(String github) async {
+    String? userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      return false;
+    }
+    try {
+      await _firestore
+          .collection('Student')
+          .doc(userId)
+          .update({'github': github});
+      return true;
+    } catch (e) {
+      print("Failed to add github link");
+      return false;
+    }
+  }
+
+  Future<bool> addGpa(double gpa) async {
+    String? userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      return false;
+    }
+    try {
+      await _firestore.collection('Student').doc(userId).update({'gpa': gpa});
+      return true;
+    } catch (e) {
+      print("Failed to add GPA: $e");
+      return false;
+    }
+  }
+
+  Future<bool> addAddress(String address) async {
+    String? userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      return false;
+    }
+    try {
+      await _firestore
+          .collection('Student')
+          .doc(userId)
+          .update({'address': address});
+      return true;
+    } catch (e) {
+      print("Failed to add Address");
+      return false;
+    }
+  }
+  Future<String?> getUserRole() async {
+    try {
+      String? uid = _auth.currentUser?.uid;
+      if (uid == null) {
+        return null;
+      }
+      DocumentSnapshot userDoc =
+      await _firestore.collection('Users').doc(uid).get();
+      if (userDoc.exists) {
+        Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+        return data['userType'];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("Error getting user role: $e");
+      return null;
+    }
+  }
+  }
 
 Future<bool> verifyIdToken(String idToken) async {
   try {
     UserCredential userCredential =
-    await FirebaseAuth.instance.signInWithCustomToken(idToken);
+        await FirebaseAuth.instance.signInWithCustomToken(idToken);
     User? user = userCredential.user;
     if (user != null) {
       // Token is valid

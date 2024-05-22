@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'package:cap_advisor/model/firebaseuser.dart';
 import 'package:cap_advisor/model/job_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../service/firebase_service.dart';
+import '../view/job-and-training_applicants_view.dart';
 
 enum ImageType {
   background,
@@ -28,38 +31,65 @@ class HRViewModel extends ChangeNotifier {
   bool isLoading = true;
   String? errorMessage;
   FirebaseStorage storage= FirebaseStorage.instance;
+  FireBaseUser? user;
 
 
   HRViewModel() {
     fetchPositions();
+    fetchUserData();
   }
 
+  Future<void> fetchUserData() async {
+    user = await getUserData();
+    notifyListeners();
+  }
+
+  Future<FireBaseUser?> getUserData() async {
+    User? authedUser = firebaseAuth.currentUser;
+    if (authedUser == null) {
+      errorMessage = "User is not authenticated.";
+      return null;
+    }
+
+    try {
+      FirebaseService service = FirebaseService();
+      var userMap = await service.getUserData(authedUser.email);
+      if (userMap != null) {
+        return FireBaseUser.fromMap(userMap['userData']);
+      } else {
+        errorMessage = "User data not found.";
+        return null;
+      }
+    } catch (e) {
+      errorMessage = "Failed to get user data: $e";
+      return null;
+    }
+  }
 
   Future<void> fetchPositions() async {
     isLoading = true;
     notifyListeners();
 
     try {
-
-      String collectionName = currentType == PositionType.job ? 'Job Position' : 'Training';
-
+      String collectionName = currentType == PositionType.job ? 'Job Position' : 'Training Position';
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(collectionName).get();
       var positions = querySnapshot.docs.map((doc) => Job.fromFirestore(doc)).toList();
+
+      final User? user = firebaseAuth.currentUser;
+      if (user != null) {
+        positions = positions.where((job) => job.hrId == user.uid).toList();
+      }
 
       allPositions = positions;
       filteredPositions = positions;
       errorMessage = null;
-
     } catch (e) {
-
       errorMessage = 'Error fetching positions: $e';
-
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
-
   Future<String> fetchImageUrl({required ImageType type}) async {
 
       String userId = firebaseAuth.currentUser?.uid ?? '';
@@ -179,6 +209,10 @@ class HRViewModel extends ChangeNotifier {
           ),
           actions: [
             ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF427D9D)), // Set the background color to #427D9D
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white), // Set the text color to white
+              ),
               onPressed: () {
                 job.title = titleController.text;
                 job.description = descriptionController.text;
@@ -196,11 +230,19 @@ class HRViewModel extends ChangeNotifier {
                 Navigator.of(context).pop();
               },
               child: Text('Save'),
-            )
+            ),
           ],
         );
       },
     );
+  }
+  bool is_account_owner(String requiredId){
+    User? user= firebaseAuth.currentUser;
+
+    if(requiredId!=user?.uid){
+      return false;
+    }
+    return true;
   }
 
 
@@ -217,4 +259,5 @@ class HRViewModel extends ChangeNotifier {
         .toList();
     notifyListeners();
   }
+
 }

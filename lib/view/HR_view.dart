@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../model/job_model.dart';
 import '../view-model/HR_viewmodel.dart';
+import '../view/student_search_view.dart';
+import 'job-and-training_applicants_view.dart';
 
 class HRView extends StatefulWidget {
   @override
@@ -65,7 +67,34 @@ class _HRViewState extends State<HRView> {
             ],
           ),
         ),
-        bottomNavigationBar: _buildBottomNavigationBar(),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Color(0xFF164863),
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white,
+          currentIndex: 0,
+          onTap: (index) {
+            switch (index) {
+              case 0:
+              // Already on HR View, no action needed
+                break;
+              case 1:
+              // Navigate to Feedback View
+                break;
+              case 2:
+              // Navigate to Student Search View
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => StudentSearchScreen()),
+                );
+                break;
+            }
+          },
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Positions'),
+            BottomNavigationBarItem(icon: Icon(Icons.feedback), label: 'Feedback'),
+            BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Student Search'),
+          ],
+        ),
       ),
     );
   }
@@ -160,7 +189,7 @@ class _HRViewState extends State<HRView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Profile Name', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text(model.user?.username ?? 'error', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     Text('# Followers', style: TextStyle(fontSize: 18, color: Colors.grey)),
                   ],
                 ),
@@ -181,7 +210,8 @@ class _HRViewState extends State<HRView> {
           child: Row(
             children: [
               Expanded(
-                child: Text(model.bio, style: TextStyle(fontSize: 16)),
+                // Handling potential null value for user and user's email
+                child: Text(model.user?.bio ?? "No email available", style: TextStyle(fontSize: 16)),
               ),
               IconButton(
                 icon: Icon(Icons.edit),
@@ -193,6 +223,7 @@ class _HRViewState extends State<HRView> {
       },
     );
   }
+
   Widget _buildToggleButtons() {
     return Consumer<HRViewModel>(
       builder: (context, model, child) {
@@ -274,46 +305,53 @@ class _HRViewState extends State<HRView> {
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  job.title,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      job.title,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    if (model.is_account_owner(job.hrId))
+                      IconButton(
+                        icon: Icon(Icons.edit, size: 20),
+                        onPressed: () => model.editJobDescription(context, job),
+                      ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.edit, size: 20),
-                  onPressed: () => model.editJobDescription(context, job),
+                Text(
+                  job.description,
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                Text(
+                  'Posted # hour ago',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
-            Text(
-              job.description,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => JobAndTrainingApplicantsView(hrDocumentId: job.hrId)),
+                );
+              },
+              child: Text('View Applicants'),
             ),
-            Text(
-              'Posted # hour ago',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Positions'),
-        BottomNavigationBarItem(icon: Icon(Icons.feedback), label: 'Feedback'),
-        BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Student Search'),
-      ],
     );
   }
 }
