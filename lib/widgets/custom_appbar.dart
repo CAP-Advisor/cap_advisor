@@ -7,6 +7,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMenuPressed;
   final VoidCallback? onFeedback;
   final VoidCallback? onJobPressed;
+
   const CustomAppBar({
     Key? key,
     required this.title,
