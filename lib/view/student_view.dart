@@ -15,7 +15,6 @@ class StudentView extends StatelessWidget {
 
   final TextEditingController _nameController = TextEditingController();
   FirebaseService firebaseService = FirebaseService();
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<StudentViewModel>(

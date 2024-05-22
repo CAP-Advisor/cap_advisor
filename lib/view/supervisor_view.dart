@@ -8,8 +8,9 @@ import 'student_view.dart';
 
 class SupervisorView extends StatelessWidget {
   final String uid;
+  final TextEditingController _nameController = TextEditingController();
 
-  const SupervisorView({Key? key, required this.uid}) : super(key: key);
+  SupervisorView({Key? key, required this.uid}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +219,6 @@ class SupervisorView extends StatelessWidget {
       ),
     );
   }
-
   void _showNameDialog(BuildContext context, SupervisorViewModel _viewModel) {
     showDialog(
       context: context,

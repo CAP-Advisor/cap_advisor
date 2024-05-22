@@ -15,9 +15,6 @@ class Student {
   final String additionalInfo;
   final String uid;
   bool isApproved = false;
-  final double? gpa; // Make GPA nullable
-  final String address;
-  final List<String>? skills; // Make skills nullable
 
   Student({
     required this.name,

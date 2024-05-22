@@ -694,7 +694,26 @@ class FirebaseService {
       return false;
     }
   }
-}
+  Future<String?> getUserRole() async {
+    try {
+      String? uid = _auth.currentUser?.uid;
+      if (uid == null) {
+        return null;
+      }
+      DocumentSnapshot userDoc =
+      await _firestore.collection('Users').doc(uid).get();
+      if (userDoc.exists) {
+        Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+        return data['userType'];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("Error getting user role: $e");
+      return null;
+    }
+  }
+  }
 
 Future<bool> verifyIdToken(String idToken) async {
   try {

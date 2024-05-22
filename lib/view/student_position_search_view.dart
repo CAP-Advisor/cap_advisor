@@ -96,7 +96,7 @@ class _StudentPositionSearchViewState extends State<StudentPositionSearchView> {
               controller: searchController,
               onChanged: (value) {
                 // Handle search input changes
-              },
+              }, hintText: 'Search Position',
             ),
             Expanded(
               child: isLoading

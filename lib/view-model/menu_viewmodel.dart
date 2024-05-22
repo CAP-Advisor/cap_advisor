@@ -10,6 +10,16 @@ import '../view/supervisor_view.dart';
 
 class MenuViewModel extends ChangeNotifier {
   final FirebaseService _firebaseService = FirebaseService();
+  String? userRole;
+
+  MenuViewModel() {
+    _getUserRole();
+  }
+
+  Future<void> _getUserRole() async {
+    userRole = await _firebaseService.getUserRole();
+    notifyListeners();
+  }
 
   void changePassword(BuildContext context) {
     Navigator.of(context)
