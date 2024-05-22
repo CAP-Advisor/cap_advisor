@@ -27,7 +27,7 @@ class StudentView extends StatelessWidget {
               title: "CAP Advisor",
               onNotificationPressed: () {},
               onJobPressed: () {
-                Navigator.of(context).pushNamed('/menu');
+                Navigator.of(context).pushNamed('/student-position-search');
               },
               onMenuPressed: () {
                 Navigator.of(context).pushNamed('/menu');
@@ -172,7 +172,7 @@ class StudentView extends StatelessWidget {
 
     if (student.address.isNotEmpty ||
         student.github.isNotEmpty ||
-        student.gpa.isNotEmpty) {
+        student.gpa > 0) {
       infoSection.add(SizedBox(height: 20));
       infoSection.add(Center(child: _buildInformationCard(student)));
     }
@@ -235,8 +235,8 @@ class StudentView extends StatelessWidget {
     if (student.github.isNotEmpty) {
       infoRows.add(_informationRow("GitHub:", student.github));
     }
-    if (student.gpa.isNotEmpty) {
-      infoRows.add(_informationRow("GPA:", student.gpa));
+    if (student.gpa > 0) {
+      infoRows.add(_informationRow("GPA:", student.gpa.toString()));
     }
 
     if (infoRows.isEmpty) {

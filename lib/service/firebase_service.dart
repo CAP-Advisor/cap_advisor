@@ -268,6 +268,26 @@ class FirebaseService {
     }
   }
 
+  Future<bool> updateStudentGpa(String email, double newGpa) async {
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('Student')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+      if (snapshot.docs.isEmpty) {
+        return false;
+      }
+      DocumentSnapshot doc = snapshot.docs.first;
+      await _firestore
+          .collection('Student')
+          .doc(doc.id)
+          .update({'gpa': newGpa});
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   Future<Student?> getStudentDataByEmail() async {
     String? email = FirebaseAuth.instance.currentUser?.email;
     if (email == null) {
@@ -542,6 +562,14 @@ class FirebaseService {
     }
   }
   
+  Future<QuerySnapshot<Map<String, dynamic>>> getTasks(String userId) {
+    return _firestore
+        .collection('Student')
+        .doc(userId)
+        .collection('Task')
+        .get();
+  }
+
   Future<bool> addExperience(String experience) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
@@ -608,31 +636,6 @@ class FirebaseService {
     }
   }
 
-  // Future<String?> getCurrentMajor() async {
-  //   // Get the current user from Firebase Authentication
-  //   User? user = FirebaseAuth.instance.currentUser;
-  //
-  //   if (user != null) {
-  //     // Access the user's document in Firestore
-  //     DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-  //         .instance
-  //         .collection('Student')
-  //         .doc(user.uid)
-  //         .get();
-  //
-  //     // Check if the user document exists and contains the 'major' field
-  //     if (snapshot.exists &&
-  //         snapshot.data() != null &&
-  //         snapshot.data()!['major'] != null) {
-  //       // Return the user's major if it exists
-  //       return snapshot.data()!['major'];
-  //     }
-  //   }
-  //
-  //   // Return null if the user is not logged in or does not have a major set
-  //   return null;
-  // }
-
   Future<bool> addGithub(String github) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
@@ -650,7 +653,7 @@ class FirebaseService {
     }
   }
 
-  Future<bool> addGpa(String gpa) async {
+  Future<bool> addGpa(double gpa) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
       return false;
@@ -659,7 +662,7 @@ class FirebaseService {
       await _firestore.collection('Student').doc(userId).update({'gpa': gpa});
       return true;
     } catch (e) {
-      print("Failed to add GPA");
+      print("Failed to add GPA: $e");
       return false;
     }
   }
@@ -679,14 +682,6 @@ class FirebaseService {
       print("Failed to add Address");
       return false;
     }
-  }
-  
-  Future<QuerySnapshot<Map<String, dynamic>>> getTasks(String userId) {
-    return _firestore
-        .collection('Student')
-        .doc(userId)
-        .collection('Task')
-        .get();
   }
 }
 

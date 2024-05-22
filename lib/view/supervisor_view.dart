@@ -42,6 +42,7 @@ class SupervisorView extends StatelessWidget {
                           onChanged: (value) {
                             _viewModel.filterStudents(value);
                           },
+                          hintText: 'search for student',
                         ),
                       ),
                       SizedBox(height: 20),

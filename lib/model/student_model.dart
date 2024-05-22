@@ -11,7 +11,7 @@ class Student {
   final List<String> experience;
   final String github;
   final String address;
-  String gpa;
+  double gpa;
   final String additionalInfo;
   final String uid;
   bool isApproved = false;
@@ -38,7 +38,9 @@ class Student {
       name: data['name'] ?? 'No name provided',
       email: data['email'] ?? 'No email provided',
       major: data['major'] ?? 'CAP',
-      gpa: data['gpa'] ?? '',
+      gpa: (data['gpa'] is num)
+          ? data['gpa'].toDouble()
+          : double.tryParse(data['gpa'].toString()) ?? 0.0,
       summary: data['summary'] ?? '',
       address: data['address'] ?? '',
       skills: List<String>.from(data['skills'] ?? []),
@@ -64,6 +66,7 @@ class Student {
       'experience': experience,
       'github': github,
       'address': address,
+      'gpa': gpa,
       'uid': uid,
       'isApproved': isApproved
     };
