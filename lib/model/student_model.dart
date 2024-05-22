@@ -15,6 +15,9 @@ class Student {
   final String additionalInfo;
   final String uid;
   bool isApproved = false;
+  final double? gpa; // Make GPA nullable
+  final String address;
+  final List<String>? skills; // Make skills nullable
 
   Student({
     required this.name,
@@ -48,6 +51,7 @@ class Student {
       github: data['github'] ?? '',
       additionalInfo: data['additionalInfo'] ?? 'Non-specialist',
       uid: doc.id,
+      //skills: data['skills'] != null ? List<String>.from(data['skills'] as List<dynamic>) : null,
       photoUrl: data['photoUrl'] as String?,
       coverPhotoUrl: data['coverPhotoUrl'] as String?,
     );
