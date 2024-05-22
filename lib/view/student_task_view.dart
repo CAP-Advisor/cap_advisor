@@ -1,3 +1,4 @@
+import 'package:cap_advisor/view/task_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view-model/student_task_viewmodel.dart';
@@ -50,8 +51,11 @@ class StudentTasksView extends StatelessWidget {
                       return CustomTaskCard(
                         taskData: viewModel.tasks[index],
                         onPressed: () {
-                          _showTaskDetailsDialog(
-                              context, viewModel.tasks[index]);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => TaskDetailsView(taskData: viewModel.tasks[index]),
+                            ),
+                          );
                         },
                         buttonTitle: "Details",
                       );
@@ -64,22 +68,6 @@ class StudentTasksView extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void _showTaskDetailsDialog(
-      BuildContext context, Map<String, dynamic> taskData) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CustomDialog(
-          taskData: taskData,
-          showFeedback: true,
-          onClose: () {
-            Navigator.of(context).pop();
-          },
-        );
-      },
     );
   }
 }
