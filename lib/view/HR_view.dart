@@ -294,7 +294,7 @@ class _HRViewState extends State<HRView> {
       height: 122,
       margin: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFFCFE0E9),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
@@ -331,24 +331,30 @@ class _HRViewState extends State<HRView> {
                   job.description,
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
-                Text(
-                  'Posted # hour ago',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+                SizedBox(height: 20,)
               ],
             ),
           ),
           Align(
             alignment: Alignment.bottomRight,
-            child: ElevatedButton(
+            child:ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => JobAndTrainingApplicantsView(hrDocumentId: job.hrId)),
                 );
               },
-              child: Text('View Applicants'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF164863), // Background color
+              ),
+              child: Text(
+                'View Applicants',
+                style: TextStyle(
+                  color: Colors.white, // Text color
+                ),
+              ),
             ),
+
           ),
         ],
       ),

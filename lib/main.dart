@@ -91,7 +91,7 @@ class MyApp extends StatelessWidget {
         '/assign-feedback':(context) => AssigningFeedbackView(),
           '/add-task':(context) => AddTaskView(studentId: '', studentName: ''),
           'job-and-training-applicants':(context)=>JobAndTrainingApplicantsView(hrDocumentId: ''),
-          '/student_position_search':(context)=>StudentPositionSearchView(),
+          '/student-position-search':(context)=>StudentPositionSearchView(),
       },
     ),
     );
