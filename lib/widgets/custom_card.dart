@@ -43,8 +43,11 @@ class CustomCard extends StatelessWidget {
           children: [
             Text("Major: ${feedback.major}"),
             Text(
-              "${feedback.additionalInfo}",
-              style: TextStyle(color: Colors.grey),
+              "Specialization: ${feedback.additionalInfo}",
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+              ),
             ),
           ],
         ),
