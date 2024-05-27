@@ -38,10 +38,12 @@ class MenuView extends StatelessWidget {
                       'Student') // Show only if user is a student
                     _buildMenuItem(context, "View Tasks",
                         onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => StudentTasksView())
-                        )),
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => StudentTasksView(
+                                      studentId: '',
+                                      studentName: '',
+                                    )))),
                   _buildMenuItem(context, "Delete Account",
                       onTap: () => _viewModel.confirmDeleteAccount(context)),
                   _buildMenuItem(context, "Logout",

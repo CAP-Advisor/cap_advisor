@@ -9,8 +9,13 @@ import '../service/firebase_service.dart';
 class StudentView extends StatelessWidget {
   final String uid;
   final bool isSupervisor;
+  final bool isInstructor;
 
-  StudentView({Key? key, required this.uid, this.isSupervisor = false})
+  StudentView(
+      {Key? key,
+      required this.uid,
+      this.isSupervisor = false,
+      this.isInstructor = false})
       : super(key: key);
 
   final TextEditingController _nameController = TextEditingController();
@@ -22,16 +27,31 @@ class StudentView extends StatelessWidget {
       child: Consumer<StudentViewModel>(
         builder: (context, model, child) {
           return Scaffold(
-            appBar: CustomAppBar(
-              title: "CAP Advisor",
-              onNotificationPressed: () {},
-              onJobPressed: () {
-                Navigator.of(context).pushNamed('/student-position-search');
-              },
-              onMenuPressed: () {
-                Navigator.of(context).pushNamed('/menu');
-              },
-            ),
+            appBar: isSupervisor
+                ? CustomAppBar(
+                    title: "CAP Advisor",
+                    onNotificationPressed: () {},
+                    onFeedback: () {
+                      Navigator.of(context).pushNamed('/assign-feedback');
+                    },
+                    onMenuPressed: () {
+                      Navigator.of(context).pushNamed('/menu');
+                    },
+                  )
+                : CustomAppBar(
+                    title: "CAP Advisor",
+                    onNotificationPressed: () {},
+                    onJobPressed: isInstructor
+                        ? null
+                        : () {
+                            Navigator.of(context)
+                                .pushNamed('/student-position-search');
+                          },
+                    onMenuPressed: () {
+                      Navigator.of(context).pushNamed('/menu');
+                    },
+                    isInstructor: isInstructor,
+                  ),
             body: model.isLoading
                 ? Center(child: CircularProgressIndicator())
                 : model.currentStudent == null
@@ -42,7 +62,7 @@ class StudentView extends StatelessWidget {
                           children: <Widget>[
                             _buildProfileHeader(context, model),
                             SizedBox(height: 60),
-                            if (!isSupervisor)
+                            if (!isSupervisor && !isInstructor)
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Padding(
@@ -59,6 +79,7 @@ class StudentView extends StatelessWidget {
                               ),
                             SizedBox(height: 10),
                             _buildInfoSection(context, model),
+                            SizedBox(height: 10),
                           ],
                         ),
                       ),
@@ -101,7 +122,7 @@ class StudentView extends StatelessWidget {
                 : null,
           ),
         ),
-        if (!isSupervisor)
+        if (!isSupervisor && !isInstructor)
           Positioned(
               right: 16,
               bottom: 16,
@@ -148,7 +169,7 @@ class StudentView extends StatelessWidget {
         children: [
           Text(student.name,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-          if (!isSupervisor)
+          if (!isSupervisor && !isInstructor)
             IconButton(
               icon: Icon(Icons.edit, color: Colors.black),
               onPressed: () => _showNameDialog(context, viewModel),
@@ -186,6 +207,11 @@ class StudentView extends StatelessWidget {
       infoSection.add(Center(child: _buildExperienceCard(student)));
     }
 
+    if (viewModel.trainings.isNotEmpty) {
+      infoSection.add(SizedBox(height: 20));
+      infoSection.add(_buildTrainingSection(context, viewModel));
+    }
+
     infoSection.add(SizedBox(height: 50));
 
     return Padding(
@@ -194,6 +220,45 @@ class StudentView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: infoSection,
       ),
+    );
+  }
+
+  Widget _buildTrainingSection(
+      BuildContext context, StudentViewModel viewModel) {
+    if (viewModel.trainings.isEmpty) {
+      print('No training records found.');
+      return SizedBox.shrink();
+    }
+
+    List<Widget> trainingCards = viewModel.trainings.map((training) {
+      return Column(
+        children: [
+          Card(
+            color: Color(0xFFDDF2FD),
+            child: Container(
+              width: 400,
+              constraints: BoxConstraints(minHeight: 114.23),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text("Feedback ${training.course}",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                  SizedBox(height: 10),
+                  Text("${training.feedback}", style: TextStyle(fontSize: 16)),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+        ],
+      );
+    }).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: trainingCards,
     );
   }
 
@@ -377,7 +442,6 @@ class StudentView extends StatelessWidget {
               if (success) {
                 Navigator.pop(context);
               } else {
-                // Show error message
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Failed to update name'),

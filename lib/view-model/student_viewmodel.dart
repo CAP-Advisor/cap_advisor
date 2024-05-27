@@ -1,6 +1,6 @@
 import 'package:cap_advisor/model/student_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../model/final_feedback_model.dart';
 import '../service/firebase_service.dart';
 
 class StudentViewModel with ChangeNotifier {
@@ -9,6 +9,7 @@ class StudentViewModel with ChangeNotifier {
   String? error;
   final String uid;
   Student? currentStudent;
+  List<FinalTraining> trainings = [];
   String? get studentName => currentStudent?.name;
   String? get studentEmail => currentStudent?.email;
   String? get studentPhotoUrl => currentStudent?.photoUrl;
@@ -16,9 +17,17 @@ class StudentViewModel with ChangeNotifier {
   StudentViewModel(this.uid) {
     print("StudentViewModel initialized with uid: $uid");
     if (uid.isNotEmpty) {
-      getStudentDataByUid();
+      getStudentDataByUid().then((_) {
+        if (currentStudent?.email != null) {
+          fetchTrainingDataByEmail(currentStudent!.email!);
+        }
+      });
     } else {
-      getStudentDataByEmail();
+      getStudentDataByEmail().then((_) {
+        if (currentStudent?.email != null) {
+          fetchTrainingDataByEmail(currentStudent!.email!);
+        }
+      });
     }
   }
 
@@ -30,6 +39,8 @@ class StudentViewModel with ChangeNotifier {
       currentStudent = await _firebaseService.getStudentDataByEmail();
       if (currentStudent == null) {
         error = "No student data available.";
+      } else {
+        fetchTrainingDataByEmail(currentStudent!.email!);
       }
     } catch (e) {
       error = e.toString();
@@ -44,16 +55,14 @@ class StudentViewModel with ChangeNotifier {
     notifyListeners();
 
     try {
-      DocumentSnapshot snapshot =
-          await FirebaseFirestore.instance.collection('Student').doc(uid).get();
-
-      if (!snapshot.exists) {
+      currentStudent = await _firebaseService.getStudentDataByUid(uid);
+      if (currentStudent == null) {
         error = "No student data available for the uid $uid.";
       } else {
-        currentStudent = Student.fromFirestore(snapshot);
+        fetchTrainingDataByEmail(currentStudent!.email!);
       }
     } catch (e) {
-      error = "Failed to fetch data: ${e.toString()}";
+      error = e.toString();
     } finally {
       isLoading = false;
       notifyListeners();
@@ -154,5 +163,20 @@ class StudentViewModel with ChangeNotifier {
         );
       },
     );
+  }
+
+  Future<void> fetchTrainingDataByEmail(String email) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      trainings = await _firebaseService.fetchTrainingDataByEmail(email);
+      print('Fetched ${trainings.length} training records.');
+    } catch (e) {
+      error = "Failed to fetch training data: ${e.toString()}";
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }

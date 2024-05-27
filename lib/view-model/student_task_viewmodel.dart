@@ -4,9 +4,12 @@ import 'package:intl/intl.dart';
 import '../service/firebase_service.dart';
 
 class StudentTasksViewModel extends ChangeNotifier {
+  final FirebaseService _firebaseService = FirebaseService();
   late TextEditingController searchController;
   late List<Map<String, dynamic>> _allTasks;
   late List<Map<String, dynamic>> _filteredTasks;
+  bool isLoading = false;
+  String? error;
 
   StudentTasksViewModel() {
     searchController = TextEditingController();
@@ -22,7 +25,8 @@ class StudentTasksViewModel extends ChangeNotifier {
     try {
       FirebaseService firebaseService = FirebaseService();
       String userId = FirebaseService().currentUser!.uid;
-      Map<String, dynamic>? studentDoc = await firebaseService.fetchStudentData(userId);
+      Map<String, dynamic>? studentDoc =
+          await firebaseService.fetchStudentData(userId);
       if (studentDoc != null) {
         // Fetch all tasks initially
         QuerySnapshot taskSnapshot = await FirebaseFirestore.instance
@@ -46,6 +50,23 @@ class StudentTasksViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> fetchTasksForSpecificStudent(String studentId) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      _allTasks =
+          await _firebaseService.fetchTasksForSpecificStudent(studentId);
+    } catch (e) {
+      error = "Error fetching tasks: $e";
+      _allTasks = [];
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
   List<Map<String, dynamic>> filterTasks(String query) {
     if (query.isEmpty) {
       _filteredTasks = []; // Reset filtered tasks if the query is empty
@@ -58,6 +79,7 @@ class StudentTasksViewModel extends ChangeNotifier {
     notifyListeners(); // Notify listeners that the filtered tasks have changed
     return _filteredTasks;
   }
+
   void dispose() {
     searchController.dispose();
     super.dispose();

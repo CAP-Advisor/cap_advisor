@@ -80,21 +80,28 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(),
         home: InstructorTasksView(studentId: 'IW1sxHO4wCaJq1V5yhYF6Hf53sK2', studentName: 'Hamzeh',),
         routes: {
-        '/login': (context) => LoginView(),
-        '/SignUp': (context) => SignUpView(),
-        '/HR': (context) => HRView(uid: ''),
-        '/Supervisor': (context) => SupervisorView(uid: '',),
-          '/Instructor': (context) => InstructorView(uid: '',),
-        '/Student': (context) => StudentView(uid: '',),
-        '/home': (context) => HomeView(),
-        '/job-and-training-posting':(context)=> PostPositionView(),
-        '/menu': (context) => MenuView(),
-        '/assign-feedback':(context) => AssigningFeedbackView(),
-          '/add-task':(context) => AddTaskView(studentId: '', studentName: ''),
-          'job-and-training-applicants':(context)=>JobAndTrainingApplicantsView(hrDocumentId: ''),
-          '/student-position-search':(context)=>StudentPositionSearchView(),
-      },
-    ),
+          '/login': (context) => LoginView(),
+          '/SignUp': (context) => SignUpView(),
+          '/HR': (context) => HRView(uid: ''),
+          '/Supervisor': (context) => SupervisorView(
+                uid: '',
+              ),
+          '/Instructor': (context) => InstructorView(
+                uid: '',
+              ),
+          '/Student': (context) => StudentView(
+                uid: '',
+              ),
+          '/home': (context) => HomeView(),
+          '/job-and-training-posting': (context) => PostPositionView(),
+          '/menu': (context) => MenuView(),
+          '/assign-feedback': (context) => AssigningFeedbackView(),
+          '/add-task': (context) => AddTaskView(studentId: '', studentName: ''),
+          'job-and-training-applicants': (context) =>
+              JobAndTrainingApplicantsView(hrDocumentId: ''),
+          '/student-position-search': (context) => StudentPositionSearchView(),
+        },
+      ),
     );
   }
 }
