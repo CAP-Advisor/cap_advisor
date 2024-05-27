@@ -10,6 +10,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final bool readOnly;
   final bool obscureText;
+  final int? maxLines;
 
   const CustomTextField({
     required this.hintText,
@@ -21,6 +22,7 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType,
     this.readOnly = false,
     this.obscureText = false,
+    this.maxLines=1,
   });
 
   @override
@@ -39,6 +41,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
           keyboardType: widget.keyboardType,
           obscureText: widget.obscureText,
           readOnly: widget.readOnly,
+          maxLines: widget.maxLines,
+          minLines: 1,
           decoration: InputDecoration(
             hintText: widget.hintText,
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 22),

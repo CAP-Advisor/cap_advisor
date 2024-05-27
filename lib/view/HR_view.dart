@@ -6,6 +6,7 @@ import '../model/job_model.dart';
 import '../view-model/HR_viewmodel.dart';
 import '../view/student_search_view.dart';
 import 'job-and-training_applicants_view.dart';
+import 'job_details_view.dart';
 
 class HRView extends StatefulWidget {
   @override
@@ -153,46 +154,50 @@ class _HRViewState extends State<HRView> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Stack(
-                alignment: Alignment.bottomRight,
+              Column( // Wrap profile photo and content in a Column
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FutureBuilder(
-                    future: model.fetchImageUrl(type:ImageType.profile),
-                    builder: (context, AsyncSnapshot<String> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.grey.shade200,
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (snapshot.hasError) {
-                        return CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage('https://via.placeholder.com/150'),
-                        );
-                      }
-                      return CircleAvatar(
-                        radius: 50,
-                        backgroundImage: NetworkImage(snapshot.data!),
-                      );
-                    },
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      FutureBuilder(
+                        future: model.fetchImageUrl(type: ImageType.profile),
+                        builder: (context, AsyncSnapshot<String> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey.shade200,
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          if (snapshot.hasError) {
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+                            );
+                          }
+                          return CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(snapshot.data!),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () => model.pickImage(ImageSource.gallery, type: ImageType.profile),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.edit, color: Colors.blue),
-                    onPressed: () => model.pickImage(ImageSource.gallery, type: ImageType.profile),
+                  SizedBox(height: 8), // Add some space between photo and content
+                  Text(
+                    model.user?.username ?? 'error',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               SizedBox(width: 16),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(model.user?.username ?? 'error', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    Text('# Followers', style: TextStyle(fontSize: 18, color: Colors.grey)),
-                  ],
-                ),
+                child: SizedBox(), // Spacer to fill remaining space
               ),
             ],
           ),
@@ -256,7 +261,6 @@ class _HRViewState extends State<HRView> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(9),
           ),
-          side: BorderSide(width: 3, color: Color(0xFF427D9D)),
           backgroundColor: isSelected ? Color(0xFF9BBEC8) : Colors.grey[200],
         ),
         child: Text(
@@ -316,19 +320,23 @@ class _HRViewState extends State<HRView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      job.title,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        Text(
+                          job.title,
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        if (model.is_account_owner(job.hrId))
+                          IconButton(
+                            icon: Icon(Icons.edit, size: 20),
+                            onPressed: () => model.editJobDescription(context, job),
+                          ),
+                      ],
                     ),
-                    if (model.is_account_owner(job.hrId))
-                      IconButton(
-                        icon: Icon(Icons.edit, size: 20),
-                        onPressed: () => model.editJobDescription(context, job),
-                      ),
                   ],
                 ),
                 Text(
-                  job.description,
+                  job.skills.join(' , '),
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 SizedBox(height: 20,)
@@ -337,24 +345,48 @@ class _HRViewState extends State<HRView> {
           ),
           Align(
             alignment: Alignment.bottomRight,
-            child:ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => JobAndTrainingApplicantsView(hrDocumentId: job.hrId)),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF164863), // Background color
-              ),
-              child: Text(
-                'View Applicants',
-                style: TextStyle(
-                  color: Colors.white, // Text color
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigate to Job Details View
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => JobDetailsView(jobData: job)),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF164863), // Background color
+                  ),
+                  child: Text(
+                    'Details',
+                    style: TextStyle(
+                      color: Colors.white, // Text color
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    // Show Applicants on the same page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => JobAndTrainingApplicantsView(hrDocumentId: job.hrId,)),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF164863), // Background color
+                  ),
+                  child: Text(
+                    'Applicants',
+                    style: TextStyle(
+                      color: Colors.white, // Text color
+                    ),
+                  ),
+                ),
+              ],
             ),
-
           ),
         ],
       ),

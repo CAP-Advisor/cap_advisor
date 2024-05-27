@@ -1,3 +1,4 @@
+import 'package:cap_advisor/view/instructor_task_view.dart';
 import 'package:cap_advisor/view/student_position_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

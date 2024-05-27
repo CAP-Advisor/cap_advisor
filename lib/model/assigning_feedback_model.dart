@@ -5,12 +5,14 @@ class AssigningFeedbackModel {
   final String major;
   final String additionalInfo;
   final String uid;
+  final String? photoUrl;
 
   AssigningFeedbackModel({
     required this.studentName,
     required this.major,
     required this.additionalInfo,
     required this.uid,
+    this.photoUrl,
   });
   FeedbackModel toFeedbackModel() {
     return FeedbackModel(

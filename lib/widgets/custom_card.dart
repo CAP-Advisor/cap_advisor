@@ -19,14 +19,23 @@ class CustomCard extends StatelessWidget {
       color: Color(0xFFDDF2FD),
       child: ListTile(
         onTap: onTap,
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: Color(0xFFCFE0E9),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(Icons.person, color: Colors.black),
+        leading: CircleAvatar(
+          backgroundColor: Colors.grey,
+          radius: 24,
+          backgroundImage: feedback.photoUrl != null
+              ? NetworkImage(feedback.photoUrl!)
+              : null,
+          child: feedback.photoUrl == null
+              ? Text(
+            feedback.studentName.isNotEmpty
+                ? feedback.studentName[0]
+                : '',
+            style: TextStyle(
+              fontSize: 24,
+              color: Colors.white,
+            ),
+          )
+              : null,
         ),
         title: Text(feedback.studentName),
         subtitle: Column(
@@ -34,8 +43,11 @@ class CustomCard extends StatelessWidget {
           children: [
             Text("Major: ${feedback.major}"),
             Text(
-              "${feedback.additionalInfo}",
-              style: TextStyle(color: Colors.grey),
+              "Specialization: ${feedback.additionalInfo}",
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+              ),
             ),
           ],
         ),
