@@ -219,6 +219,7 @@ class SupervisorView extends StatelessWidget {
       ),
     );
   }
+
   void _showNameDialog(BuildContext context, SupervisorViewModel _viewModel) {
     showDialog(
       context: context,

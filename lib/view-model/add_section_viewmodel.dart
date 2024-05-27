@@ -11,6 +11,8 @@ class SectionViewModel extends ChangeNotifier {
   final TextEditingController skillsController = TextEditingController();
   final TextEditingController experienceController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController trainingController = TextEditingController();
+  final TextEditingController companyController = TextEditingController();
 
   String summaryError = '';
   String majorError = '';
@@ -19,6 +21,8 @@ class SectionViewModel extends ChangeNotifier {
   String skillsError = '';
   String experienceError = '';
   String addressError = '';
+  String companyError = '';
+  String trainingError = '';
 
   bool isSummaryValid = true;
   bool isMajorValid = true;
@@ -27,6 +31,8 @@ class SectionViewModel extends ChangeNotifier {
   bool isSkillValid = true;
   bool isExperienceValid = true;
   bool isAddressValid = true;
+  bool isCompanyValid = true;
+  bool isTrainingValid = true;
 
   SectionViewModel(this._firebaseService);
 
@@ -54,6 +60,8 @@ class SectionViewModel extends ChangeNotifier {
     bool hasSkills = skillsController.text.isNotEmpty;
     bool hasExperience = experienceController.text.isNotEmpty;
     bool hasAddress = addressController.text.isNotEmpty;
+    bool hasCompany = companyController.text.isNotEmpty;
+    bool hasTraining = trainingController.text.isNotEmpty;
 
     if (!hasSummary &&
         !hasMajor &&
@@ -61,9 +69,34 @@ class SectionViewModel extends ChangeNotifier {
         !hasGpa &&
         !hasSkills &&
         !hasExperience &&
-        !hasAddress) {
+        !hasAddress &&
+        !hasTraining &&
+        !hasCompany) {
       showFeedback(context, 'Please fill in at least one field.');
       return;
+    }
+
+    if (hasCompany) {
+      bool success = await _firebaseService.addCompany(companyController.text);
+      if (!success) {
+        companyError = "Failed to add company.";
+        isCompanyValid = false;
+        notifyListeners();
+        showFeedback(context, companyError);
+        return;
+      }
+    }
+
+    if (hasTraining) {
+      bool success =
+          await _firebaseService.addTraining(trainingController.text);
+      if (!success) {
+        trainingError = "Failed to add training.";
+        isTrainingValid = false;
+        notifyListeners();
+        showFeedback(context, trainingError);
+        return;
+      }
     }
 
     if (hasMajor) {

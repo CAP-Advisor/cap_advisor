@@ -1,15 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Instructor {
-  String email;
-  String name;
-  List<String> studentList;
-  String password;
-  String userType;
+  final String name;
+  final String email;
+  final String? photoUrl;
+  final String? coverPhotoUrl;
 
   Instructor({
-    required this.email,
     required this.name,
-    required this.studentList,
-    required this.password,
-    required this.userType,
+    required this.email,
+    this.photoUrl,
+    this.coverPhotoUrl,
   });
+
+  factory Instructor.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Instructor(
+      name: data['name'] ?? '',
+      email: data['email'] ?? '',
+      photoUrl: data['photoUrl'],
+      coverPhotoUrl: data['coverPhotoUrl'],
+    );
+  }
 }

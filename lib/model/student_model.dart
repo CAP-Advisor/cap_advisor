@@ -14,6 +14,8 @@ class Student {
   double gpa;
   final String additionalInfo;
   final String uid;
+  String company;
+  String training;
   bool isApproved = false;
 
   Student({
@@ -30,6 +32,8 @@ class Student {
     required this.github,
     required this.skills,
     required this.summary,
+    required this.company,
+    required this.training,
   });
 
   factory Student.fromFirestore(DocumentSnapshot doc) {
@@ -43,12 +47,13 @@ class Student {
           : double.tryParse(data['gpa'].toString()) ?? 0.0,
       summary: data['summary'] ?? '',
       address: data['address'] ?? '',
+      company: data['company'] ?? '',
+      training: data['training'] ?? '',
       skills: List<String>.from(data['skills'] ?? []),
       experience: List<String>.from(data['experience'] ?? []),
       github: data['github'] ?? '',
       additionalInfo: data['additionalInfo'] ?? 'Non-specialist',
       uid: doc.id,
-      //skills: data['skills'] != null ? List<String>.from(data['skills'] as List<dynamic>) : null,
       photoUrl: data['photoUrl'] as String?,
       coverPhotoUrl: data['coverPhotoUrl'] as String?,
     );
@@ -67,6 +72,8 @@ class Student {
       'experience': experience,
       'github': github,
       'address': address,
+      'company': company,
+      'training': training,
       'gpa': gpa,
       'uid': uid,
       'isApproved': isApproved
