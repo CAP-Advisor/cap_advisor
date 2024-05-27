@@ -1,3 +1,4 @@
+import 'package:cap_advisor/view/instructor_task_view.dart';
 import 'package:cap_advisor/view/student_position_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -77,7 +78,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'CAP Advisor',
         theme: ThemeData(),
-        home: homeView,
+        home: InstructorTasksView(studentId: 'IW1sxHO4wCaJq1V5yhYF6Hf53sK2', studentName: 'Hamzeh',),
         routes: {
           '/login': (context) => LoginView(),
           '/SignUp': (context) => SignUpView(),
