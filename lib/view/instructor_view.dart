@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../view-model/instructor_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/custom_search_field.dart';
+import 'instructor_task_view.dart';
 
 class InstructorView extends StatelessWidget {
   final String uid;
@@ -88,7 +89,7 @@ class InstructorView extends StatelessWidget {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      StudentTasksView(
+                                                      InstructorTasksView(
                                                     studentId: student.uid,
                                                     studentName: student.name,
                                                   ),
