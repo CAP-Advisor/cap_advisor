@@ -12,12 +12,21 @@ class InstructorTasksView extends StatelessWidget {
   final String studentId;
   final String studentName;
 
-  const InstructorTasksView({Key? key, required this.studentId,required this.studentName}) : super(key: key);
+  const InstructorTasksView(
+      {Key? key, required this.studentId, required this.studentName})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => InstructorTasksViewModel(studentId), // Pass the studentId to the view model
+    return ChangeNotifierProvider<InstructorTasksViewModel>(
+      create: (_) {
+        var viewModel = InstructorTasksViewModel(studentId);
+        viewModel.fetchTasksForSpecificStudent(
+            studentId); // Fetch tasks for the specific student
+        return viewModel;
+      },
+      // return ChangeNotifierProvider(
+      //   create: (context) => InstructorTasksViewModel(studentId), // Pass the studentId to the view model
       child: Scaffold(
         appBar: CustomAppBar(
           title: '${studentName} Tasks',
@@ -28,7 +37,7 @@ class InstructorTasksView extends StatelessWidget {
             Navigator.of(context).pushNamed('/menu');
           },
           onBack: () {
-            Navigator.of(context).pushNamed('/Student');
+            Navigator.of(context).pop();
           },
         ),
         body: Padding(
@@ -52,14 +61,16 @@ class InstructorTasksView extends StatelessWidget {
                   builder: (context, viewModel, _) {
                     return ListView.separated(
                       itemCount: viewModel.tasks.length,
-                      separatorBuilder: (context, index) => SizedBox(height: 16),
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         return CustomTaskCard(
                           taskData: viewModel.tasks[index],
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => TaskDetailsView(taskData: viewModel.tasks[index]),
+                                builder: (context) => TaskDetailsView(
+                                    taskData: viewModel.tasks[index]),
                               ),
                             );
                           },

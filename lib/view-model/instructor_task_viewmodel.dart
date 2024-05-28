@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import '../service/firebase_service.dart';
 
 class InstructorTasksViewModel extends ChangeNotifier {
+  final FirebaseService _firebaseService = FirebaseService();
   late TextEditingController searchController;
   late List<Map<String, dynamic>> _allTasks;
   late List<Map<String, dynamic>> _filteredTasks;
-  late String _studentId; // Add a variable to store studentId
+  late String _studentId;
+  bool isLoading = false;
+  String? error;
 
   InstructorTasksViewModel(String studentId) {
-    _studentId = studentId; // Initialize studentId
+    _studentId = studentId;
     searchController = TextEditingController();
     _allTasks = [];
     _filteredTasks = [];
@@ -22,7 +25,8 @@ class InstructorTasksViewModel extends ChangeNotifier {
   Future<void> fetchTasks() async {
     try {
       FirebaseService firebaseService = FirebaseService();
-      Map<String, dynamic>? studentDoc = await firebaseService.fetchStudentData(_studentId);
+      Map<String, dynamic>? studentDoc =
+          await firebaseService.fetchStudentData(_studentId);
       if (studentDoc != null) {
         QuerySnapshot taskSnapshot = await FirebaseFirestore.instance
             .collection('Student')
@@ -33,29 +37,42 @@ class InstructorTasksViewModel extends ChangeNotifier {
             .map((taskDoc) => taskDoc.data() as Map<String, dynamic>)
             .toList();
       } else {
-        _allTasks = []; // Set _allTasks to an empty list if no tasks are found
+        _allTasks = [];
       }
-      // Notify listeners that tasks have been fetched
       notifyListeners();
     } catch (e) {
       print("Error fetching tasks: $e");
-      // Set _allTasks to an empty list in case of an error
       _allTasks = [];
-      // Notify listeners about the error
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchTasksForSpecificStudent(String studentId) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      _allTasks =
+          await _firebaseService.fetchTasksForSpecificStudent(studentId);
+    } catch (e) {
+      error = "Error fetching tasks: $e";
+      _allTasks = [];
+    } finally {
+      isLoading = false;
       notifyListeners();
     }
   }
 
   List<Map<String, dynamic>> filterTasks(String query) {
     if (query.isEmpty) {
-      _filteredTasks = []; // Reset filtered tasks if the query is empty
+      _filteredTasks = [];
     } else {
       _filteredTasks = _allTasks.where((task) {
         String taskTitle = (task['Task Title'] ?? "").toLowerCase();
         return taskTitle.contains(query.toLowerCase());
       }).toList();
     }
-    notifyListeners(); // Notify listeners that the filtered tasks have changed
+    notifyListeners();
     return _filteredTasks;
   }
 

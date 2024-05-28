@@ -4,12 +4,10 @@ import 'package:intl/intl.dart';
 import '../service/firebase_service.dart';
 
 class StudentTasksViewModel extends ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
   late TextEditingController searchController;
   late List<Map<String, dynamic>> _allTasks;
   late List<Map<String, dynamic>> _filteredTasks;
   bool isLoading = false;
-  String? error;
 
   StudentTasksViewModel() {
     searchController = TextEditingController();
@@ -47,22 +45,6 @@ class StudentTasksViewModel extends ChangeNotifier {
       // Set _allTasks to an empty list in case of an error
       _allTasks = [];
       // Notify listeners about the error
-      notifyListeners();
-    }
-  }
-
-  Future<void> fetchTasksForSpecificStudent(String studentId) async {
-    isLoading = true;
-    notifyListeners();
-
-    try {
-      _allTasks =
-          await _firebaseService.fetchTasksForSpecificStudent(studentId);
-    } catch (e) {
-      error = "Error fetching tasks: $e";
-      _allTasks = [];
-    } finally {
-      isLoading = false;
       notifyListeners();
     }
   }
