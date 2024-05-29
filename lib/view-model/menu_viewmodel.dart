@@ -11,12 +11,14 @@ import '../view/supervisor_view.dart';
 class MenuViewModel extends ChangeNotifier {
   final FirebaseService _firebaseService = FirebaseService();
   String? userRole;
+  User? currentUser;
 
   MenuViewModel() {
     _getUserRole();
   }
 
   Future<void> _getUserRole() async {
+    currentUser = _firebaseService.currentUser;
     userRole = await _firebaseService.getUserRole();
     notifyListeners();
   }
@@ -83,7 +85,7 @@ class MenuViewModel extends ChangeNotifier {
                 FirebaseAuth.instance.signOut().then((_) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => LoginView()),
-                    (Route<dynamic> route) => false,
+                        (Route<dynamic> route) => false,
                   );
                 });
               },
