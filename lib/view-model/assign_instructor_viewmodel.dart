@@ -54,6 +54,8 @@ class InstructorSearchViewModel extends ChangeNotifier {
     DocumentReference instructorRef =
     FirebaseFirestore.instance.collection('Instructor').doc(instructorId);
 
+    bool studentAssigned = false;
+
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       DocumentSnapshot snapshot = await transaction.get(instructorRef);
 
@@ -67,6 +69,7 @@ class InstructorSearchViewModel extends ChangeNotifier {
       if (!studentList.contains(studentId)) {
         studentList.add(studentId);
         transaction.update(instructorRef, {'studentList': studentList});
+        studentAssigned = true;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -75,6 +78,12 @@ class InstructorSearchViewModel extends ChangeNotifier {
         );
       }
     });
+
+    if (studentAssigned) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Student assigned successfully')),
+      );
+    }
   }
 
   @override

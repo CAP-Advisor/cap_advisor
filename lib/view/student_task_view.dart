@@ -55,8 +55,12 @@ class StudentTasksView extends StatelessWidget {
                       return CustomTaskCard(
                         taskData: viewModel.tasks[index],
                         onPressed: () {
-                          _showTaskDetailsDialog(
-                              context, viewModel.tasks[index]);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => TaskDetailsView(
+                                  taskData: viewModel.tasks[index]),
+                            ),
+                          );
                         },
                         buttonTitle: "Details",
                       );

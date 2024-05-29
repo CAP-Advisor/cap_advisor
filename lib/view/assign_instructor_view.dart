@@ -92,12 +92,6 @@ class InstructorSearchView extends StatelessWidget {
                                     onPressed: () {
                                       model.assignStudentToInstructor(
                                           instructor.id, studentId, context);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                            content: Text(
-                                                'Student assigned successfully')),
-                                      );
                                     },
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,
