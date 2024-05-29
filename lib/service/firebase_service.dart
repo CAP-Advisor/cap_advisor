@@ -796,7 +796,7 @@ class FirebaseService {
       await FirebaseFirestore.instance
           .collection('Student')
           .doc(userId)
-          .update({'major': major});
+          .update({'additionalInfo': major});
       return true;
     } catch (e) {
       print("Failed to add major");

@@ -17,14 +17,15 @@ class AssigningFeedbackViewModel extends ChangeNotifier {
     User? user = FirebaseAuth.instance.currentUser;
     String supervisorId = user!.uid;
     List<Student> students =
-        await FirebaseService().fetchStudentsId(supervisorId);
+    await FirebaseService().fetchStudentsId(supervisorId);
     feedbacks = students
         .map((student) => AssigningFeedbackModel(
-              studentName: student.name,
-              major: student.major,
-              additionalInfo: student.additionalInfo,
-              uid: student.uid,
-            ))
+      studentName: student.name,
+      major: student.major,
+      additionalInfo: student.additionalInfo,
+      uid: student.uid,
+      photoUrl: student.photoUrl,
+    ))
         .toList();
     filteredFeedbacks = feedbacks;
     notifyListeners();
@@ -33,9 +34,9 @@ class AssigningFeedbackViewModel extends ChangeNotifier {
   void filterFeedbacks(String query) {
     filteredFeedbacks = feedbacks
         .where((feedback) =>
-            feedback.studentName.toLowerCase().contains(query.toLowerCase()) ||
-            feedback.major.toLowerCase().contains(query.toLowerCase()) ||
-            feedback.additionalInfo.toLowerCase().contains(query.toLowerCase()))
+    feedback.studentName.toLowerCase().contains(query.toLowerCase()) ||
+        feedback.major.toLowerCase().contains(query.toLowerCase()) ||
+        feedback.additionalInfo.toLowerCase().contains(query.toLowerCase()))
         .toList();
     notifyListeners();
   }
