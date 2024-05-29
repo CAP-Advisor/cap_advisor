@@ -1,3 +1,4 @@
+import 'package:cap_advisor/view/task_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view-model/student_task_viewmodel.dart';
@@ -7,7 +8,11 @@ import '../widgets/custom_search_field.dart';
 import '../widgets/custom_task_card.dart';
 
 class StudentTasksView extends StatelessWidget {
-  const StudentTasksView({Key? key}) : super(key: key);
+  final String studentId;
+  final String studentName;
+  const StudentTasksView(
+      {Key? key, required this.studentId, required this.studentName})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +26,7 @@ class StudentTasksView extends StatelessWidget {
           Navigator.of(context).pushNamed('/menu');
         },
         onBack: () {
-          Navigator.of(context).pushNamed('/Student');
+          Navigator.of(context).pop();
         },
       ),
       body: Padding(
@@ -50,8 +55,12 @@ class StudentTasksView extends StatelessWidget {
                       return CustomTaskCard(
                         taskData: viewModel.tasks[index],
                         onPressed: () {
-                          _showTaskDetailsDialog(
-                              context, viewModel.tasks[index]);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => TaskDetailsView(
+                                  taskData: viewModel.tasks[index]),
+                            ),
+                          );
                         },
                         buttonTitle: "Details",
                       );

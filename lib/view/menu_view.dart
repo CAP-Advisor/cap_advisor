@@ -1,10 +1,9 @@
-import 'package:cap_advisor/view/student_task_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view-model/menu_viewmodel.dart';
+import 'assign_instructor_view.dart';
 import 'change_password_view.dart';
-import 'final_feedback_view.dart'; // Import TaskView
+import 'student_task_view.dart';
 
 class MenuView extends StatelessWidget {
   final MenuViewModel _viewModel = MenuViewModel();
@@ -34,14 +33,25 @@ class MenuView extends StatelessWidget {
                   ),
                   _buildMenuItem(context, "View Profile",
                       onTap: () => _viewModel.navigateToProfile(context)),
-                  if (model.userRole ==
-                      'Student') // Show only if user is a student
+                  if (model.userRole == 'Student') ...[
                     _buildMenuItem(context, "View Tasks",
                         onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => StudentTasksView())
-                        )),
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => StudentTasksView(
+                                      studentId: model.currentUser?.uid ?? '',
+                                      studentName:
+                                          '', // Pass the appropriate student name
+                                    )))),
+                    _buildMenuItem(context, "Assign Instructor",
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => InstructorSearchView(
+                                      studentId: model.currentUser?.uid ??
+                                          '', // Pass the appropriate studentId
+                                    )))),
+                  ],
                   _buildMenuItem(context, "Delete Account",
                       onTap: () => _viewModel.confirmDeleteAccount(context)),
                   _buildMenuItem(context, "Logout",

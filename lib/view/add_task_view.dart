@@ -55,6 +55,7 @@ class AddTaskView extends StatelessWidget {
                   CustomTextField(
                     hintText: "Task Description",
                     controller: model.taskDescriptionController,
+                    maxLines: null,
                     onChanged: (value) {},
                     errorMessage: "Please enter a valid description",
                     isValid: !model.showDescriptionError,
