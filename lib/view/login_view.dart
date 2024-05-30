@@ -17,6 +17,7 @@ class _LoginViewState extends State<LoginView> {
   final LoginViewModel viewModel = LoginViewModel();
   final _formKey = GlobalKey<FormState>();
 
+  bool rememberMe = false;
   bool isSubmitted = false;
   bool isValidEmail = false;
   bool isValidPassword = false;
@@ -25,6 +26,22 @@ class _LoginViewState extends State<LoginView> {
   String? emailError;
   String? passwordError;
   String? loginError;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStoredCredentials();
+  }
+
+  void _loadStoredCredentials() async {
+    final credentials = await viewModel.getStoredCredentials();
+    setState(() {
+      emailController.text = credentials['email'] ?? '';
+      passwordController.text = credentials['password'] ?? '';
+      rememberMe =
+          credentials['email'] != null && credentials['password'] != null;
+    });
+  }
 
   @override
   void dispose() {
@@ -57,7 +74,6 @@ class _LoginViewState extends State<LoginView> {
                       hintText: "Email",
                       controller: emailController,
                       onChanged: (value) {
-                        viewModel.setEmail(value);
                         setState(() {
                           isValidEmail = value.isNotEmpty &&
                               ValidationUtils.isValidEmail(value);
@@ -66,7 +82,7 @@ class _LoginViewState extends State<LoginView> {
                       },
                       errorMessage: "Please enter a valid email",
                       isValid: isValidEmail,
-                      showError: isSubmitted,
+                      showError: isSubmitted && !isValidEmail,
                       keyboardType: TextInputType.emailAddress,
                     ),
                   ),
@@ -77,7 +93,6 @@ class _LoginViewState extends State<LoginView> {
                       hintText: "Password",
                       controller: passwordController,
                       onChanged: (value) {
-                        viewModel.setPassword(value);
                         setState(() {
                           isValidPassword = value.isNotEmpty &&
                               ValidationUtils.isValidPassword(value);
@@ -86,24 +101,41 @@ class _LoginViewState extends State<LoginView> {
                       },
                       errorMessage: "Please enter a valid password",
                       isValid: isValidPassword,
-                      showError: isSubmitted,
+                      showError: isSubmitted && !isValidPassword,
                       obscureText: true,
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  CheckboxListTile(
+                    title: Text("Remember Me"),
+                    value: rememberMe,
+                    onChanged: (newValue) {
+                      setState(() {
+                        rememberMe = newValue!;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
                   ),
                   const SizedBox(height: 60),
                   CustomButton(
                     onPressed: () async {
                       setState(() {
                         isSubmitted = true;
-                        emailExists = false;
+                        isValidEmail = emailController.text.isNotEmpty &&
+                            ValidationUtils.isValidEmail(emailController.text);
+                        isValidPassword = passwordController.text.isNotEmpty &&
+                            ValidationUtils.isValidPassword(
+                                passwordController.text);
+                        isValidForm = isValidEmail && isValidPassword;
                       });
                       if (isValidForm) {
                         String email = emailController.text.trim();
                         String password = passwordController.text.trim();
-                        viewModel.login(email, password).then((user) {
+                        viewModel
+                            .login(email, password, rememberMe)
+                            .then((user) {
                           if (user != null) {
-                            viewModel.redirectUser(context,
-                                user.userType); // Redirect based on userType
+                            viewModel.redirectUser(context, user.userType);
                           } else {
                             setState(() {
                               loginError =
