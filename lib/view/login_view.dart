@@ -74,6 +74,7 @@ class _LoginViewState extends State<LoginView> {
                       hintText: "Email",
                       controller: emailController,
                       onChanged: (value) {
+                        viewModel.setEmail(value);
                         setState(() {
                           isValidEmail = value.isNotEmpty &&
                               ValidationUtils.isValidEmail(value);
@@ -82,7 +83,7 @@ class _LoginViewState extends State<LoginView> {
                       },
                       errorMessage: "Please enter a valid email",
                       isValid: isValidEmail,
-                      showError: isSubmitted && !isValidEmail,
+                      showError: isSubmitted,
                       keyboardType: TextInputType.emailAddress,
                     ),
                   ),
@@ -93,6 +94,7 @@ class _LoginViewState extends State<LoginView> {
                       hintText: "Password",
                       controller: passwordController,
                       onChanged: (value) {
+                        viewModel.setPassword(value);
                         setState(() {
                           isValidPassword = value.isNotEmpty &&
                               ValidationUtils.isValidPassword(value);
@@ -101,7 +103,7 @@ class _LoginViewState extends State<LoginView> {
                       },
                       errorMessage: "Please enter a valid password",
                       isValid: isValidPassword,
-                      showError: isSubmitted && !isValidPassword,
+                      showError: isSubmitted,
                       obscureText: true,
                     ),
                   ),
