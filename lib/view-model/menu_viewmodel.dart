@@ -11,12 +11,14 @@ import '../view/supervisor_view.dart';
 class MenuViewModel extends ChangeNotifier {
   final FirebaseService _firebaseService = FirebaseService();
   String? userRole;
+  User? currentUser;
 
   MenuViewModel() {
     _getUserRole();
   }
 
   Future<void> _getUserRole() async {
+    currentUser = _firebaseService.currentUser;
     userRole = await _firebaseService.getUserRole();
     notifyListeners();
   }
@@ -64,12 +66,34 @@ class MenuViewModel extends ChangeNotifier {
   }
 
   void logout(BuildContext context) {
-    FirebaseAuth.instance.signOut().then((_) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => LoginView()),
-        (Route<dynamic> route) => false,
-      );
-    });
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Logout'),
+          content: Text('Are you sure you want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Logout'),
+              onPressed: () {
+                FirebaseAuth.instance.signOut().then((_) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => LoginView()),
+                        (Route<dynamic> route) => false,
+                  );
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void confirmDeleteAccount(BuildContext context) {

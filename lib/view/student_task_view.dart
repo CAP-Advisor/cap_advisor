@@ -8,7 +8,11 @@ import '../widgets/custom_search_field.dart';
 import '../widgets/custom_task_card.dart';
 
 class StudentTasksView extends StatelessWidget {
-  const StudentTasksView({Key? key}) : super(key: key);
+  final String studentId;
+  final String studentName;
+  const StudentTasksView(
+      {Key? key, required this.studentId, required this.studentName})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +26,7 @@ class StudentTasksView extends StatelessWidget {
           Navigator.of(context).pushNamed('/menu');
         },
         onBack: () {
-          Navigator.of(context).pushNamed('/Student');
+          Navigator.of(context).pop();
         },
       ),
       body: Padding(
@@ -53,7 +57,8 @@ class StudentTasksView extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => TaskDetailsView(taskData: viewModel.tasks[index]),
+                              builder: (context) => TaskDetailsView(
+                                  taskData: viewModel.tasks[index]),
                             ),
                           );
                         },
@@ -68,6 +73,22 @@ class StudentTasksView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showTaskDetailsDialog(
+      BuildContext context, Map<String, dynamic> taskData) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomDialog(
+          taskData: taskData,
+          showFeedback: true,
+          onClose: () {
+            Navigator.of(context).pop();
+          },
+        );
+      },
     );
   }
 }

@@ -7,6 +7,7 @@ class StudentTasksViewModel extends ChangeNotifier {
   late TextEditingController searchController;
   late List<Map<String, dynamic>> _allTasks;
   late List<Map<String, dynamic>> _filteredTasks;
+  bool isLoading = false;
 
   StudentTasksViewModel() {
     searchController = TextEditingController();
@@ -22,7 +23,8 @@ class StudentTasksViewModel extends ChangeNotifier {
     try {
       FirebaseService firebaseService = FirebaseService();
       String userId = FirebaseService().currentUser!.uid;
-      Map<String, dynamic>? studentDoc = await firebaseService.fetchStudentData(userId);
+      Map<String, dynamic>? studentDoc =
+          await firebaseService.fetchStudentData(userId);
       if (studentDoc != null) {
         // Fetch all tasks initially
         QuerySnapshot taskSnapshot = await FirebaseFirestore.instance
@@ -46,6 +48,7 @@ class StudentTasksViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   List<Map<String, dynamic>> filterTasks(String query) {
     if (query.isEmpty) {
       _filteredTasks = []; // Reset filtered tasks if the query is empty
@@ -58,6 +61,7 @@ class StudentTasksViewModel extends ChangeNotifier {
     notifyListeners(); // Notify listeners that the filtered tasks have changed
     return _filteredTasks;
   }
+
   void dispose() {
     searchController.dispose();
     super.dispose();

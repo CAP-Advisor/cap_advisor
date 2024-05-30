@@ -78,6 +78,36 @@ class SectionView extends StatelessWidget {
                     ),
                     SizedBox(height: 30),
                     Text(
+                      "Company",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    CustomTextField(
+                      hintText: "Company",
+                      controller: viewModel.companyController,
+                      onChanged: (value) {},
+                      errorMessage: viewModel.companyError,
+                      isValid: viewModel.isCompanyValid,
+                      showError: !viewModel.isCompanyValid,
+                    ),
+                    SizedBox(height: 30),
+                    Text(
+                      "Training",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    CustomTextField(
+                      hintText: "Your Training Name",
+                      controller: viewModel.trainingController,
+                      onChanged: (value) {},
+                      errorMessage: viewModel.trainingError,
+                      isValid: viewModel.isTrainingValid,
+                      showError: !viewModel.isTrainingValid,
+                    ),
+                    SizedBox(height: 30),
+                    Text(
                       "GPA",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

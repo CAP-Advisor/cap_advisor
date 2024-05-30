@@ -7,6 +7,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMenuPressed;
   final VoidCallback? onFeedback;
   final VoidCallback? onJobPressed;
+  final bool isInstructor;
+  final bool isSupervisor;
 
   const CustomAppBar({
     Key? key,
@@ -16,12 +18,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onJobPressed,
     required this.onNotificationPressed,
     required this.onMenuPressed,
+    this.isInstructor = false,
+    this.isSupervisor = false,
   }) : super(key: key);
+
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
   @override
   Widget build(BuildContext context) {
     List<Widget> actions = [];
+
+    actions.add(
+      IconButton(
+        icon: Icon(Icons.notifications),
+        onPressed: onNotificationPressed,
+        color: Colors.white,
+      ),
+    );
 
     if (onFeedback != null) {
       actions.add(
@@ -32,13 +45,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       );
     }
-    actions.add(
-      IconButton(
-        icon: Icon(Icons.notifications),
-        onPressed: onNotificationPressed,
-        color: Colors.white,
-      ),
-    );
 
     if (onJobPressed != null) {
       actions.add(
