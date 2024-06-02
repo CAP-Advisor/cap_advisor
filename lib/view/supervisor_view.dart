@@ -36,7 +36,7 @@ class SupervisorView extends StatelessWidget {
                 _buildProfileHeader(context, _viewModel),
                 _buildSupervisorDetails(context, _viewModel),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 130, 0),
                   child: CustomSearchField(
                     controller: _viewModel.searchController,
                     onChanged: (value) {
@@ -75,8 +75,7 @@ class SupervisorView extends StatelessWidget {
                           leading: CircleAvatar(
                             backgroundColor: Colors.grey,
                             radius: 24,
-                            backgroundImage: student.photoUrl !=
-                                null
+                            backgroundImage: student.photoUrl != null
                                 ? NetworkImage(student.photoUrl!)
                                 : null,
                             child: student.photoUrl == null
@@ -89,37 +88,47 @@ class SupervisorView extends StatelessWidget {
                             )
                                 : null,
                           ),
-                          title: Text(student.name),
-                          subtitle: Text(student.email),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddTaskView(
-                                      studentId: student.uid,
-                                      studentName: student.name),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                student.name,
+                              ),
+                              Text(
+                                'Major: ${student.major}',
+                                style: TextStyle(
+                                  fontSize: 14, // Change the font size as needed
+                                  color: Colors.grey, // Change the color as needed
                                 ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF164863),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(20),
                               ),
-                            ),
-                            child: Text(
-                              'Add Task',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                color: Colors.white,
+                              Text(
+                                'Specialization: ${student.additionalInfo}',
+                                style: TextStyle(
+                                  fontSize: 14, // Change the font size as needed
+                                  color: Colors.grey, // Change the color as needed
+                                ),
                               ),
+                            ],
+                          ),
+                          trailing: Tooltip(
+                            message: 'Add Task',
+                            child: IconButton(
+                              icon: Icon(Icons.add_box, color: Color(0xFF164863)),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AddTaskView(
+                                      studentId: student.uid,
+                                      studentName: student.name,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
+
                       );
                     },
                   ),

@@ -41,7 +41,13 @@ class CustomCard extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Major: ${feedback.major}"),
+            Text(
+              'Major: ${feedback.major}',
+              style: TextStyle(
+                fontSize: 14, // Change the font size as needed
+                color: Colors.grey, // Change the color as needed
+              ),
+            ),
             Text(
               "Specialization: ${feedback.additionalInfo}",
               style: TextStyle(
@@ -51,14 +57,12 @@ class CustomCard extends StatelessWidget {
             ),
           ],
         ),
-        trailing: ElevatedButton(
-          onPressed: onAddFeedbackPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF164863),
-          ),
-          child: Text(
-            "Add Feedback",
-            style: TextStyle(color: Colors.white),
+        trailing: Tooltip(
+          message: 'Add Feedback',
+          child: IconButton(
+            onPressed: onAddFeedbackPressed,
+            icon: Icon(Icons.add_comment,color: Color(0xFF164863),),
+            color: Colors.white,
           ),
         ),
       ),
