@@ -10,13 +10,15 @@ class StudentView extends StatelessWidget {
   final String uid;
   final bool isSupervisor;
   final bool isInstructor;
+  final bool isHR;
 
-  StudentView(
-      {Key? key,
-      required this.uid,
-      this.isSupervisor = false,
-      this.isInstructor = false})
-      : super(key: key);
+  StudentView({
+    Key? key,
+    required this.uid,
+    this.isSupervisor = false,
+    this.isInstructor = false,
+    this.isHR = false,
+  }) : super(key: key);
 
   final TextEditingController _nameController = TextEditingController();
   FirebaseService firebaseService = FirebaseService();
@@ -30,6 +32,9 @@ class StudentView extends StatelessWidget {
             appBar: isSupervisor
                 ? CustomAppBar(
                     title: "CAP Advisor",
+                    onBack: () {
+                      Navigator.of(context).pop();
+                    },
                     onNotificationPressed: () {},
                     onFeedback: () {
                       Navigator.of(context).pushNamed('/assign-feedback');
@@ -38,20 +43,35 @@ class StudentView extends StatelessWidget {
                       Navigator.of(context).pushNamed('/menu');
                     },
                   )
-                : CustomAppBar(
-                    title: "CAP Advisor",
-                    onNotificationPressed: () {},
-                    onJobPressed: isInstructor
-                        ? null
-                        : () {
-                            Navigator.of(context)
-                                .pushNamed('/student-position-search');
-                          },
-                    onMenuPressed: () {
-                      Navigator.of(context).pushNamed('/menu');
-                    },
-                    isInstructor: isInstructor,
-                  ),
+                : isHR
+                    ? CustomAppBar(
+                        title: "CAP Advisor",
+                        onBack: () {
+                          Navigator.of(context).pop();
+                        },
+                        onNotificationPressed: () {},
+                        onMenuPressed: () {
+                          Navigator.of(context).pushNamed('/menu');
+                        },
+                        isHR: isHR,
+                      )
+                    : CustomAppBar(
+                        title: "CAP Advisor",
+                        onBack: () {
+                          Navigator.of(context).pop();
+                        },
+                        onNotificationPressed: () {},
+                        onJobPressed: isInstructor
+                            ? null
+                            : () {
+                                Navigator.of(context)
+                                    .pushNamed('/student-position-search');
+                              },
+                        onMenuPressed: () {
+                          Navigator.of(context).pushNamed('/menu');
+                        },
+                        isInstructor: isInstructor,
+                      ),
             body: model.isLoading
                 ? Center(child: CircularProgressIndicator())
                 : model.currentStudent == null
@@ -62,7 +82,7 @@ class StudentView extends StatelessWidget {
                           children: <Widget>[
                             _buildProfileHeader(context, model),
                             SizedBox(height: 60),
-                            if (!isSupervisor && !isInstructor)
+                            if (!isSupervisor && !isInstructor && !isHR)
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Padding(
@@ -122,7 +142,7 @@ class StudentView extends StatelessWidget {
                 : null,
           ),
         ),
-        if (!isSupervisor && !isInstructor)
+        if (!isSupervisor && !isInstructor && !isHR)
           Positioned(
               right: 16,
               bottom: 16,
@@ -169,7 +189,7 @@ class StudentView extends StatelessWidget {
         children: [
           Text(student.name,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-          if (!isSupervisor && !isInstructor)
+          if (!isSupervisor && !isInstructor && !isHR)
             IconButton(
               icon: Icon(Icons.edit, color: Colors.black),
               onPressed: () => _showNameDialog(context, viewModel),
