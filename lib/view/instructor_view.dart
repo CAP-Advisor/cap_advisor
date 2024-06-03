@@ -1,4 +1,3 @@
-import 'package:cap_advisor/view/student_task_view.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -104,14 +103,9 @@ class InstructorView extends StatelessWidget {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: Text(
-                                              'Tasks',
-                                              style: TextStyle(
-                                                fontFamily: 'Roboto',
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14,
-                                                color: Colors.white,
-                                              ),
+                                            child: const Icon(
+                                              Icons.task,
+                                              color: Colors.white,
                                             ),
                                           ),
                                           onTap: () {
