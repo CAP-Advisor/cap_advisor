@@ -39,9 +39,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (onFeedback != null) {
       actions.add(
         IconButton(
-          icon: Icon(Icons.feedback),
+          icon: Icon(Icons.add_comment),
           onPressed: onFeedback!,
           color: Colors.white,
+          tooltip: 'Feedback',
         ),
       );
     }

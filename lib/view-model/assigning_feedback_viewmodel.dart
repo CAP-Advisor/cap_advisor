@@ -10,7 +10,14 @@ class AssigningFeedbackViewModel extends ChangeNotifier {
   List<AssigningFeedbackModel> filteredFeedbacks = [];
 
   AssigningFeedbackViewModel() {
-    _fetchFeedbackData();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        feedbacks.clear();
+        filteredFeedbacks.clear();
+      } else {
+        _fetchFeedbackData();
+      }
+    });
   }
 
   Future<void> _fetchFeedbackData() async {
