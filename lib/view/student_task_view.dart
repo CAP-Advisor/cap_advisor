@@ -62,7 +62,7 @@ class StudentTasksView extends StatelessWidget {
                             ),
                           );
                         },
-                        buttonTitle: "Details",
+                        iconData: Icons.info,
                       );
                     },
                   );

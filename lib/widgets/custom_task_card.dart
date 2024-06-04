@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class CustomTaskCard extends StatelessWidget {
   final Map<String, dynamic> taskData;
   final VoidCallback onPressed;
-  final String buttonTitle;
+  final IconData iconData;
 
   const CustomTaskCard({
     Key? key,
     required this.taskData,
     required this.onPressed,
-    required this.buttonTitle,
+    required this.iconData,
   }) : super(key: key);
 
   @override
@@ -40,25 +39,13 @@ class CustomTaskCard extends StatelessWidget {
                 ),
               ],
             ),
-            _buildTaskDetailsButton(context),
+            IconButton(
+              onPressed: onPressed,
+              icon: Icon(iconData),
+              color: Color(0XFF164863),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTaskDetailsButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0XFF164863),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-      ),
-      child: Text(
-        buttonTitle,
-        style: TextStyle(color: Colors.white),
       ),
     );
   }
