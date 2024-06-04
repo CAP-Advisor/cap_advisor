@@ -66,6 +66,9 @@ class AddTaskViewModel extends ChangeNotifier {
         studentId: studentId,
         taskData: task.toMap(),
       );
+      taskTitleController.clear();
+      taskDescriptionController.clear();
+      selectedDeadline = null;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Task added successfully'),

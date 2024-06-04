@@ -7,9 +7,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../model/HR_model.dart';
 import '../model/final_feedback_model.dart';
 import '../model/instructor_model.dart';
 import '../model/student_model.dart';
+import '../model/supervisor_model.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -353,6 +355,30 @@ class FirebaseService {
     }
   }
 
+  Future<HR> getHRDataByEmail() async {
+    String? email = FirebaseAuth.instance.currentUser?.email;
+    if (email == null) {
+      throw Exception("Email is not available.");
+    }
+
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('HR')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        throw Exception("No HR data available for the email $email.");
+      } else {
+        DocumentSnapshot doc = snapshot.docs.first;
+        return HR.fromFirestore(doc);
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch data: ${e.toString()}");
+    }
+  }
+
   Future<Map<String, dynamic>?> getSupervisorData(String email) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
@@ -600,6 +626,36 @@ class FirebaseService {
     }
   }
 
+  Future<bool> updateHRProfileImage() async {
+    try {
+      String? imageUrl = await uploadImage();
+      if (imageUrl == null) {
+        print("Image upload failed or was cancelled.");
+        return false;
+      }
+
+      String userId = _auth.currentUser!.uid;
+      DocumentReference hrRef = _firestore.collection('HR').doc(userId);
+
+      DocumentSnapshot hrSnapshot = await hrRef.get();
+
+      if (hrSnapshot.exists) {
+        await hrRef.update({'photoUrl': imageUrl});
+        print("Profile photo updated successfully.");
+        return true;
+      } else {
+        await hrRef.set({
+          'photoUrl': imageUrl,
+        }, SetOptions(merge: true));
+        print("Profile photo set successfully in new document.");
+        return true;
+      }
+    } catch (e) {
+      print("Error updating profile image: $e");
+      return false;
+    }
+  }
+
   Future<bool> updateCoverPhoto() async {
     try {
       String? imageUrl = await uploadImage();
@@ -648,6 +704,33 @@ class FirebaseService {
         return true;
       } else {
         print("Student document does not exist.");
+        return false;
+      }
+    } catch (e) {
+      print("Error updating cover photo: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateHRCoverPhoto() async {
+    try {
+      String? imageUrl = await uploadImage();
+      if (imageUrl == null) {
+        print("Image upload failed or was cancelled.");
+        return false;
+      }
+
+      String userId = _auth.currentUser!.uid;
+      DocumentReference hrRef = _firestore.collection('HR').doc(userId);
+
+      DocumentSnapshot hrSnapshot = await hrRef.get();
+
+      if (hrSnapshot.exists) {
+        await hrRef.update({'coverPhotoUrl': imageUrl});
+        print("Cover photo updated successfully.");
+        return true;
+      } else {
+        print("HR document does not exist.");
         return false;
       }
     } catch (e) {
@@ -936,6 +1019,120 @@ class FirebaseService {
     } catch (e) {
       print("Error getting user role: $e");
       return null;
+    }
+  }
+
+  Future<void> deleteJob(String jobId) async {
+    await _firestore.collection('Job Position').doc(jobId).delete();
+  }
+
+  Future<List<Student>> fetchApplicants(
+      String positionId, String positionType) async {
+    var positionSnapshot =
+        await _firestore.collection(positionType).doc(positionId).get();
+
+    List<Student> applicants = [];
+    if (positionSnapshot.exists) {
+      var studentIds = List<String>.from(
+          positionSnapshot.get('studentApplicantsList') ?? []);
+
+      if (studentIds.isNotEmpty) {
+        var studentSnapshot = await _firestore
+            .collection('Student')
+            .where(FieldPath.documentId, whereIn: studentIds)
+            .get();
+        applicants = studentSnapshot.docs
+            .map((doc) => Student.fromFirestore(doc))
+            .toList();
+      }
+    }
+    return applicants;
+  }
+  //   var jobPositions = jobSnapshot.docs
+  //       .map((doc) => {
+  //             'id': doc.id,
+  //             'type': 'Job Position',
+  //             'studentApplicantsList':
+  //                 List<String>.from(doc['studentApplicantsList'] ?? []),
+  //           })
+  //       .toList();
+  //
+  //   var trainingSnapshot = await _firestore
+  //       .collection('Training Position')
+  //       .where('hrId', isEqualTo: hrId)
+  //       .get();
+  //   var trainingPositions = trainingSnapshot.docs
+  //       .map((doc) => {
+  //             'id': doc.id,
+  //             'type': 'Training Position',
+  //             'studentApplicantsList':
+  //                 List<String>.from(doc['studentApplicantsList'] ?? []),
+  //           })
+  //       .toList();
+  //
+  //   List<String> studentIds = [];
+  //   List<Map<String, String>> positionTypes = [];
+  //
+  //   for (var job in jobPositions) {
+  //     studentIds.addAll(
+  //         (job['studentApplicantsList'] as List<dynamic>).whereType<String>());
+  //     positionTypes
+  //         .add({'id': job['id'].toString(), 'type': job['type'].toString()});
+  //   }
+  //
+  //   for (var training in trainingPositions) {
+  //     studentIds.addAll((training['studentApplicantsList'] as List<dynamic>)
+  //         .whereType<String>());
+  //     positionTypes.add({
+  //       'id': training['id'].toString(),
+  //       'type': training['type'].toString()
+  //     });
+  //   }
+  //
+  //   studentIds = studentIds.toSet().toList();
+  //
+  //   List<Student> applicants = [];
+  //   if (studentIds.isNotEmpty) {
+  //     var studentSnapshot = await _firestore
+  //         .collection('Student')
+  //         .where(FieldPath.documentId, whereIn: studentIds)
+  //         .get();
+  //     applicants = studentSnapshot.docs
+  //         .map((doc) => Student.fromFirestore(doc))
+  //         .toList();
+  //   }
+  //
+  //   return applicants;
+  // }
+
+  Future<List<SupervisorModel>> fetchSupervisors(String hrDocumentId) async {
+    var hrDoc = await _firestore.collection('HR').doc(hrDocumentId).get();
+    if (hrDoc.exists) {
+      var hrId = hrDoc.id;
+
+      var snapshot = await _firestore
+          .collection('Supervisor')
+          .where('hrId', isEqualTo: hrId)
+          .get();
+      return snapshot.docs
+          .map((doc) => SupervisorModel.fromFirestore(doc))
+          .toList();
+    }
+    return [];
+  }
+
+  Future<void> assignStudentToSupervisor(
+      String studentId, SupervisorModel supervisor) async {
+    final supervisorRef =
+        _firestore.collection('Supervisor').doc(supervisor.uid);
+
+    try {
+      await supervisorRef.update({
+        'studentList': FieldValue.arrayUnion([studentId])
+      });
+    } catch (e) {
+      print("Failed to assign student to supervisor: $e");
+      throw e; // Rethrow the exception after logging it
     }
   }
 }

@@ -1,14 +1,11 @@
-import 'package:cap_advisor/view/instructor_task_view.dart';
 import 'package:cap_advisor/view/student_position_search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'view-model/student_search_viewmodel.dart';
 import 'view-model/assigning_feedback_viewmodel.dart';
 import 'view-model/student_task_viewmodel.dart';
-import 'view/student_search_view.dart';
 import 'view/HR_view.dart';
 import 'view/add_task_view.dart';
 import 'view/assigning_feedback_view.dart';
@@ -19,7 +16,6 @@ import 'view/login_view.dart';
 import 'view/post_position_view.dart';
 import 'view/menu_view.dart';
 import 'view/sign_up_view.dart';
-import 'view/student_task_view.dart';
 import 'view/student_view.dart';
 import 'view/supervisor_view.dart';
 import 'model/firebaseuser.dart';
@@ -98,7 +94,11 @@ class MyApp extends StatelessWidget {
           '/assign-feedback': (context) => AssigningFeedbackView(),
           '/add-task': (context) => AddTaskView(studentId: '', studentName: ''),
           'job-and-training-applicants': (context) =>
-              JobAndTrainingApplicantsView(hrDocumentId: ''),
+              JobAndTrainingApplicantsView(
+                hrDocumentId: '',
+                positionId: '',
+                positionType: '',
+              ),
           '/student-position-search': (context) => StudentPositionSearchView(),
         },
       ),
