@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
 import '../service/firebase_service.dart';
+import '../service/hr_firebase_serviece.dart';
+import '../service/student_firebase_service.dart';
 
 class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final HRFirebaseService _hrfirebaseService = HRFirebaseService();
   List<Student> applicants = [];
   List<SupervisorModel> supervisors = [];
   List<Student> filteredApplicants = [];
@@ -49,13 +51,13 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
 
   Future<void> fetchApplicants(String positionId, String positionType) async {
     applicants =
-        await _firebaseService.fetchApplicants(positionId, positionType);
+        await _hrfirebaseService.fetchApplicants(positionId, positionType);
     filteredApplicants = List.from(applicants);
     notifyListeners();
   }
 
   Future<void> fetchSupervisors() async {
-    supervisors = await _firebaseService.fetchSupervisors(hrDocumentId);
+    supervisors = await _hrfirebaseService.fetchSupervisors(hrDocumentId);
     notifyListeners();
   }
 
@@ -103,7 +105,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     final selectedSupervisor = await _showSupervisorSelectionDialog(context);
     if (selectedSupervisor != null) {
       try {
-        await _firebaseService.assignStudentToSupervisor(
+        await _hrfirebaseService.assignStudentToSupervisor(
             student.uid, selectedSupervisor);
         await _updateApplicantInCollection('Job Position', student.uid);
         await _updateApplicantInCollection('Training Position', student.uid);
@@ -131,7 +133,8 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     final student = filteredApplicants[applicantIndex];
 
     try {
-      await _firebaseService.assignStudentToSupervisor(student.uid, supervisor);
+      await _hrfirebaseService.assignStudentToSupervisor(
+          student.uid, supervisor);
       filteredApplicants.removeAt(applicantIndex);
       notifyListeners();
     } catch (e) {

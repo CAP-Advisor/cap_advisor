@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../service/firebase_service.dart';
+import '../service/student_firebase_service.dart';
 
 class StudentTasksViewModel extends ChangeNotifier {
   late TextEditingController searchController;
@@ -21,7 +21,7 @@ class StudentTasksViewModel extends ChangeNotifier {
 
   Future<void> fetchTasks() async {
     try {
-      FirebaseService firebaseService = FirebaseService();
+      StudentFirebaseService firebaseService = StudentFirebaseService();
       String userId = FirebaseService().currentUser!.uid;
       Map<String, dynamic>? studentDoc =
           await firebaseService.fetchStudentData(userId);

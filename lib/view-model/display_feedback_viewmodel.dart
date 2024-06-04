@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/display_feedback_model.dart';
 import '../service/firebase_service.dart';
+import '../service/supervisor_firebase_service.dart';
 
 class DisplayFeedbackViewModel extends ChangeNotifier {
   final FeedbackModel feedback;
@@ -83,7 +84,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       try {
         // Proceed with feedback submission
         String feedbackTypeCollection =
-        selectedFeedbackType == 'Task Feedback' ? 'Task' : 'Training';
+            selectedFeedbackType == 'Task Feedback' ? 'Task' : 'Training';
         if (selectedFeedbackType == 'Task Feedback') {
           String taskId = await getTaskId(selectedTaskTitle!);
           feedbackTypeCollection = 'Task';
@@ -97,7 +98,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           );
         } else if (selectedFeedbackType == 'Final Feedback') {
           String finalFeedbackText = finalFeedbackController.text;
-          await FirebaseService().addFeedback(
+          await SupervisorFirebaseService().addFeedback(
             studentId: feedback.studentId,
             feedbackType: feedbackTypeCollection,
             feedbackData: {
@@ -125,6 +126,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       }
     }
   }
+
   Future<void> updateFeedback({
     required String studentId,
     required String feedbackType,
@@ -133,9 +135,9 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
   }) async {
     try {
       DocumentReference studentRef =
-      FirebaseFirestore.instance.collection('Student').doc(studentId);
+          FirebaseFirestore.instance.collection('Student').doc(studentId);
       DocumentReference feedbackDocRef =
-      studentRef.collection(feedbackType).doc(feedbackId);
+          studentRef.collection(feedbackType).doc(feedbackId);
       await feedbackDocRef.update(feedbackData);
 
       print('Feedback updated successfully');
@@ -169,7 +171,8 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
 
   void updateSelectedFeedbackType(String? newValue) {
     selectedFeedbackType = newValue;
-    feedbackText = newValue == "Task Feedback" ? "Task Feedback" : "Final Feedback";
+    feedbackText =
+        newValue == "Task Feedback" ? "Task Feedback" : "Final Feedback";
     // Reset selected training when changing feedback type
     selectedTraining = null;
     notifyListeners(); // Notify listeners to update the UI

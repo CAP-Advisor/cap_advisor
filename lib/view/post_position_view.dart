@@ -22,6 +22,9 @@ class _PostPositionViewState extends State<PostPositionView> {
   List<String>? selectedSkills = [];
   PostPositionViewModel viewModel = PostPositionViewModel();
   bool _isLoading = false;
+  bool showDropdownError = false;
+  bool showTitleError = false;
+  bool showDescriptionError = false;
   String hrId = '';
   final List<String> skills = [
     'C++',
@@ -125,18 +128,27 @@ class _PostPositionViewState extends State<PostPositionView> {
               hintText: "Position Type",
               onChanged: (value) {
                 viewModel.setPositionType(value!);
-                setState(() {});
+                setState(() {
+                  showDropdownError = !viewModel.isValidPositionType();
+                });
               },
               errorMessage: 'Required',
               isValid: viewModel.isValidPositionType(),
+              showError: showDropdownError,
             ),
             SizedBox(height: 35),
             CustomTextField(
               hintText: 'Position Title',
               controller: positionTitleController,
-              onChanged: (value) {},
+              onChanged: (value) {
+                viewModel.setPositionTitle(value);
+                setState(() {
+                  showTitleError = !viewModel.isValidTitle();
+                });
+              },
               errorMessage: 'Enter a Position Title',
               isValid: viewModel.isValidTitle(),
+              showError: showTitleError,
             ),
             SizedBox(height: 35),
             GestureDetector(
@@ -170,9 +182,15 @@ class _PostPositionViewState extends State<PostPositionView> {
             CustomTextField(
               hintText: 'Position Description',
               controller: positionDescriptionController,
-              onChanged: (value) {},
+              onChanged: (value) {
+                setState(() {
+                  viewModel.setPositionDescription(value);
+                  showDescriptionError = !viewModel.isValidDescription();
+                });
+              },
               errorMessage: 'Enter a brief description',
               isValid: viewModel.isValidDescription(),
+              showError: showDescriptionError,
             ),
             Padding(
               padding: const EdgeInsets.only(top: 50.0),
@@ -180,6 +198,19 @@ class _PostPositionViewState extends State<PostPositionView> {
                   ? const CircularProgressIndicator()
                   : CustomButton(
                       onPressed: () async {
+                        setState(() {
+                          showDropdownError = !viewModel.isValidPositionType();
+                          showTitleError = !viewModel.isValidTitle();
+                          showDescriptionError =
+                              !viewModel.isValidDescription();
+                        });
+
+                        if (!viewModel.isValidPositionType() ||
+                            !viewModel.isValidTitle() ||
+                            !viewModel.isValidDescription()) {
+                          return;
+                        }
+
                         setState(() {
                           _isLoading = true;
                         });

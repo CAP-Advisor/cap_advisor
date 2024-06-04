@@ -2,9 +2,10 @@ import 'package:cap_advisor/model/student_model.dart';
 import 'package:flutter/material.dart';
 import '../model/final_feedback_model.dart';
 import '../service/firebase_service.dart';
+import '../service/student_firebase_service.dart';
 
 class StudentViewModel with ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final StudentFirebaseService _firebaseService = StudentFirebaseService();
   bool isLoading = false;
   String? error;
   final String uid;

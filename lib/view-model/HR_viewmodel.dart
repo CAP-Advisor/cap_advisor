@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/HR_model.dart';
 import '../service/firebase_service.dart';
+import '../service/hr_firebase_serviece.dart';
 import '../view/job-and-training_applicants_view.dart';
 
 enum PositionType {
@@ -14,7 +15,7 @@ enum PositionType {
 
 class HRViewModel extends ChangeNotifier {
   PositionType currentType = PositionType.job;
-  final FirebaseService _firebaseService = FirebaseService();
+  final HRFirebaseService _firebaseService = HRFirebaseService();
   TextEditingController searchController = TextEditingController();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   List<Job> allPositions = [];
@@ -90,6 +91,24 @@ class HRViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       errorMessage = 'Failed to delete job';
+      notifyListeners();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteTraining(Job job) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await _firebaseService.deleteTraining(job.id);
+      allPositions.removeWhere((j) => j.id == job.id);
+      filteredPositions.removeWhere((j) => j.id == job.id);
+      notifyListeners();
+    } catch (e) {
+      errorMessage = 'Failed to delete training';
       notifyListeners();
     } finally {
       isLoading = false;
@@ -179,8 +198,8 @@ class HRViewModel extends ChangeNotifier {
         TextEditingController(text: job.title);
     TextEditingController descriptionController =
         TextEditingController(text: job.description);
-    TextEditingController skillsController = TextEditingController(
-        text: job.skills.join(', ')); // Initialize skills controller
+    TextEditingController skillsController =
+        TextEditingController(text: job.skills.join(', '));
 
     showDialog(
       context: context,

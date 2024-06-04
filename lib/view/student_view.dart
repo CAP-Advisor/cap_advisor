@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/student_model.dart';
+import '../service/student_firebase_service.dart';
 import '../view-model/student_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 import 'add_section_view.dart';
@@ -21,7 +22,7 @@ class StudentView extends StatelessWidget {
   }) : super(key: key);
 
   final TextEditingController _nameController = TextEditingController();
-  FirebaseService firebaseService = FirebaseService();
+  StudentFirebaseService firebaseService = StudentFirebaseService();
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<StudentViewModel>(

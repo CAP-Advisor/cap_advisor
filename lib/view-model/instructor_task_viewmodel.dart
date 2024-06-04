@@ -1,9 +1,12 @@
+import 'package:cap_advisor/model/student_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../service/firebase_service.dart';
+import '../service/instructor_firebase_service.dart';
+import '../service/student_firebase_service.dart';
 
 class InstructorTasksViewModel extends ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final StudentFirebaseService _firebaseService = StudentFirebaseService();
   late TextEditingController searchController;
   late List<Map<String, dynamic>> _allTasks;
   late List<Map<String, dynamic>> _filteredTasks;
@@ -24,7 +27,7 @@ class InstructorTasksViewModel extends ChangeNotifier {
 
   Future<void> fetchTasks() async {
     try {
-      FirebaseService firebaseService = FirebaseService();
+      StudentFirebaseService firebaseService = StudentFirebaseService();
       Map<String, dynamic>? studentDoc =
           await firebaseService.fetchStudentData(_studentId);
       if (studentDoc != null) {

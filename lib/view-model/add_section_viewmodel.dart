@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cap_advisor/service/firebase_service.dart';
+import '../service/student_firebase_service.dart';
 import '../view/student_view.dart';
 
 class SectionViewModel extends ChangeNotifier {
-  final FirebaseService _firebaseService;
+  final StudentFirebaseService _firebaseService;
   final TextEditingController summaryController = TextEditingController();
   final TextEditingController majorController = TextEditingController();
   final TextEditingController githubController = TextEditingController();

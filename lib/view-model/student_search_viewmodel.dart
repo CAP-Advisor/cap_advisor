@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../service/firebase_service.dart';
 import '../model/student_model.dart';
+import '../service/student_firebase_service.dart';
 
 class StudentViewModel extends ChangeNotifier {
   List<Student> _students = [];
   List<Student> _filteredStudents = [];
-  final FirebaseService _firebaseService = FirebaseService();
+  final StudentFirebaseService _firebaseService = StudentFirebaseService();
 
   List<Student> get students =>
       _filteredStudents.isNotEmpty ? _filteredStudents : _students;

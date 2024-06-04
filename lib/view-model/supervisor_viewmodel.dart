@@ -2,12 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
-import '../service/firebase_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../service/supervisor_firebase_service.dart';
+
 class SupervisorViewModel extends ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final SupervisorFirebaseService _firebaseService =
+      SupervisorFirebaseService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   TextEditingController searchController = TextEditingController();
 
@@ -99,7 +101,7 @@ class SupervisorViewModel extends ChangeNotifier {
   }
 
   Future<bool> updateSupervisorProfileImage() async {
-    bool result = await _firebaseService.updateProfileImage();
+    bool result = await _firebaseService.updateSupervisorProfileImage();
     if (result) {
       print("Profile image updated successfully.");
     } else {
@@ -109,7 +111,7 @@ class SupervisorViewModel extends ChangeNotifier {
   }
 
   Future<bool> updateSupervisorCoverPhoto() async {
-    bool result = await _firebaseService.updateCoverPhoto();
+    bool result = await _firebaseService.updateSupervisorCoverPhoto();
     if (result) {
       print("Cover photo updated successfully.");
     } else {
