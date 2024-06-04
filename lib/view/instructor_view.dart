@@ -82,7 +82,7 @@ class InstructorView extends StatelessWidget {
                                               Text(student.email),
                                             ],
                                           ),
-                                          trailing: ElevatedButton(
+                                          trailing: IconButton(
                                             onPressed: () {
                                               Navigator.push(
                                                 context,
@@ -95,17 +95,9 @@ class InstructorView extends StatelessWidget {
                                                 ),
                                               );
                                             },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Color(0xFF164863),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                            ),
-                                            child: const Icon(
+                                            icon: Icon(
                                               Icons.task,
-                                              color: Colors.white,
+                                              color: Color(0xFF164863),
                                             ),
                                           ),
                                           onTap: () {
@@ -196,35 +188,36 @@ class InstructorView extends StatelessWidget {
           ),
         ),
         Positioned(
-            right: 16,
-            bottom: 16,
-            child: PopupMenuButton<String>(
-              onSelected: (String value) {
-                _viewModel.handleProfileAction(context, value);
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'view_profile_photo',
-                  child: Text('View Profile Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'choose_profile_photo',
-                  child: Text('Choose Profile Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'view_cover_photo',
-                  child: Text('View Cover Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'choose_cover_photo',
-                  child: Text('Choose Cover Photo'),
-                ),
-              ],
-              child: CircleAvatar(
-                backgroundColor: Colors.grey[800],
-                child: const Icon(Icons.add_a_photo, color: Colors.white),
+          right: 16,
+          bottom: 16,
+          child: PopupMenuButton<String>(
+            onSelected: (String value) {
+              _viewModel.handleProfileAction(context, value);
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'view_profile_photo',
+                child: Text('View Profile Photo'),
               ),
-            ))
+              const PopupMenuItem<String>(
+                value: 'choose_profile_photo',
+                child: Text('Choose Profile Photo'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'view_cover_photo',
+                child: Text('View Cover Photo'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'choose_cover_photo',
+                child: Text('Choose Cover Photo'),
+              ),
+            ],
+            child: CircleAvatar(
+              backgroundColor: Colors.grey[800],
+              child: const Icon(Icons.add_a_photo, color: Colors.white),
+            ),
+          ),
+        )
       ],
     );
   }

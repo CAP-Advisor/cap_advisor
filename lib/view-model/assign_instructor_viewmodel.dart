@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class InstructorSearchViewModel extends ChangeNotifier {
+class AssigningInstructorViewModel extends ChangeNotifier {
   TextEditingController searchController = TextEditingController();
   List<DocumentSnapshot> instructors = [];
   bool isLoading = false;
+  String? error;
 
-  InstructorSearchViewModel() {
+  AssigningInstructorViewModel() {
     searchController.addListener(_onSearchChanged);
-    _fetchAllInstructors(); // Fetch all instructors initially
+    _fetchAllInstructors();
   }
 
   void _onSearchChanged() {
@@ -19,35 +20,45 @@ class InstructorSearchViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    QuerySnapshot querySnapshot;
-    if (query.isEmpty) {
-      querySnapshot = await FirebaseFirestore.instance
-          .collection('Instructor')
-          .get();
-    } else {
-      querySnapshot = await FirebaseFirestore.instance
-          .collection('Instructor')
-          .where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThanOrEqualTo: query + '\uf8ff')
-          .get();
-    }
+    try {
+      QuerySnapshot querySnapshot;
+      if (query.isEmpty) {
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('Instructor')
+            .get();
+      } else {
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('Instructor')
+            .where('name', isGreaterThanOrEqualTo: query)
+            .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+            .get();
+      }
 
-    instructors = querySnapshot.docs;
-    isLoading = false;
-    notifyListeners();
+      instructors = querySnapshot.docs;
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   void _fetchAllInstructors() async {
     isLoading = true;
     notifyListeners();
 
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Instructor')
-        .get();
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Instructor')
+          .get();
 
-    instructors = querySnapshot.docs;
-    isLoading = false;
-    notifyListeners();
+      instructors = querySnapshot.docs;
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   void assignStudentToInstructor(String instructorId, String studentId, BuildContext context) async {
@@ -63,7 +74,11 @@ class InstructorSearchViewModel extends ChangeNotifier {
         throw Exception("Instructor does not exist!");
       }
 
-      List<dynamic> studentList = snapshot['studentList'] ?? [];
+      List<dynamic> studentList = [];
+      if (snapshot.data() != null) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        studentList = data['studentList'] ?? [];
+      }
 
       // Check if the studentId is already in the studentList
       if (!studentList.contains(studentId)) {
