@@ -42,6 +42,7 @@ class PostPositionViewModel {
         'description': model.positionDescription,
         'skills': model.skillList,
         'hrId': hrId,
+        'studentApplicantsList': [],
       });
       model.positionTitle = '';
       model.positionDescription = '';

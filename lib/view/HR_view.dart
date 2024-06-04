@@ -417,6 +417,7 @@ class _HRViewState extends State<HRView> {
               onPressed: () {
                 Navigator.of(context).pop();
                 model.deleteJob(job);
+                model.deleteTraining(job);
               },
             ),
           ],

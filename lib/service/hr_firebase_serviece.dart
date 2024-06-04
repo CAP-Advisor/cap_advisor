@@ -137,6 +137,10 @@ class HRFirebaseService {
     await _firestore.collection('Job Position').doc(jobId).delete();
   }
 
+  Future<void> deleteTraining(String trainingId) async {
+    await _firestore.collection('Training Position').doc(trainingId).delete();
+  }
+
   Future<void> assignStudentToSupervisor(
       String studentId, SupervisorModel supervisor) async {
     final supervisorRef =

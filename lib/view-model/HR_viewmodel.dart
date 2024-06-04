@@ -98,6 +98,24 @@ class HRViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteTraining(Job job) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await _firebaseService.deleteTraining(job.id);
+      allPositions.removeWhere((j) => j.id == job.id);
+      filteredPositions.removeWhere((j) => j.id == job.id);
+      notifyListeners();
+    } catch (e) {
+      errorMessage = 'Failed to delete training';
+      notifyListeners();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> updateHRProfileImage() async {
     bool result = await _firebaseService.updateHRProfileImage();
     if (result) {
@@ -180,8 +198,8 @@ class HRViewModel extends ChangeNotifier {
         TextEditingController(text: job.title);
     TextEditingController descriptionController =
         TextEditingController(text: job.description);
-    TextEditingController skillsController = TextEditingController(
-        text: job.skills.join(', ')); // Initialize skills controller
+    TextEditingController skillsController =
+        TextEditingController(text: job.skills.join(', '));
 
     showDialog(
       context: context,
