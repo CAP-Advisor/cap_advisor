@@ -372,7 +372,13 @@ class _HRViewState extends State<HRView> {
                     // Show Applicants on the same page
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => JobAndTrainingApplicantsView(hrDocumentId: job.hrId,)),
+                      MaterialPageRoute(
+                        builder: (context) => JobAndTrainingApplicantsView(
+                          hrDocumentId: job.hrId,
+                          positionId: job.id, // Pass position ID
+                          positionType: model.currentType == PositionType.job ? 'Job Position' : 'Training Position', // Pass position type
+                        ),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(

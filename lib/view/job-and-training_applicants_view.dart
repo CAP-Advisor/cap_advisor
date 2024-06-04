@@ -5,12 +5,20 @@ import '../widgets/custom_appbar.dart';
 
 class JobAndTrainingApplicantsView extends StatefulWidget {
   final String hrDocumentId;
+  final String positionId;
+  final String positionType;
 
-  JobAndTrainingApplicantsView({super.key, required this.hrDocumentId});
+  JobAndTrainingApplicantsView({
+    super.key,
+    required this.hrDocumentId,
+    required this.positionId,
+    required this.positionType,
+  });
 
   @override
   _JobAndTrainingApplicantsViewState createState() => _JobAndTrainingApplicantsViewState();
 }
+
 
 class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsView> {
   late JobAndTrainingApplicantsViewModel viewModel;
@@ -19,20 +27,33 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
   @override
   void initState() {
     super.initState();
-    viewModel = JobAndTrainingApplicantsViewModel(hrDocumentId: widget.hrDocumentId);
-    fetchData(widget.hrDocumentId);
+    viewModel = JobAndTrainingApplicantsViewModel(
+      hrDocumentId: widget.hrDocumentId,
+      positionId: widget.positionId,
+      positionType: widget.positionType,
+    );
+    fetchData(widget.positionId, widget.positionType);
   }
 
-  void fetchData(String hrDocumentId) async {
+  void fetchData(String positionId, String positionType) async {
     setState(() {
       _isLoading = true;
     });
-    await viewModel.fetchApplicants(hrDocumentId);
-    await viewModel.fetchSupervisors();
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      await viewModel.fetchApplicants(positionId, positionType);
+      await viewModel.fetchSupervisors();
+    } catch (e) {
+      // Handle errors appropriately, e.g., show a snackbar
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to fetch data: $e'),
+      ));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
+
 
   void _onSearchChanged(String query) {
     setState(() {
@@ -98,7 +119,7 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Training Applicants",
+        title: "Position Applicants",
         onBack: () {
           Navigator.of(context).pop();
         },
@@ -111,16 +132,16 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+          : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 20),
-            SizedBox(height: 8),
             Text(
               "Gain hands-on experience, enhance skills, and contribute to real-world projects in a collaborative environment. Your gateway to growth and innovation in software development.",
               style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 16),
             TextField(
@@ -150,52 +171,54 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
               onChanged: _onSearchChanged,
             ),
             SizedBox(height: 16),
-            viewModel.filteredApplicants.isEmpty
-                ? Text(
-              "No applicants yet",
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            )
-                : ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: viewModel.filteredApplicants.length,
-              itemBuilder: (context, index) {
-                final applicant = viewModel.filteredApplicants[index];
-                return Card(
-                  key: ValueKey<int>(applicant.hashCode),
-                  color: Color(0xFFDDF2FD),
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Text(applicant.name[0]),
+            Expanded(
+              child: viewModel.filteredApplicants.isEmpty
+                  ? Center(
+                child: Text(
+                  "No applicants yet",
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: viewModel.filteredApplicants.length,
+                itemBuilder: (context, index) {
+                  final applicant = viewModel.filteredApplicants[index];
+                  return Card(
+                    key: ValueKey<int>(applicant.hashCode),
+                    color: Color(0xFFDDF2FD),
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: Text(applicant.name[0]),
+                      ),
+                      title: Text(applicant.name),
+                      subtitle: Text(applicant.email),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.check, color: Colors.green),
+                            onPressed: () async {
+                              await viewModel.approveApplicant(context, index);
+                              setState(() {
+                                viewModel.filteredApplicants.removeAt(index);
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                viewModel.rejectApplicant(index);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                    title: Text(applicant.name),
-                    subtitle: Text(applicant.email),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.check, color: Colors.green),
-                          onPressed: () async {
-                            await viewModel.approveApplicant(context, index);
-                            setState(() {
-                              viewModel.filteredApplicants.removeAt(index);
-                            });
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.close, color: Colors.red),
-                          onPressed: () {
-                            setState(() {
-                              viewModel.rejectApplicant(index);
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -221,4 +244,5 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
       ),
     );
   }
+
 }

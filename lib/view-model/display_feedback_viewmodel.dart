@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/display_feedback_model.dart';
 import '../service/firebase_service.dart';
+import 'package:http/http.dart' as http;
 
 class DisplayFeedbackViewModel extends ChangeNotifier {
   final FeedbackModel feedback;
@@ -109,6 +112,26 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           taskTitleController.clear();
           taskDescriptionController.clear();
           taskFeedbackController.clear();
+
+          // Send notification
+          final url = Uri.parse(
+              'https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
+          final response = await http.post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'userId': feedback.studentId,
+              'title': 'Feedback Submitted',
+              'message': 'Your feedback has been submitted successfully.',
+            }),
+          );
+          if (response.statusCode == 200) {
+            print('Notification sent successfully');
+          } else {
+            print('Failed to send notification: ${response.body}');
+          }
         }
 
         // Feedback added successfully
@@ -125,6 +148,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       }
     }
   }
+
   Future<void> updateFeedback({
     required String studentId,
     required String feedbackType,
@@ -138,12 +162,33 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       studentRef.collection(feedbackType).doc(feedbackId);
       await feedbackDocRef.update(feedbackData);
 
+      // Send notification
+      final url = Uri.parse(
+          'https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'userId': studentId,
+          'title': 'Feedback Updated',
+          'message': 'Your feedback has been updated successfully.',
+        }),
+      );
+      if (response.statusCode == 200) {
+        print('Notification sent successfully');
+      } else {
+        print('Failed to send notification: ${response.body}');
+      }
+
       print('Feedback updated successfully');
     } catch (error) {
       print("Error updating feedback: $error");
       throw error; // Rethrow the error for error handling in UI
     }
   }
+
 
   Future<String> getTaskId(String taskTitle) async {
     try {

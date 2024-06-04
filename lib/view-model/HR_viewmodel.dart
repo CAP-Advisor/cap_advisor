@@ -34,6 +34,7 @@ class HRViewModel extends ChangeNotifier {
   FireBaseUser? user;
 
 
+
   HRViewModel() {
     fetchPositions();
     fetchUserData();
@@ -92,19 +93,19 @@ class HRViewModel extends ChangeNotifier {
   }
   Future<String> fetchImageUrl({required ImageType type}) async {
 
-      String userId = firebaseAuth.currentUser?.uid ?? '';
-      String folderName = type == ImageType.background ? 'background' : 'profile';
-      Reference folderRef = storage.ref('$userId/$folderName');
+    String userId = firebaseAuth.currentUser?.uid ?? '';
+    String folderName = type == ImageType.background ? 'background' : 'profile';
+    Reference folderRef = storage.ref('$userId/$folderName');
 
-      ListResult result = await folderRef.listAll();
-      if (result.items.isNotEmpty) {
-        result.items.sort((a, b) => b.name.compareTo(a.name));
-        String imageUrl = await result.items.last.getDownloadURL();
+    ListResult result = await folderRef.listAll();
+    if (result.items.isNotEmpty) {
+      result.items.sort((a, b) => b.name.compareTo(a.name));
+      String imageUrl = await result.items.last.getDownloadURL();
 
-        return imageUrl;
-      } else {
-          return type == ImageType.background ? 'https://dummyimage.com/500x300/808080/000000' : 'https://dummyimage.com/150/808080/000000';
-      }
+      return imageUrl;
+    } else {
+      return type == ImageType.background ? 'https://dummyimage.com/500x300/808080/000000' : 'https://dummyimage.com/150/808080/000000';
+    }
   }
 
 
@@ -226,6 +227,18 @@ class HRViewModel extends ChangeNotifier {
                 }).catchError((error) {
                   print("Error updating document: $error");
                 });
+
+                // Show Applicants on the same page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => JobAndTrainingApplicantsView(
+                      hrDocumentId: job.hrId,
+                      positionId: job.id, // Pass position ID
+                      positionType: currentType == PositionType.job ? 'Job Position' : 'Training Position', // Pass position type
+                    ),
+                  ),
+                );
 
                 Navigator.of(context).pop();
               },
