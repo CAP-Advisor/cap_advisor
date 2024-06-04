@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
 import '../service/firebase_service.dart';
+import '../service/hr_firebase_serviece.dart';
+import '../service/student_firebase_service.dart';
 
 class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final StudentFirebaseService _firebaseService = StudentFirebaseService();
+  final HRFirebaseService _hrfirebaseService = HRFirebaseService();
   List<Student> applicants = [];
   List<SupervisorModel> supervisors = [];
   List<Student> filteredApplicants = [];
@@ -55,7 +58,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchSupervisors() async {
-    supervisors = await _firebaseService.fetchSupervisors(hrDocumentId);
+    supervisors = await _hrfirebaseService.fetchSupervisors(hrDocumentId);
     notifyListeners();
   }
 

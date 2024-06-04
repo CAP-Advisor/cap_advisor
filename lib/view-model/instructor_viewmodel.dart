@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../model/student_model.dart';
 import '../service/firebase_service.dart';
+import '../service/instructor_firebase_service.dart';
 
 class InstructorViewModel with ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final InstructorFirebaseService _firebaseService =
+      InstructorFirebaseService();
   TextEditingController searchController = TextEditingController();
   bool isLoading = false;
   String? error;

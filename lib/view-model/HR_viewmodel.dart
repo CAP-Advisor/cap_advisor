@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/HR_model.dart';
 import '../service/firebase_service.dart';
+import '../service/hr_firebase_serviece.dart';
 import '../view/job-and-training_applicants_view.dart';
 
 enum PositionType {
@@ -14,7 +15,7 @@ enum PositionType {
 
 class HRViewModel extends ChangeNotifier {
   PositionType currentType = PositionType.job;
-  final FirebaseService _firebaseService = FirebaseService();
+  final HRFirebaseService _firebaseService = HRFirebaseService();
   TextEditingController searchController = TextEditingController();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   List<Job> allPositions = [];
