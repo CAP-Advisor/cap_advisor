@@ -8,7 +8,6 @@ import '../service/hr_firebase_serviece.dart';
 import '../service/student_firebase_service.dart';
 
 class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
-  final StudentFirebaseService _firebaseService = StudentFirebaseService();
   final HRFirebaseService _hrfirebaseService = HRFirebaseService();
   List<Student> applicants = [];
   List<SupervisorModel> supervisors = [];
@@ -52,7 +51,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
 
   Future<void> fetchApplicants(String positionId, String positionType) async {
     applicants =
-        await _firebaseService.fetchApplicants(positionId, positionType);
+        await _hrfirebaseService.fetchApplicants(positionId, positionType);
     filteredApplicants = List.from(applicants);
     notifyListeners();
   }
@@ -106,7 +105,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     final selectedSupervisor = await _showSupervisorSelectionDialog(context);
     if (selectedSupervisor != null) {
       try {
-        await _firebaseService.assignStudentToSupervisor(
+        await _hrfirebaseService.assignStudentToSupervisor(
             student.uid, selectedSupervisor);
         await _updateApplicantInCollection('Job Position', student.uid);
         await _updateApplicantInCollection('Training Position', student.uid);
@@ -134,7 +133,8 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     final student = filteredApplicants[applicantIndex];
 
     try {
-      await _firebaseService.assignStudentToSupervisor(student.uid, supervisor);
+      await _hrfirebaseService.assignStudentToSupervisor(
+          student.uid, supervisor);
       filteredApplicants.removeAt(applicantIndex);
       notifyListeners();
     } catch (e) {

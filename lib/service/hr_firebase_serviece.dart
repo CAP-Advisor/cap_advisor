@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import '../model/HR_model.dart';
+import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
 
 class HRFirebaseService {
@@ -134,5 +135,43 @@ class HRFirebaseService {
 
   Future<void> deleteJob(String jobId) async {
     await _firestore.collection('Job Position').doc(jobId).delete();
+  }
+
+  Future<void> assignStudentToSupervisor(
+      String studentId, SupervisorModel supervisor) async {
+    final supervisorRef =
+        _firestore.collection('Supervisor').doc(supervisor.uid);
+
+    try {
+      await supervisorRef.update({
+        'studentList': FieldValue.arrayUnion([studentId])
+      });
+    } catch (e) {
+      print("Failed to assign student to supervisor: $e");
+      throw e;
+    }
+  }
+
+  Future<List<Student>> fetchApplicants(
+      String positionId, String positionType) async {
+    var positionSnapshot =
+        await _firestore.collection(positionType).doc(positionId).get();
+
+    List<Student> applicants = [];
+    if (positionSnapshot.exists) {
+      var studentIds = List<String>.from(
+          positionSnapshot.get('studentApplicantsList') ?? []);
+
+      if (studentIds.isNotEmpty) {
+        var studentSnapshot = await _firestore
+            .collection('Student')
+            .where(FieldPath.documentId, whereIn: studentIds)
+            .get();
+        applicants = studentSnapshot.docs
+            .map((doc) => Student.fromFirestore(doc))
+            .toList();
+      }
+    }
+    return applicants;
   }
 }

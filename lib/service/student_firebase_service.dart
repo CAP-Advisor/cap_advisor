@@ -6,7 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import '../model/final_feedback_model.dart';
 import '../model/student_model.dart';
-import '../model/supervisor_model.dart';
 
 class StudentFirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -236,44 +235,6 @@ class StudentFirebaseService {
       print("Failed to fetch training data: ${e.toString()}");
       return [];
     }
-  }
-
-  Future<void> assignStudentToSupervisor(
-      String studentId, SupervisorModel supervisor) async {
-    final supervisorRef =
-        _firestore.collection('Supervisor').doc(supervisor.uid);
-
-    try {
-      await supervisorRef.update({
-        'studentList': FieldValue.arrayUnion([studentId])
-      });
-    } catch (e) {
-      print("Failed to assign student to supervisor: $e");
-      throw e; // Rethrow the exception after logging it
-    }
-  }
-
-  Future<List<Student>> fetchApplicants(
-      String positionId, String positionType) async {
-    var positionSnapshot =
-        await _firestore.collection(positionType).doc(positionId).get();
-
-    List<Student> applicants = [];
-    if (positionSnapshot.exists) {
-      var studentIds = List<String>.from(
-          positionSnapshot.get('studentApplicantsList') ?? []);
-
-      if (studentIds.isNotEmpty) {
-        var studentSnapshot = await _firestore
-            .collection('Student')
-            .where(FieldPath.documentId, whereIn: studentIds)
-            .get();
-        applicants = studentSnapshot.docs
-            .map((doc) => Student.fromFirestore(doc))
-            .toList();
-      }
-    }
-    return applicants;
   }
 
   Future<bool> addGithub(String github) async {
