@@ -57,6 +57,21 @@ class MenuView extends StatelessWidget {
                         ),
                       ),
                     ),
+                    _buildMenuItem(
+                      context,
+                      "Assign Instructor",
+                      Icons.person_add,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AssigningInstructorView(
+                            studentId: model.currentUser?.uid ??
+                                '', // Pass the appropriate studentId
+                          ),
+                        ),
+                      ),
+                    ),
+                    Divider(),
                   ],
                   _buildMenuItem(
                     context,

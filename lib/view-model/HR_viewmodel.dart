@@ -29,6 +29,7 @@ class HRViewModel extends ChangeNotifier {
   String? get HREmail => currentHR?.email;
   String? get HRPhotoUrl => currentHR?.photoUrl;
 
+
   HRViewModel() {
     fetchPositions();
     getHRDataByEmail();

@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../model/student_position_search_model.dart';
@@ -19,15 +18,13 @@ class _StudentPositionSearchViewState extends State<StudentPositionSearchView> {
   final StudentPositionSearchViewModel viewModel =
       StudentPositionSearchViewModel();
 
-  List<StudentPositionSearchModel> positions = [];
   bool isLoading = true;
   late String studentId;
 
   @override
   void initState() {
     super.initState();
-    fetchPositions();
-    fetchCurrentUser();
+    fetchCurrentUserAndPositions();
     searchController.addListener(onSearchChanged);
   }
 
@@ -44,21 +41,27 @@ class _StudentPositionSearchViewState extends State<StudentPositionSearchView> {
     });
   }
 
-  Future<void> fetchCurrentUser() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      studentId = user.uid;
-    }
-  }
-
-  Future<void> fetchPositions() async {
+  Future<void> fetchCurrentUserAndPositions() async {
     try {
+      await fetchCurrentUser();
       await viewModel.fetchPositions();
       setState(() {
         isLoading = false;
       });
     } catch (e) {
-      print("Error fetching positions: $e");
+      print("Error fetching data: $e");
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error fetching data')));
+    }
+  }
+
+  Future<void> fetchCurrentUser() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      studentId = user.uid;
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('User not logged in')));
     }
   }
 
@@ -91,33 +94,43 @@ class _StudentPositionSearchViewState extends State<StudentPositionSearchView> {
         ),
         body: Column(
           children: [
-            CustomSearchField(
-              controller: searchController,
-              onChanged: (value) {
-                // Handle search input changes
-              }, hintText: 'Search Position',
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: CustomSearchField(
+                controller: searchController,
+                hintText: 'Search Position by Title',
+                onChanged: (String value) {},
+              ),
             ),
             Expanded(
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      itemCount: viewModel.filteredPositions.length,
-                      itemBuilder: (context, index) {
-                        final position = viewModel.filteredPositions[index];
-                        return CustomPositionCard(
-                          title: position.title,
-                          companyName: position.companyName,
-                          description: position.description,
-                          positionType: position.positionType,
-                          skills: position.skills,
-                          onPressed: () => applyForPosition(position),
-                        );
-                      },
-                    ),
+                  : buildPositionList(),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildPositionList() {
+    final positions = viewModel.filteredPositions;
+    if (positions.isEmpty) {
+      return Center(child: Text('No positions found'));
+    }
+    return ListView.builder(
+      itemCount: positions.length,
+      itemBuilder: (context, index) {
+        final position = positions[index];
+        return CustomPositionCard(
+          title: position.title,
+          companyName: position.companyName,
+          description: position.description,
+          positionType: position.positionType,
+          skills: position.skills,
+          onPressed: () => applyForPosition(position),
+        );
+      },
     );
   }
 }

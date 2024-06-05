@@ -16,7 +16,7 @@ class AssigningInstructorViewModel extends ChangeNotifier {
     searchInstructors(searchController.text);
   }
 
-  void searchInstructors(String query) async {
+  Future<void> searchInstructors(String query) async {
     isLoading = true;
     notifyListeners();
 
@@ -36,14 +36,14 @@ class AssigningInstructorViewModel extends ChangeNotifier {
 
       instructors = querySnapshot.docs;
     } catch (e) {
-      error = e.toString();
+      error = 'Failed to fetch instructors: $e';
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
-  void _fetchAllInstructors() async {
+  Future<void> _fetchAllInstructors() async {
     isLoading = true;
     notifyListeners();
 
@@ -54,48 +54,50 @@ class AssigningInstructorViewModel extends ChangeNotifier {
 
       instructors = querySnapshot.docs;
     } catch (e) {
-      error = e.toString();
+      error = 'Failed to fetch instructors: $e';
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
-  void assignStudentToInstructor(String instructorId, String studentId, BuildContext context) async {
+  Future<void> assignStudentToInstructor(String instructorId, String studentId, BuildContext context) async {
     DocumentReference instructorRef =
     FirebaseFirestore.instance.collection('Instructor').doc(instructorId);
 
-    bool studentAssigned = false;
-
-    await FirebaseFirestore.instance.runTransaction((transaction) async {
-      DocumentSnapshot snapshot = await transaction.get(instructorRef);
+    try {
+      DocumentSnapshot snapshot = await instructorRef.get();
 
       if (!snapshot.exists) {
         throw Exception("Instructor does not exist!");
       }
 
-      List<dynamic> studentList = [];
-      if (snapshot.data() != null) {
-        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        studentList = data['studentList'] ?? [];
-      }
+      List<dynamic> studentList = (snapshot.data() as Map<String, dynamic>)['studentList'] ?? [];
 
       if (!studentList.contains(studentId)) {
         studentList.add(studentId);
-        transaction.update(instructorRef, {'studentList': studentList});
-        studentAssigned = true;
+        await instructorRef.update({'studentList': studentList});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Student assigned successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('This student is already assigned to this instructor.'),
+            backgroundColor: Colors.deepOrangeAccent,
           ),
         );
       }
-    });
-
-    if (studentAssigned) {
+    } catch (e) {
+      error = 'Failed to assign student: $e';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Student assigned successfully')),
+        SnackBar(
+          content: Text('Failed to assign student: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }

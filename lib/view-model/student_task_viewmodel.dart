@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../service/firebase_service.dart';
 import '../service/student_firebase_service.dart';
 
@@ -13,7 +14,17 @@ class StudentTasksViewModel extends ChangeNotifier {
     searchController = TextEditingController();
     _allTasks = [];
     _filteredTasks = [];
-    fetchTasks();
+    _init();
+  }
+
+  void _init() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        _clearData();
+      } else {
+        fetchTasks();
+      }
+    });
   }
 
   List<Map<String, dynamic>> get tasks =>
@@ -21,10 +32,13 @@ class StudentTasksViewModel extends ChangeNotifier {
 
   Future<void> fetchTasks() async {
     try {
+      isLoading = true;
+      notifyListeners();
+
       StudentFirebaseService firebaseService = StudentFirebaseService();
       String userId = FirebaseService().currentUser!.uid;
       Map<String, dynamic>? studentDoc =
-          await firebaseService.fetchStudentData(userId);
+      await firebaseService.fetchStudentData(userId);
       if (studentDoc != null) {
         QuerySnapshot taskSnapshot = await FirebaseFirestore.instance
             .collection('Student')
@@ -37,10 +51,12 @@ class StudentTasksViewModel extends ChangeNotifier {
       } else {
         _allTasks = [];
       }
-      notifyListeners();
+      _filteredTasks = [];
     } catch (e) {
       print("Error fetching tasks: $e");
       _allTasks = [];
+    } finally {
+      isLoading = false;
       notifyListeners();
     }
   }
@@ -58,6 +74,14 @@ class StudentTasksViewModel extends ChangeNotifier {
     return _filteredTasks;
   }
 
+  void _clearData() {
+    _allTasks.clear();
+    _filteredTasks.clear();
+    searchController.clear();
+    notifyListeners();
+  }
+
+  @override
   void dispose() {
     searchController.dispose();
     super.dispose();

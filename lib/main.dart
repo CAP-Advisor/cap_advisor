@@ -1,8 +1,13 @@
+import 'package:cap_advisor/view/Notification_student.dart';
+import 'package:cap_advisor/view/instructor_task_view.dart';
 import 'package:cap_advisor/view/student_position_search_view.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rxdart/rxdart.dart';
 import 'view-model/student_search_viewmodel.dart';
 import 'view-model/assigning_feedback_viewmodel.dart';
 import 'view-model/student_task_viewmodel.dart';
@@ -21,8 +26,23 @@ import 'view/supervisor_view.dart';
 import 'model/firebaseuser.dart';
 import 'service/firebase_service.dart';
 import 'utils/role_factory.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+
+  if (kDebugMode) {
+    print("Handling a background message: ${message.messageId}");
+    print('Message data: ${message.data}');
+    print('Message notification: ${message.notification?.title}');
+    print('Message notification: ${message.notification?.body}');
+  }
+}
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: FirebaseOptions(
@@ -37,6 +57,43 @@ void main() async {
 
   FirebaseAuth auth = FirebaseAuth.instance;
   var user = auth.currentUser;
+
+  print('user id is ${user?.uid}');
+  final messaging = FirebaseMessaging.instance;
+  final settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  if (user != null) {
+    // user.reload();
+    await messaging.subscribeToTopic('user_${user.uid}');
+    print('Subscribed to user-specific topic: user_${user.uid}');
+  }
+
+  String? token = await messaging.getToken();
+
+  if (kDebugMode) {
+    print('Registration Token=$token');
+  }
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    if (kDebugMode) {
+
+    }
+    print('Handling a foreground message: ${message.messageId}');
+    print('Message data: ${message.data}');
+    print('Message notification: ${message.notification?.title}');
+    print('Message notification: ${message.notification?.body}');
+    _showToast(message);
+
+  });
   bool isAuthenticated = user != null;
 
   String? userType;
@@ -52,6 +109,7 @@ void main() async {
   runApp(MyApp(
     isAuthenticated: isAuthenticated,
     userType: userType,
+
   ));
 }
 
@@ -75,19 +133,20 @@ class MyApp extends StatelessWidget {
         title: 'CAP Advisor',
         theme: ThemeData(),
         home: homeView,
+        builder: FToastBuilder(),
         routes: {
           '/login': (context) => LoginView(),
           '/SignUp': (context) => SignUpView(),
           '/HR': (context) => HRView(uid: ''),
           '/Supervisor': (context) => SupervisorView(
-                uid: '',
-              ),
+            uid: '',
+          ),
           '/Instructor': (context) => InstructorView(
-                uid: '',
-              ),
+            uid: '',
+          ),
           '/Student': (context) => StudentView(
-                uid: '',
-              ),
+            uid: '',
+          ),
           '/home': (context) => HomeView(),
           '/job-and-training-posting': (context) => PostPositionView(),
           '/menu': (context) => MenuView(),
@@ -100,8 +159,23 @@ class MyApp extends StatelessWidget {
                 positionType: '',
               ),
           '/student-position-search': (context) => StudentPositionSearchView(),
+          '/notifications': (context) => NotificationPage(studentId: 'your-student-id', notifications: [],),
+
         },
       ),
     );
   }
+}
+
+void _showToast(RemoteMessage message) {
+  Fluttertoast.showToast(
+    msg: "${message.notification?.title ?? "Notification"}: ${message.notification?.body ?? "No body"}",
+    toastLength: Toast.LENGTH_LONG,
+    gravity: ToastGravity.BOTTOM,
+    timeInSecForIosWeb: 1,
+
+    backgroundColor: Colors.black54,
+    textColor: Colors.white,
+    fontSize: 16.0,
+  );
 }
