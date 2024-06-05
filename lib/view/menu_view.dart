@@ -64,7 +64,7 @@ class MenuView extends StatelessWidget {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => InstructorSearchView(
+                          builder: (context) => AssigningInstructorView(
                             studentId: model.currentUser?.uid ??
                                 '', // Pass the appropriate studentId
                           ),
