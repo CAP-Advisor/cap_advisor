@@ -11,7 +11,6 @@ import 'package:rxdart/rxdart.dart';
 import 'view-model/student_search_viewmodel.dart';
 import 'view-model/assigning_feedback_viewmodel.dart';
 import 'view-model/student_task_viewmodel.dart';
-import 'view/student_search_view.dart';
 import 'view/HR_view.dart';
 import 'view/add_task_view.dart';
 import 'view/assigning_feedback_view.dart';
@@ -22,7 +21,6 @@ import 'view/login_view.dart';
 import 'view/post_position_view.dart';
 import 'view/menu_view.dart';
 import 'view/sign_up_view.dart';
-import 'view/student_task_view.dart';
 import 'view/student_view.dart';
 import 'view/supervisor_view.dart';
 import 'model/firebaseuser.dart';
@@ -32,7 +30,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
@@ -59,7 +56,6 @@ void main() async {
   );
 
   FirebaseAuth auth = FirebaseAuth.instance;
-  // await auth.userChanges().firstWhere((user) => user != null); // Ensure user is not null
   var user = auth.currentUser;
 
   print('user id is ${user?.uid}');
@@ -84,13 +80,6 @@ void main() async {
   if (kDebugMode) {
     print('Registration Token=$token');
   }
-  // const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-  // final IOSInitializationSettings initializationSettingsIOS = IOSInitializationSettings();
-  // final InitializationSettings initializationSettings = InitializationSettings(
-  //   android: initializationSettingsAndroid,
-  //   iOS: initializationSettingsIOS,
-  // );
-  // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -102,8 +91,6 @@ void main() async {
     print('Message data: ${message.data}');
     print('Message notification: ${message.notification?.title}');
     print('Message notification: ${message.notification?.body}');
-    // _messageStreamController.sink.add(message);
-    // _showNotification(message);
     _showToast(message);
 
   });
@@ -166,7 +153,11 @@ class MyApp extends StatelessWidget {
           '/assign-feedback': (context) => AssigningFeedbackView(),
           '/add-task': (context) => AddTaskView(studentId: '', studentName: ''),
           'job-and-training-applicants': (context) =>
-              JobAndTrainingApplicantsView(hrDocumentId: '', positionId: '', positionType: '',),
+              JobAndTrainingApplicantsView(
+                hrDocumentId: '',
+                positionId: '',
+                positionType: '',
+              ),
           '/student-position-search': (context) => StudentPositionSearchView(),
           '/notifications': (context) => NotificationPage(studentId: 'your-student-id', notifications: [],),
 
@@ -175,24 +166,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-// void _showNotification(RemoteMessage message) async {
-//   const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-//     'your_channel_id',
-//     'your_channel_name',
-//     'your_channel_description',
-//     importance: Importance.max,
-//     priority: Priority.high,
-//     showWhen: false,
-//   );
-//   const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-//   await flutterLocalNotificationsPlugin.show(
-//     0,
-//     message.notification?.title,
-//     message.notification?.body,
-//     platformChannelSpecifics,
-//     payload: 'item x',
-//   );
-// }
+
 void _showToast(RemoteMessage message) {
   Fluttertoast.showToast(
     msg: "${message.notification?.title ?? "Notification"}: ${message.notification?.body ?? "No body"}",

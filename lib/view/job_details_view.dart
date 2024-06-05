@@ -83,9 +83,7 @@ class JobDetailsView extends StatelessWidget {
                           Text(
                             "Description",
                             style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold
-                            ),
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -120,11 +118,9 @@ class JobDetailsView extends StatelessWidget {
                           Icon(Icons.list, color: iconColor),
                           SizedBox(width: 8),
                           Text(
-                            "Requirements",
+                            "Required Skills",
                             style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold
-                            ),
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),

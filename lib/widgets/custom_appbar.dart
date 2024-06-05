@@ -9,6 +9,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onJobPressed;
   final bool isInstructor;
   final bool isSupervisor;
+  final bool isHR;
 
   const CustomAppBar({
     Key? key,
@@ -20,6 +21,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onMenuPressed,
     this.isInstructor = false,
     this.isSupervisor = false,
+    this.isHR = false,
   }) : super(key: key);
 
   @override
@@ -39,9 +41,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (onFeedback != null) {
       actions.add(
         IconButton(
-          icon: Icon(Icons.feedback),
+          icon: Icon(Icons.add_comment),
           onPressed: onFeedback!,
           color: Colors.white,
+          tooltip: 'Feedback',
         ),
       );
     }

@@ -1,131 +1,157 @@
+import 'package:cap_advisor/view/student_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view-model/student_search_viewmodel.dart';
+import '../widgets/custom_appbar.dart';
 import '../widgets/filter_popup.dart';
 import 'hr_view.dart';
 
 class StudentSearchScreen extends StatelessWidget {
+  void _showFilterDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: FilterPopup(),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<StudentViewModel>(
       builder: (context, studentViewModel, child) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              'Student Search',
-              style: TextStyle(color: Color(0xFFFFFFFF)),
-            ),
-            backgroundColor: Color(0xFF164863),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.notifications, color: Color(0xFFFFFFFF)),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(Icons.menu, color: Color(0xFFFFFFFF)),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/menu');
-                },
-              ),
-            ],
-            iconTheme: IconThemeData(color: Color(0xFFFFFFFF)),
+          appBar: CustomAppBar(
+            title: "Student Search",
+            onBack: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => HRView(uid: 'uid'),
+                ),
+              );
+            },
+            onNotificationPressed: () {
+              // Handle notification pressed
+            },
+            onMenuPressed: () {
+              Navigator.of(context).pushNamed('/menu');
+            },
           ),
           body: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
                 SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        onChanged: (value) {
-                          studentViewModel.filterStudents(name: value);
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Search',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    IconButton(
-                      icon: Icon(Icons.filter_list),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Center(
-                              child: FilterPopup(),
-                            );
+                Center(
+                  child: Container(
+                    width: 400,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.filter_alt),
+                          onPressed: () {
+                            _showFilterDialog(context);
                           },
-                        );
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFEBEBEB),
+                      ),
+                      onChanged: (value) {
+                        studentViewModel.filterStudents(name: value);
                       },
                     ),
-                  ],
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: studentViewModel.students.length,
-                    itemBuilder: (context, index) {
-                      final student = studentViewModel.students[index];
-                      return Container(
-                        width: 387,
-                        height: 133,
-                        margin: EdgeInsets.symmetric(vertical: 8),
-                        color: Color(0xFFDDF2FD),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.grey.shade300,
-                            child: Icon(Icons.person),
-                          ),
-                          title: Text(student.name),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(student.major),
-                              Text('GPA: ${student.gpa}'),
-                              Text(student.address),
-                              Text('Skills: ${student.skills?.join(', ')}'),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
                   ),
+                ),
+                SizedBox(height: 16),
+                Expanded(
+                  child: studentViewModel.students.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No students found',
+                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: studentViewModel.students.length,
+                          itemBuilder: (context, index) {
+                            final student = studentViewModel.students[index];
+                            return Container(
+                              width: 350,
+                              height: 133,
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Color(0xFFDDF2FD),
+                                borderRadius: BorderRadius.circular(
+                                    10), // Make it more rounded
+                              ),
+                              child: ListTile(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => StudentView(
+                                        uid: student.uid,
+                                        isHR: true,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.grey[200],
+                                  backgroundImage: student.photoUrl != null
+                                      ? NetworkImage(student.photoUrl!)
+                                      : null,
+                                  child: student.photoUrl == null
+                                      ? Icon(Icons.person)
+                                      : null,
+                                ),
+                                title: Text(student.name),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    if (student.gpa != null)
+                                      Text('GPA: ${student.gpa}'),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    if (student.address != null &&
+                                        student.address!.isNotEmpty)
+                                      Text(student.address),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    if (student.skills != null &&
+                                        student.skills!.isNotEmpty)
+                                      Text(
+                                          'Skills: ${student.skills?.join(', ')}'),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Color(0xFF164863),
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white,
-            currentIndex: 2,
-            onTap: (index) {
-              switch (index) {
-                case 0:
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => HRView(uid: '')),
-                  );
-                  break;
-                case 1:
-                // Navigate to Feedback View
-                  break;
-                case 2:
-                // Already on Student Search View, no action needed
-                  break;
-              }
-            },
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Positions'),
-              BottomNavigationBarItem(icon: Icon(Icons.feedback), label: 'Feedback'),
-              BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Student Search'),
-            ],
           ),
         );
       },

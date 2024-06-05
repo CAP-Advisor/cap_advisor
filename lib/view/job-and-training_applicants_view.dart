@@ -1,3 +1,5 @@
+import 'package:cap_advisor/view/post_position_view.dart';
+import 'package:cap_advisor/view/student_search_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../view-model/job-and-training_applicants_viewmodel.dart';
@@ -16,9 +18,9 @@ class JobAndTrainingApplicantsView extends StatefulWidget {
   });
 
   @override
-  _JobAndTrainingApplicantsViewState createState() => _JobAndTrainingApplicantsViewState();
+  _JobAndTrainingApplicantsViewState createState() =>
+      _JobAndTrainingApplicantsViewState();
 }
-
 
 class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsView> {
   late JobAndTrainingApplicantsViewModel viewModel;
@@ -32,6 +34,7 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
       positionId: widget.positionId,
       positionType: widget.positionType,
     );
+
     fetchData(widget.positionId, widget.positionType);
   }
 
@@ -43,7 +46,6 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
       await viewModel.fetchApplicants(positionId, positionType);
       await viewModel.fetchSupervisors();
     } catch (e) {
-      // Handle errors appropriately, e.g., show a snackbar
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Failed to fetch data: $e'),
       ));
@@ -63,8 +65,8 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
 
   void _showFilterDialog(BuildContext context) {
     List<String> filterTypes = ['GPA', 'Address', 'Skill'];
-    String selectedFilterType = filterTypes.first; // Initialize with the first item
-    String filterValue = ''; // Store filter value
+    String selectedFilterType = filterTypes.first;
+    String filterValue = '';
 
     showDialog(
       context: context,
@@ -84,7 +86,8 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
                     selectedFilterType = newValue!;
                   });
                 },
-                items: filterTypes.map<DropdownMenuItem<String>>((String value) {
+                items:
+                    filterTypes.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -104,7 +107,6 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
         actions: [
           TextButton(
             onPressed: () {
-              // Call ViewModel method to update filter options and apply filter
               viewModel.updateFilter(selectedFilterType, filterValue);
               Navigator.of(context).pop();
             },
@@ -112,6 +114,66 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
           ),
         ],
       ),
+    );
+  }
+
+  void _showActionSheet(BuildContext context, int index) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.check, color: Colors.green),
+                title: Text('Approve'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await viewModel.approveApplicant(context, index);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.close, color: Colors.red),
+                title: Text('Reject'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _showRejectConfirmationDialog(context, index);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRejectConfirmationDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirm Reject'),
+          content: Text('Are you sure you want to reject this applicant?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  viewModel.rejectApplicant(index);
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -132,115 +194,112 @@ class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsV
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            Text(
-              "Gain hands-on experience, enhance skills, and contribute to real-world projects in a collaborative environment. Your gateway to growth and innovation in software development.",
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Search",
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.filter_alt),
-                  onPressed: () {
-                    _showFilterDialog(context);
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Color(0xFFEBEBEB),
-              ),
-              onChanged: _onSearchChanged,
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: viewModel.filteredApplicants.isEmpty
-                  ? Center(
-                child: Text(
-                  "No applicants yet",
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              )
-                  : ListView.builder(
-                itemCount: viewModel.filteredApplicants.length,
-                itemBuilder: (context, index) {
-                  final applicant = viewModel.filteredApplicants[index];
-                  return Card(
-                    key: ValueKey<int>(applicant.hashCode),
-                    color: Color(0xFFDDF2FD),
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Text(applicant.name[0]),
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 20),
+                  SizedBox(height: 8),
+                  Text(
+                    "Gain hands-on experience, enhance skills, and contribute to real-world projects in a collaborative environment. Your gateway to growth and innovation in software development.",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search",
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.filter_alt),
+                        onPressed: () {
+                          _showFilterDialog(context);
+                        },
                       ),
-                      title: Text(applicant.name),
-                      subtitle: Text(applicant.email),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.check, color: Colors.green),
-                            onPressed: () async {
-                              await viewModel.approveApplicant(context, index);
-                              setState(() {
-                                viewModel.filteredApplicants.removeAt(index);
-                              });
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close, color: Colors.red),
-                            onPressed: () {
-                              setState(() {
-                                viewModel.rejectApplicant(index);
-                              });
-                            },
-                          ),
-                        ],
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFEBEBEB),
                     ),
-                  );
-                },
+                    onChanged: _onSearchChanged,
+                  ),
+                  SizedBox(height: 16),
+                  viewModel.filteredApplicants.isEmpty
+                      ? Text(
+                          "No applicants yet",
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: viewModel.filteredApplicants.length,
+                          itemBuilder: (context, index) {
+                            final applicant =
+                                viewModel.filteredApplicants[index];
+                            return Card(
+                              key: ValueKey<int>(applicant.hashCode),
+                              color: Color(0xFFDDF2FD),
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.grey[200],
+                                  backgroundImage: applicant.photoUrl != null
+                                      ? NetworkImage(applicant.photoUrl!)
+                                      : null,
+                                  child: applicant.photoUrl == null
+                                      ? Icon(Icons.person)
+                                      : null,
+                                ),
+                                title: Text(applicant.name),
+                                subtitle: Text(applicant.email),
+                                trailing: IconButton(
+                                  icon: Icon(Icons.more_vert),
+                                  onPressed: () {
+                                    _showActionSheet(context, index);
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.work),
-            label: 'Positions',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.feedback),
-            label: 'Feedback',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Student Search',
-          ),
-        ],
+        backgroundColor: Colors.white,
+        selectedItemColor: Color(0xFF9DB2CE),
+        unselectedItemColor: Color(0xFF9DB2CE),
+        currentIndex: 0,
         onTap: (index) {
-          // Handle bottom navigation tap
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => PostPositionView()),
+              );
+              break;
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => StudentSearchScreen()),
+              );
+              break;
+          }
         },
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Positions'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.school), label: 'Student Search'),
+        ],
       ),
     );
   }

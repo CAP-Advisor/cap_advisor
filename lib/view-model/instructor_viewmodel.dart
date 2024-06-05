@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../model/student_model.dart';
 import '../service/firebase_service.dart';
+import '../service/instructor_firebase_service.dart';
 
 class InstructorViewModel with ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final InstructorFirebaseService _firebaseService =
+      InstructorFirebaseService();
   TextEditingController searchController = TextEditingController();
   bool isLoading = false;
   String? error;
@@ -18,8 +20,25 @@ class InstructorViewModel with ChangeNotifier {
   List<Student> filteredStudents = [];
 
   InstructorViewModel(this.uid) {
-    getInstructorDataByUid();
-    loadStudentsForInstructor();
+    _init();
+  }
+
+  void _init() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        _clearData();
+      } else {
+        getInstructorDataByUid();
+        loadStudentsForInstructor();
+      }
+    });
+  }
+
+  void _clearData() {
+    currentInstructor = null;
+    students.clear();
+    filteredStudents.clear();
+    notifyListeners();
   }
 
   void filterStudents(String query) {
@@ -44,7 +63,7 @@ class InstructorViewModel with ChangeNotifier {
       if (user != null) {
         print("Fetching instructor data for email: ${user.email}");
         currentInstructor =
-            await _firebaseService.getInstructorDataByEmail(user.email!);
+        await _firebaseService.getInstructorDataByEmail(user.email!);
       }
       if (currentInstructor == null) {
         error = "No instructor data available.";

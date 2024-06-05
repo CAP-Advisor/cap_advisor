@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/display_feedback_model.dart';
 import '../service/firebase_service.dart';
 import 'package:http/http.dart' as http;
+import '../service/supervisor_firebase_service.dart';
 
 class DisplayFeedbackViewModel extends ChangeNotifier {
   final FeedbackModel feedback;
@@ -14,7 +15,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
   String feedbackText = "Feedback";
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  // Task titles retrieved from Firestore
   List<String> taskTitles = [];
   Map<String, String> titleDescriptionMap = {};
 
@@ -27,20 +27,16 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
   String? selectedTraining;
 
   DisplayFeedbackViewModel(this.feedback) {
-    // Fetch task titles from Firestore on initialization
     fetchTaskTitles();
     nameController = TextEditingController(text: feedback.studentName);
   }
 
-  // Fetch task titles from Firestore
   Future<void> fetchTaskTitles() async {
     try {
-      // Get reference to student document
       DocumentReference studentRef = FirebaseFirestore.instance
           .collection('Student')
           .doc(feedback.studentId);
 
-      // Get tasks collection under the student document
       QuerySnapshot taskSnapshot = await studentRef.collection('Task').get();
 
       // Extract task titles and descriptions from the snapshot
@@ -56,9 +52,8 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       taskTitles = titles;
       this.titleDescriptionMap = titleDescriptionMap;
 
-      notifyListeners(); // Notify listeners of change
+      notifyListeners(); 
     } catch (error) {
-      // Handle error
       print("Error fetching task titles: $error");
     }
   }
@@ -73,20 +68,18 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           (selectedFeedbackType == "Final Feedback" &&
               (finalFeedbackController.text.isEmpty ||
                   selectedTraining == null))) {
-        // Show snackbar if any field or dropdown is empty or null
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Please fill all fields'),
             backgroundColor: Colors.red,
           ),
         );
-        return; // Exit early if any field is empty or null
+        return;
       }
 
       try {
-        // Proceed with feedback submission
         String feedbackTypeCollection =
-        selectedFeedbackType == 'Task Feedback' ? 'Task' : 'Training';
+            selectedFeedbackType == 'Task Feedback' ? 'Task' : 'Training';
         if (selectedFeedbackType == 'Task Feedback') {
           String taskId = await getTaskId(selectedTaskTitle!);
           feedbackTypeCollection = 'Task';
@@ -100,7 +93,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           );
         } else if (selectedFeedbackType == 'Final Feedback') {
           String finalFeedbackText = finalFeedbackController.text;
-          await FirebaseService().addFeedback(
+          await SupervisorFirebaseService().addFeedback(
             studentId: feedback.studentId,
             feedbackType: feedbackTypeCollection,
             feedbackData: {
@@ -141,9 +134,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
             backgroundColor: Colors.green,
           ),
         );
-        // You may navigate back or show a confirmation message
       } catch (error) {
-        // Handle error
         print("Error adding feedback: $error");
       }
     }
@@ -157,9 +148,9 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
   }) async {
     try {
       DocumentReference studentRef =
-      FirebaseFirestore.instance.collection('Student').doc(studentId);
+          FirebaseFirestore.instance.collection('Student').doc(studentId);
       DocumentReference feedbackDocRef =
-      studentRef.collection(feedbackType).doc(feedbackId);
+          studentRef.collection(feedbackType).doc(feedbackId);
       await feedbackDocRef.update(feedbackData);
 
       // Send notification
@@ -214,9 +205,10 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
 
   void updateSelectedFeedbackType(String? newValue) {
     selectedFeedbackType = newValue;
-    feedbackText = newValue == "Task Feedback" ? "Task Feedback" : "Final Feedback";
+    feedbackText =
+        newValue == "Task Feedback" ? "Task Feedback" : "Final Feedback";
     // Reset selected training when changing feedback type
     selectedTraining = null;
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners();
   }
 }

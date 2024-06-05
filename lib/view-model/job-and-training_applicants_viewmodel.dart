@@ -4,20 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
+import '../service/firebase_service.dart';
+import '../service/hr_firebase_serviece.dart';
+import '../service/student_firebase_service.dart';
 
 class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
+  final HRFirebaseService _hrfirebaseService = HRFirebaseService();
   List<Student> applicants = [];
   List<SupervisorModel> supervisors = [];
   List<Student> filteredApplicants = [];
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final String hrDocumentId;
 
-  JobAndTrainingApplicantsViewModel({
-    required this.hrDocumentId,
-    required String positionId,
-    required String positionType,
-  }) {
-    fetchApplicants(positionId, positionType);
+  JobAndTrainingApplicantsViewModel(
+      {required this.hrDocumentId,
+      required String positionId,
+      required String positionType}) {
+    fetchApplicants(hrDocumentId, positionType);
     fetchSupervisors();
   }
 
@@ -58,34 +61,15 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchApplicants(String positionId, String positionType) async {
-    var positionSnapshot = await _db.collection(positionType).doc(positionId).get();
-    if (positionSnapshot.exists) {
-      var studentIds = List<String>.from(positionSnapshot.get('studentApplicantsList') ?? []);
-      if (studentIds.isNotEmpty) {
-        var studentSnapshot = await _db
-            .collection('Student')
-            .where(FieldPath.documentId, whereIn: studentIds)
-            .get();
-        applicants = studentSnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
-      } else {
-        applicants = [];
-      }
-      filteredApplicants = List.from(applicants);
-      notifyListeners();
-    }
+    applicants =
+        await _hrfirebaseService.fetchApplicants(positionId, positionType);
+    filteredApplicants = List.from(applicants);
+    notifyListeners();
   }
 
   Future<void> fetchSupervisors() async {
-    var hrDoc = await _db.collection('HR').doc(hrDocumentId).get();
-    if (hrDoc.exists) {
-      var hrId = hrDoc.id;
-      var snapshot = await _db
-          .collection('Supervisor')
-          .where('hrId', isEqualTo: hrId)
-          .get();
-      supervisors = snapshot.docs.map((doc) => SupervisorModel.fromFirestore(doc)).toList();
-      notifyListeners();
-    }
+    supervisors = await _hrfirebaseService.fetchSupervisors(hrDocumentId);
+    notifyListeners();
   }
 
   void filterApplicants(String query) {
@@ -99,11 +83,48 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _showSupervisorSelectionDialog(BuildContext context, int applicantIndex) async {
+    await showDialog<SupervisorModel>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Select Supervisor'),
+          content: Container(
+            width: double.minPositive,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: supervisors.length,
+              itemBuilder: (context, index) {
+                final supervisor = supervisors[index];
+                return ListTile(
+                  title: Text(supervisor.name),
+                  onTap: () {
+                    assignStudentToSupervisor(applicantIndex, supervisor).then((_) {
+                      Navigator.of(context).pop();
+                      //Navigator.of(context).pop(supervisor);
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> approveApplicant(BuildContext context, int index) async {
     final student = filteredApplicants[index];
-    await _showSupervisorSelectionDialog(context, index);
-
-    final url = Uri.parse('https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
+    final selectedSupervisor = await _showSupervisorSelectionDialog(context);
+    if (selectedSupervisor != null) {
+      try {
+        await _hrfirebaseService.assignStudentToSupervisor(
+            student.uid, selectedSupervisor);
+        await _updateApplicantInCollection('Job Position', student.uid);
+        await _updateApplicantInCollection('Training Position', student.uid);
+        filteredApplicants.removeAt(index);
+        
+         final url = Uri.parse('https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -118,7 +139,11 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     } else {
       print('Failed to send notification: ${response.body}');
     }
-    notifyListeners();
+        notifyListeners();
+      } catch (e) {
+        print("Failed to approve applicant: $e");
+      }
+    }
   }
 
   Future<void> rejectApplicant(int index) async {
@@ -128,8 +153,8 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
 
     await _updateApplicantInCollection('Training Position', student.uid);
     await _updateApplicantInCollection('Job Position', student.uid);
-
-    final url = Uri.parse('https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
+    
+     final url = Uri.parse('https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -147,43 +172,14 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _showSupervisorSelectionDialog(BuildContext context, int applicantIndex) async {
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Select Supervisor'),
-          content: Container(
-            width: double.minPositive,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: supervisors.length,
-              itemBuilder: (context, index) {
-                final supervisor = supervisors[index];
-                return ListTile(
-                  title: Text(supervisor.name),
-                  onTap: () {
-                    _assignStudentToSupervisor(applicantIndex, supervisor).then((_) {
-                      Navigator.of(context).pop();
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _assignStudentToSupervisor(int applicantIndex, SupervisorModel supervisor) async {
+  Future<void> assignStudentToSupervisor(
+      int applicantIndex, SupervisorModel supervisor) async {
     final student = filteredApplicants[applicantIndex];
-    final supervisorRef = _db.collection('Supervisor').doc(supervisor.uid);
 
     try {
-      await supervisorRef.update({
-        'studentList': FieldValue.arrayUnion([student.uid])
-      });
+      await _hrfirebaseService.assignStudentToSupervisor(
+          student.uid, supervisor);
+      filteredApplicants.removeAt(applicantIndex);
       notifyListeners();
     } catch (e) {
       print("Failed to assign student to supervisor: $e");

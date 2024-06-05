@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../model/add_task_model.dart';
 import '../service/firebase_service.dart';
 import 'package:http/http.dart' as http;
+import '../service/supervisor_firebase_service.dart';
 
 class AddTaskViewModel extends ChangeNotifier {
   late TextEditingController taskTitleController;
@@ -24,8 +25,8 @@ class AddTaskViewModel extends ChangeNotifier {
     try {
       String? supervisorEmail = FirebaseAuth.instance.currentUser?.email;
       if (supervisorEmail != null) {
-        Map<String, dynamic>? supervisorData =
-        await FirebaseService().getSupervisorData(supervisorEmail);
+        Map<String, dynamic>? supervisorData = await SupervisorFirebaseService()
+            .getSupervisorData(supervisorEmail);
         if (supervisorData != null) {
           supervisorName = supervisorData['name'];
           print('Supervisor Name: $supervisorName');
@@ -37,6 +38,7 @@ class AddTaskViewModel extends ChangeNotifier {
       print('Error fetching supervisor name: $error');
     }
   }
+
   Future<void> addTask(BuildContext context, String studentId) async {
     showTitleError = false;
     showDescriptionError = false;
@@ -61,11 +63,10 @@ class AddTaskViewModel extends ChangeNotifier {
       description: taskDescriptionController.text,
       deadline: selectedDeadline!,
       supervisorName: supervisorName,
-
     );
 
     try {
-      await FirebaseService().addTask(
+      await SupervisorFirebaseService().addTask(
         studentId: studentId,
         taskData: task.toMap(),
       );
@@ -81,6 +82,9 @@ class AddTaskViewModel extends ChangeNotifier {
           'message': 'the supervisor added tasks',
         }),
       );
+      taskTitleController.clear();
+      taskDescriptionController.clear();
+      selectedDeadline = null;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Task added successfully'),
@@ -104,5 +108,4 @@ class AddTaskViewModel extends ChangeNotifier {
     taskDescriptionController.dispose();
     super.dispose();
   }
-
 }
