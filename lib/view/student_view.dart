@@ -23,6 +23,7 @@ class StudentView extends StatelessWidget {
 
   final TextEditingController _nameController = TextEditingController();
   StudentFirebaseService firebaseService = StudentFirebaseService();
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<StudentViewModel>(
@@ -30,80 +31,61 @@ class StudentView extends StatelessWidget {
       child: Consumer<StudentViewModel>(
         builder: (context, model, child) {
           return Scaffold(
-            appBar: isSupervisor
-                ? CustomAppBar(
-                    title: "CAP Advisor",
-                    onBack: () {
-                      Navigator.of(context).pop();
-                    },
-                    onNotificationPressed: () {},
-                    onFeedback: () {
-                      Navigator.of(context).pushNamed('/assign-feedback');
-                    },
-                    onMenuPressed: () {
-                      Navigator.of(context).pushNamed('/menu');
-                    },
-                  )
-                : isHR
-                    ? CustomAppBar(
-                        title: "CAP Advisor",
-                        onBack: () {
-                          Navigator.of(context).pop();
-                        },
-                        onNotificationPressed: () {},
-                        onMenuPressed: () {
-                          Navigator.of(context).pushNamed('/menu');
-                        },
-                        isHR: isHR,
-                      )
-                    : CustomAppBar(
-                        title: "CAP Advisor",
-                        onBack: () {
-                          Navigator.of(context).pop();
-                        },
-                        onNotificationPressed: () {},
-                        onJobPressed: isInstructor
-                            ? null
-                            : () {
-                                Navigator.of(context)
-                                    .pushNamed('/student-position-search');
-                              },
-                        onMenuPressed: () {
-                          Navigator.of(context).pushNamed('/menu');
-                        },
-                        isInstructor: isInstructor,
-                      ),
+            appBar: CustomAppBar(
+              title: "CAP Advisor",
+              onBack: (isSupervisor || isInstructor || isHR)
+                  ? () {
+                Navigator.of(context).pop();
+              }
+                  : null,
+              onNotificationPressed: () {},
+              onFeedback: isSupervisor
+                  ? () {
+                Navigator.of(context).pushNamed('/assign-feedback');
+              }
+                  : null,
+              onMenuPressed: () {
+                Navigator.of(context).pushNamed('/menu');
+              },
+              isHR: isHR,
+              isInstructor: isInstructor,
+              onJobPressed: !isSupervisor && !isInstructor && !isHR
+                  ? () {
+                Navigator.of(context).pushNamed('/student-position-search');
+              }
+                  : null,
+            ),
             body: model.isLoading
                 ? Center(child: CircularProgressIndicator())
                 : model.currentStudent == null
-                    ? Center(
-                        child: Text(model.error ?? 'No student data available'))
-                    : SingleChildScrollView(
-                        child: Column(
-                          children: <Widget>[
-                            _buildProfileHeader(context, model),
-                            SizedBox(height: 60),
-                            if (!isSupervisor && !isInstructor && !isHR)
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 16.0),
-                                  child: _buildButton(
-                                    context,
-                                    'Add Section',
-                                    Color(0xFF427D9D),
-                                    SectionView(
-                                      firebaseService: firebaseService,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            SizedBox(height: 10),
-                            _buildInfoSection(context, model),
-                            SizedBox(height: 10),
-                          ],
+                ? Center(
+                child: Text(model.error ?? 'No student data available'))
+                : SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  _buildProfileHeader(context, model),
+                  SizedBox(height: 60),
+                  if (!isSupervisor && !isInstructor && !isHR)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: _buildButton(
+                          context,
+                          'Add Section',
+                          Color(0xFF427D9D),
+                          SectionView(
+                            firebaseService: firebaseService,
+                          ),
                         ),
                       ),
+                    ),
+                  SizedBox(height: 10),
+                  _buildInfoSection(context, model),
+                  SizedBox(height: 10),
+                ],
+              ),
+            ),
           );
         },
       ),
@@ -121,9 +103,9 @@ class StudentView extends StatelessWidget {
           decoration: BoxDecoration(
             image: (_viewModel.currentStudent?.coverPhotoUrl != null)
                 ? DecorationImage(
-                    fit: BoxFit.cover,
-                    image:
-                        NetworkImage(_viewModel.currentStudent!.coverPhotoUrl!))
+                fit: BoxFit.cover,
+                image:
+                NetworkImage(_viewModel.currentStudent!.coverPhotoUrl!))
                 : null,
             color: Colors.grey[300],
           ),
@@ -139,7 +121,7 @@ class StudentView extends StatelessWidget {
                 : null,
             child: _viewModel.currentStudent?.photoUrl == null
                 ? Text(_viewModel.currentStudent?.name.substring(0, 1) ?? 'A',
-                    style: TextStyle(fontSize: 40))
+                style: TextStyle(fontSize: 40))
                 : null,
           ),
         ),
@@ -265,7 +247,7 @@ class StudentView extends StatelessWidget {
                 children: <Widget>[
                   Text("Feedback ${training.course}",
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                   SizedBox(height: 10),
                   Text("${training.feedback}", style: TextStyle(fontSize: 16)),
                 ],
@@ -289,7 +271,7 @@ class StudentView extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment:
-          multiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      multiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Text(
@@ -459,7 +441,7 @@ class StudentView extends StatelessWidget {
           TextButton(
             onPressed: () async {
               bool success =
-                  await _viewModel.updateStudentName(_nameController.text);
+              await _viewModel.updateStudentName(_nameController.text);
               if (success) {
                 Navigator.pop(context);
               } else {
