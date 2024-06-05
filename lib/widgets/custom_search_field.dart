@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomSearchField extends StatelessWidget {
@@ -29,7 +30,7 @@ class CustomSearchField extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           filled: true,
-          fillColor: Color(0xFFF5F8F9),
+          fillColor: backgroundBoxColor,
           labelStyle: TextStyle(
             color: Colors.grey,
           ),

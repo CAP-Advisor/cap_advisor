@@ -20,11 +20,9 @@ class InstructorTasksView extends StatelessWidget {
       create: (_) {
         var viewModel = InstructorTasksViewModel(studentId);
         viewModel.fetchTasksForSpecificStudent(
-            studentId); // Fetch tasks for the specific student
+            studentId);
         return viewModel;
       },
-      // return ChangeNotifierProvider(
-      //   create: (context) => InstructorTasksViewModel(studentId), // Pass the studentId to the view model
       child: Scaffold(
         appBar: CustomAppBar(
           title: '${studentName} Tasks',
@@ -73,7 +71,7 @@ class InstructorTasksView extends StatelessWidget {
                               ),
                             );
                           },
-                          iconData: Icons.info, // Provide the icon data
+                          iconData: Icons.info,
                         );
                       },
                     );

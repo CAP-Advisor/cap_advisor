@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/student_model.dart';
@@ -5,7 +6,6 @@ import '../service/student_firebase_service.dart';
 import '../view-model/student_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 import 'add_section_view.dart';
-import '../service/firebase_service.dart';
 
 class StudentView extends StatelessWidget {
   final String uid;
@@ -76,7 +76,7 @@ class StudentView extends StatelessWidget {
                         child: _buildButton(
                           context,
                           'Add Section',
-                          Color(0xFF427D9D),
+                          primaryColor,
                           SectionView(
                             firebaseService: firebaseService,
                           ),
@@ -239,7 +239,7 @@ class StudentView extends StatelessWidget {
       return Column(
         children: [
           Card(
-            color: Color(0xFFDDF2FD),
+            color: cardColor,
             child: Container(
               width: 400,
               constraints: BoxConstraints(minHeight: 114.23),
@@ -288,7 +288,6 @@ class StudentView extends StatelessWidget {
           IconButton(
             icon: Icon(icon, color: Colors.black),
             onPressed: () {
-              // Define what happens when this is pressed
             },
           ),
       ],
@@ -315,7 +314,7 @@ class StudentView extends StatelessWidget {
 
   Widget _buildInformationCard(Student student) {
     return Card(
-      color: Color(0xFFDDF2FD),
+      color: cardColor,
       child: Container(
         width: 400,
         constraints: BoxConstraints(minHeight: 50),
@@ -344,7 +343,7 @@ class StudentView extends StatelessWidget {
     if (skills.isEmpty) return SizedBox.shrink();
 
     return Card(
-      color: Color(0xFFDDF2FD),
+      color: cardColor,
       child: Container(
         width: 400,
         constraints: BoxConstraints(minHeight: 50),
@@ -371,7 +370,7 @@ class StudentView extends StatelessWidget {
     if (experience.isEmpty) return SizedBox.shrink();
 
     return Card(
-      color: Color(0xFFDDF2FD),
+      color: cardColor,
       child: Container(
         width: 400,
         constraints: BoxConstraints(minHeight: 50),

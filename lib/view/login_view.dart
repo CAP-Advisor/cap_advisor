@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import '../utils/validation_utils.dart';
 import '../view-model/login_viewmodel.dart';
@@ -145,7 +146,7 @@ class _LoginViewState extends State<LoginView> {
                             });
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(loginError!),
-                              backgroundColor: Colors.red,
+                              backgroundColor: errorColor,
                             ));
                           }
                         });
@@ -177,7 +178,7 @@ class _LoginViewState extends State<LoginView> {
         },
         child: const Text(
           'Forgot Password?',
-          style: TextStyle(color: Color(0xFF427D9D)),
+          style: TextStyle(color: primaryColor),
         ),
       ),
     );
@@ -194,7 +195,7 @@ class _LoginViewState extends State<LoginView> {
         },
         child: const Text(
           'Do not have an account? Sign up',
-          style: TextStyle(color: Color(0xFF427D9D)),
+          style: TextStyle(color: primaryColor),
         ),
       ),
     );

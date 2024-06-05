@@ -1,10 +1,10 @@
 import 'package:cap_advisor/model/firebaseuser.dart';
 import 'package:cap_advisor/model/job_model.dart';
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/HR_model.dart';
-import '../service/firebase_service.dart';
 import '../service/hr_firebase_serviece.dart';
 import '../view/job-and-training_applicants_view.dart';
 
@@ -232,7 +232,7 @@ class HRViewModel extends ChangeNotifier {
                 ),
                 SizedBox(height: 8),
                 TextField(
-                  controller: skillsController, // Use skillsController
+                  controller: skillsController,
                   decoration:
                       InputDecoration(labelText: 'Skills (comma-separated)'),
                 ),
@@ -243,9 +243,9 @@ class HRViewModel extends ChangeNotifier {
             ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
-                    Color(0xFF427D9D)), // Set the background color to #427D9D
+                    primaryColor),
                 foregroundColor: MaterialStateProperty.all<Color>(
-                    Colors.white), // Set the text color to white
+                    Colors.white),
               ),
               onPressed: () {
                 job.title = titleController.text;

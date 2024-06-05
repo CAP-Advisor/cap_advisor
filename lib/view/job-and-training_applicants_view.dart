@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:cap_advisor/view/post_position_view.dart';
 import 'package:cap_advisor/view/student_search_view.dart';
 import 'package:cap_advisor/view/student_view.dart';
@@ -125,7 +126,7 @@ class _JobAndTrainingApplicantsViewState
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.check, color: Colors.green),
+                leading: Icon(Icons.check, color: successColor),
                 title: Text('Approve'),
                 onTap: () async {
                   Navigator.of(context).pop();
@@ -227,7 +228,7 @@ class _JobAndTrainingApplicantsViewState
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: Color(0xFFEBEBEB),
+                  fillColor:  backgroundBoxColor,
                 ),
                 onChanged: _onSearchChanged,
               ),
@@ -249,7 +250,7 @@ class _JobAndTrainingApplicantsViewState
                       viewModel.filteredApplicants[index];
                       return Card(
                         key: ValueKey<int>(applicant.hashCode),
-                        color: Color(0xFFDDF2FD),
+                        color: cardColor,
                         margin:
                         const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
@@ -289,37 +290,33 @@ class _JobAndTrainingApplicantsViewState
                   );
                 },
               ),
-            ],
-          ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          selectedItemColor: Color(0xFF9DB2CE),
-          unselectedItemColor: Color(0xFF9DB2CE),
-          currentIndex: 0,
-          onTap: (index) {
-            switch (index) {
-              case 0:
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => PostPositionView()),
-                );
-                break;
-              case 1:
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => StudentSearchScreen()),
-                );
-                break;
-            }
-          },
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Positions'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.school), label: 'Student Search'),
-          ],
-        ),
+            ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        selectedItemColor: bottomNavbarColor,
+        unselectedItemColor: bottomNavbarColor,
+        currentIndex: 0,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => PostPositionView()),
+              );
+              break;
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => StudentSearchScreen()),
+              );
+              break;
+          }
+        },
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Positions'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.school), label: 'Student Search'),
+        ],
       ),
     );
   }

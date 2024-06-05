@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -56,7 +57,7 @@ class InstructorView extends StatelessWidget {
                                       return Container(
                                         margin: EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: Color(0xFFCFE0E9),
+                                          color: positionCardColor,
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
@@ -97,7 +98,7 @@ class InstructorView extends StatelessWidget {
                                             },
                                             icon: Icon(
                                               Icons.task,
-                                              color: Color(0xFF164863),
+                                              color: secondaryColor,
                                             ),
                                           ),
                                           onTap: () {

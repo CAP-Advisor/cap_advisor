@@ -1,5 +1,5 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/display_feedback_model.dart';
@@ -48,7 +48,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
         titleDescriptionMap[title] = doc['Task Description'];
       });
 
-      // Update taskTitles and titleDescriptionMap with retrieved data
       taskTitles = titles;
       this.titleDescriptionMap = titleDescriptionMap;
 
@@ -60,7 +59,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
 
   Future<void> submitFeedback(BuildContext context) async {
     if (formKey.currentState!.validate()) {
-      // Check if any field or dropdown is empty or null
       if (selectedFeedbackType == null ||
           (selectedFeedbackType == "Task Feedback" &&
               (selectedTaskTitle == null ||
@@ -71,7 +69,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Please fill all fields'),
-            backgroundColor: Colors.red,
+            backgroundColor: errorColor,
           ),
         );
         return;
@@ -101,7 +99,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
               'Training Course': selectedTraining,
             },
           );
-          // Clear text controllers after submission
           taskTitleController.clear();
           taskDescriptionController.clear();
           taskFeedbackController.clear();
@@ -127,11 +124,10 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           }
         }
 
-        // Feedback added successfully
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Feedback Added Successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: successColor,
           ),
         );
       } catch (error) {
@@ -176,7 +172,7 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       print('Feedback updated successfully');
     } catch (error) {
       print("Error updating feedback: $error");
-      throw error; // Rethrow the error for error handling in UI
+      throw error;
     }
   }
 
@@ -207,7 +203,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
     selectedFeedbackType = newValue;
     feedbackText =
         newValue == "Task Feedback" ? "Task Feedback" : "Final Feedback";
-    // Reset selected training when changing feedback type
     selectedTraining = null;
     notifyListeners();
   }

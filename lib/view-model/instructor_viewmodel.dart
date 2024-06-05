@@ -2,7 +2,6 @@ import 'package:cap_advisor/model/instructor_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../model/student_model.dart';
-import '../service/firebase_service.dart';
 import '../service/instructor_firebase_service.dart';
 
 class InstructorViewModel with ChangeNotifier {
@@ -69,7 +68,7 @@ class InstructorViewModel with ChangeNotifier {
         error = "No instructor data available.";
       }
     } catch (e) {
-      print("Error in getInstructorDataByUid: $e"); // Log the error
+      print("Error in getInstructorDataByUid: $e");
       error = e.toString();
     } finally {
       isLoading = false;

@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../view-model/reset_password_viewmodel.dart';
@@ -16,7 +17,7 @@ class ResetPasswordView extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
-          tooltip: 'Back', // Tooltip added for better accessibility
+          tooltip: 'Back',
         ),
       ),
       body: Container(
@@ -24,7 +25,6 @@ class ResetPasswordView extends StatelessWidget {
         child: Form(
           key: viewModel.formKey,
           child: SingleChildScrollView(
-            // Use SingleChildScrollView to avoid overflow when keyboard appears
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -51,7 +51,6 @@ class ResetPasswordView extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 Center(
-                  // Wrap ElevatedButton with Center widget
                   child: ElevatedButton(
                     onPressed: () => viewModel.validateAndSubmit(context),
                     child: Text(
@@ -60,11 +59,11 @@ class ResetPasswordView extends StatelessWidget {
                     ),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xFF427D9D),
+                      backgroundColor: primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      minimumSize: Size(138, 55), // Adjust button size
+                      minimumSize: Size(138, 55),
                       padding: EdgeInsets.zero,
                       textStyle: TextStyle(letterSpacing: 1.2),
                     ),
@@ -82,7 +81,5 @@ class ResetPasswordView extends StatelessWidget {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-  // Run the app
   runApp(MaterialApp(home: ResetPasswordView()));
 }

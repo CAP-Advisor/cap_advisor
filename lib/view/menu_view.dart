@@ -17,7 +17,7 @@ class MenuView extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text("Menu"),
-              elevation: 4, // Add elevation for depth
+              elevation: 4,
             ),
             body: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -41,7 +41,7 @@ class MenuView extends StatelessWidget {
                     ),
                   ),
                   if (model.userRole == 'Student') ...[
-                    Divider(), // Add a divider before student-specific options
+                    Divider(),
                     _buildMenuItem(
                       context,
                       "View Tasks",
@@ -52,7 +52,7 @@ class MenuView extends StatelessWidget {
                           builder: (context) => StudentTasksView(
                             studentId: model.currentUser?.uid ?? '',
                             studentName:
-                            '', // Pass the appropriate student name
+                            '',
                           ),
                         ),
                       ),
@@ -71,7 +71,7 @@ class MenuView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Divider(), // Add a divider after student-specific options
+                    Divider(),
                   ],
                   _buildMenuItem(
                     context,

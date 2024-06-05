@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -69,7 +70,7 @@ class StudentSearchScreen extends StatelessWidget {
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
-                        fillColor: Color(0xFFEBEBEB),
+                        fillColor: backgroundBoxColor,
                       ),
                       onChanged: (value) {
                         studentViewModel.filterStudents(name: value);
@@ -96,9 +97,9 @@ class StudentSearchScreen extends StatelessWidget {
                               margin: EdgeInsets.symmetric(
                                   vertical: 8, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Color(0xFFDDF2FD),
+                                color: cardColor,
                                 borderRadius: BorderRadius.circular(
-                                    10), // Make it more rounded
+                                    10),
                               ),
                               child: ListTile(
                                 onTap: () {
