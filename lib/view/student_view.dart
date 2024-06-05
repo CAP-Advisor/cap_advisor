@@ -38,7 +38,8 @@ class StudentView extends StatelessWidget {
                 Navigator.of(context).pop();
               }
                   : null,
-              onNotificationPressed: () {},
+              onNotificationPressed: () {
+               Navigator.of(context).pushNamed('/notifications');},
               onFeedback: isSupervisor
                   ? () {
                 Navigator.of(context).pushNamed('/assign-feedback');
@@ -74,6 +75,7 @@ class StudentView extends StatelessWidget {
                           context,
                           'Add Section',
                           Color(0xFF427D9D),
+
                           SectionView(
                             firebaseService: firebaseService,
                           ),
@@ -92,8 +94,7 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader(
-      BuildContext context, StudentViewModel _viewModel) {
+  Widget _buildProfileHeader(BuildContext context, StudentViewModel _viewModel) {
     return Stack(
       clipBehavior: Clip.none,
       children: <Widget>[
@@ -155,7 +156,7 @@ class StudentView extends StatelessWidget {
                   backgroundColor: Colors.grey[800],
                   child: const Icon(Icons.add_a_photo, color: Colors.white),
                 ),
-              ))
+              )),
       ],
     );
   }
@@ -170,7 +171,6 @@ class StudentView extends StatelessWidget {
       infoSection.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(student.name,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
           if (!isSupervisor && !isInstructor && !isHR)
             IconButton(
@@ -188,14 +188,10 @@ class StudentView extends StatelessWidget {
 
     if (student.summary.isNotEmpty) {
       infoSection.add(SizedBox(height: 30));
-      infoSection.add(_editableTextRow(
-          "Summary", null, student.summary, context,
-          multiline: true));
+      infoSection.add(_editableTextRow("Summary", null, student.summary, context, multiline: true));
     }
 
-    if (student.address.isNotEmpty ||
-        student.github.isNotEmpty ||
-        student.gpa > 0) {
+    if (student.address.isNotEmpty || student.github.isNotEmpty || student.gpa > 0) {
       infoSection.add(SizedBox(height: 20));
       infoSection.add(Center(child: _buildInformationCard(student)));
     }
@@ -226,8 +222,7 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  Widget _buildTrainingSection(
-      BuildContext context, StudentViewModel viewModel) {
+  Widget _buildTrainingSection(BuildContext context, StudentViewModel viewModel) {
     if (viewModel.trainings.isEmpty) {
       print('No training records found.');
       return SizedBox.shrink();
@@ -265,9 +260,7 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  Widget _editableTextRow(
-      String label, IconData? icon, String value, BuildContext context,
-      {bool multiline = false}) {
+  Widget _editableTextRow(String label, IconData? icon, String value, BuildContext context, {bool multiline = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment:
@@ -282,92 +275,71 @@ class StudentView extends StatelessWidget {
             overflow: multiline ? TextOverflow.visible : TextOverflow.ellipsis,
           ),
         ),
-        if (icon != null)
+        if (!isSupervisor && !isInstructor)
           IconButton(
-            icon: Icon(icon, color: Colors.black),
-            onPressed: () {
-              // Define what happens when this is pressed
-            },
+            icon: const Icon(Icons.edit, color: Colors.black),
+            onPressed: () => _showEditableDialog(context, label, value, multiline, _nameController),
           ),
       ],
     );
   }
 
+  Widget _buildButton(BuildContext context, String label, Color color, Widget targetView) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => targetView),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), backgroundColor: color,
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+      child: Text(label, style: TextStyle(fontSize: 18, color: Colors.white)),
+    );
+  }
+
   Widget _buildInformationCard(Student student) {
-    List<Widget> infoRows = [];
-
-    if (student.address.isNotEmpty) {
-      infoRows.add(_informationRow("Address:", student.address));
-    }
-    if (student.github.isNotEmpty) {
-      infoRows.add(_informationRow("GitHub:", student.github));
-    }
-    if (student.gpa > 0) {
-      infoRows.add(_informationRow("GPA:", student.gpa.toString()));
-    }
-
-    if (infoRows.isEmpty) {
-      return SizedBox.shrink();
-    }
-
     return Card(
       color: Color(0xFFDDF2FD),
       child: Container(
         width: 400,
-        constraints: BoxConstraints(minHeight: 114.23),
+        constraints: BoxConstraints(minHeight: 50),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text("Information:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-            SizedBox(height: 10),
-            ...infoRows,
+          children: [
+            if (student.address.isNotEmpty) Text("Address: ${student.address}", style: TextStyle(fontSize: 16)),
+            if (student.github.isNotEmpty) SizedBox(height: 10),
+            if (student.github.isNotEmpty) Text("Github: ${student.github}", style: TextStyle(fontSize: 16)),
+            if (student.gpa > 0) SizedBox(height: 10),
+            if (student.gpa > 0) Text("GPA: ${student.gpa.toString()}", style: TextStyle(fontSize: 16)),
           ],
         ),
       ),
     );
   }
 
-  Widget _informationRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("$label ",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 16),
-              softWrap: true,
-              overflow: TextOverflow.visible,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSkillsCard(Student student) {
+    List<String> skills = student.skills;
+    if (skills.isEmpty) return SizedBox.shrink();
+
     return Card(
       color: Color(0xFFDDF2FD),
       child: Container(
         width: 400,
-        constraints: BoxConstraints(minHeight: 114.23),
+        constraints: BoxConstraints(minHeight: 50),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text("Skills:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+          children: [
+            Text("Skills", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
             SizedBox(height: 10),
-            for (var skill in student.skills)
+            for (var skill in skills)
               Text(
                 skill,
                 style: TextStyle(fontSize: 16),
-                softWrap: true,
               ),
           ],
         ),
@@ -376,23 +348,24 @@ class StudentView extends StatelessWidget {
   }
 
   Widget _buildExperienceCard(Student student) {
+    List<String> experience = student.experience;
+    if (experience.isEmpty) return SizedBox.shrink();
+
     return Card(
       color: Color(0xFFDDF2FD),
       child: Container(
         width: 400,
-        constraints: BoxConstraints(minHeight: 114.23),
+        constraints: BoxConstraints(minHeight: 50),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text("Experience:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+          children: [
+            Text("Experience", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
             SizedBox(height: 10),
-            for (var exp in student.experience)
+            for (var exp in experience)
               Text(
                 exp,
                 style: TextStyle(fontSize: 16),
-                softWrap: true,
               ),
           ],
         ),
@@ -400,43 +373,47 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(
-      BuildContext context, String text, Color color, Widget targetPage) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => targetPage),
+  void _showEditableDialog(BuildContext context, String label, String initialValue, bool multiline, TextEditingController controller) {
+    controller.text = initialValue;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Edit $label"),
+          content: TextField(
+            controller: controller,
+            maxLines: multiline ? null : 1,
+            keyboardType: multiline ? TextInputType.multiline : TextInputType.text,
+          ),
+          actions: [
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Save"),
+              onPressed: () {
+                // Update logic here
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
       },
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: color,
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      ),
     );
   }
 
-  void _showNameDialog(BuildContext context, StudentViewModel _viewModel) {
+  void _showNameDialog(BuildContext context, StudentViewModel viewModel) {
+    _nameController.text = viewModel.currentStudent?.name ?? '';
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Edit Name'),
-        content: TextField(
-          controller: _nameController,
-          decoration: InputDecoration(hintText: 'Enter new name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Edit Name"),
+          content: TextField(
+            controller: _nameController,
           ),
           TextButton(
             onPressed: () async {

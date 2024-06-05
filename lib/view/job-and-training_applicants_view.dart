@@ -22,8 +22,7 @@ class JobAndTrainingApplicantsView extends StatefulWidget {
       _JobAndTrainingApplicantsViewState();
 }
 
-class _JobAndTrainingApplicantsViewState
-    extends State<JobAndTrainingApplicantsView> {
+class _JobAndTrainingApplicantsViewState extends State<JobAndTrainingApplicantsView> {
   late JobAndTrainingApplicantsViewModel viewModel;
   bool _isLoading = true;
 
@@ -31,9 +30,11 @@ class _JobAndTrainingApplicantsViewState
   void initState() {
     super.initState();
     viewModel = JobAndTrainingApplicantsViewModel(
-        hrDocumentId: widget.hrDocumentId,
-        positionId: widget.positionId,
-        positionType: widget.positionType);
+      hrDocumentId: widget.hrDocumentId,
+      positionId: widget.positionId,
+      positionType: widget.positionType,
+    );
+
     fetchData(widget.positionId, widget.positionType);
   }
 
@@ -54,6 +55,7 @@ class _JobAndTrainingApplicantsViewState
       });
     }
   }
+
 
   void _onSearchChanged(String query) {
     setState(() {
@@ -301,4 +303,5 @@ class _JobAndTrainingApplicantsViewState
       ),
     );
   }
+
 }
