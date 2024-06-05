@@ -201,10 +201,10 @@ class _JobAndTrainingApplicantsViewState
             children: [
               SizedBox(height: 20),
               SizedBox(height: 8),
-              Text(
+              /*Text(
                 "Gain hands-on experience, enhance skills, and contribute to real-world projects in a collaborative environment. Your gateway to growth and innovation in software development.",
                 style: TextStyle(fontSize: 16),
-              ),
+              ),*/
               SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
@@ -290,33 +290,36 @@ class _JobAndTrainingApplicantsViewState
                   );
                 },
               ),
-            ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: bottomNavbarColor,
-        unselectedItemColor: bottomNavbarColor,
-        currentIndex: 0,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => PostPositionView()),
-              );
-              break;
-            case 1:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => StudentSearchScreen()),
-              );
-              break;
-          }
-        },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Positions'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.school), label: 'Student Search'),
-        ],
+            ],
+          ),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          selectedItemColor: bottomNavbarColor,
+          unselectedItemColor: bottomNavbarColor,
+          currentIndex: 0,
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => PostPositionView()),
+                );
+                break;
+              case 1:
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => StudentSearchScreen()),
+                );
+                break;
+            }
+          },
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Positions'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.school), label: 'Student Search'),
+          ],
+        ),
       ),
     );
   }

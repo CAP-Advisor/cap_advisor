@@ -120,10 +120,10 @@ class AssigningInstructorView extends StatelessWidget {
                                   trailing: IconButton(
                                     icon: Icon(Icons.assignment),
                                     onPressed: () {
-                                      model.assignStudentToInstructor(
+                                      /*model.assignStudentToInstructor(
                                           instructorSnapshot.id,
                                           studentId,
-                                          context);
+                                          context);*/
                                     },
                                   ),
                                 ),
