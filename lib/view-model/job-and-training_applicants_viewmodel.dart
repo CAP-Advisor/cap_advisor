@@ -16,10 +16,11 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final String hrDocumentId;
 
-  JobAndTrainingApplicantsViewModel(
-      {required this.hrDocumentId,
-      required String positionId,
-      required String positionType}) {
+  JobAndTrainingApplicantsViewModel({
+    required this.hrDocumentId,
+    required String positionId,
+    required String positionType,
+  }) {
     fetchApplicants(hrDocumentId, positionType);
     fetchSupervisors();
   }
@@ -32,12 +33,17 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
       switch (filterType) {
         case 'gpa':
           filteredApplicants = applicants.where((applicant) {
-            return applicant.gpa.toString().toLowerCase().contains(filterValue.toLowerCase());
+            return applicant.gpa
+                .toString()
+                .toLowerCase()
+                .contains(filterValue.toLowerCase());
           }).toList();
           break;
         case 'address':
           filteredApplicants = applicants.where((applicant) {
-            return applicant.address.toLowerCase().contains(filterValue.toLowerCase());
+            return applicant.address
+                .toLowerCase()
+                .contains(filterValue.toLowerCase());
           }).toList();
           break;
         case 'skill':
@@ -83,8 +89,9 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _showSupervisorSelectionDialog(BuildContext context, int applicantIndex) async {
-    await showDialog<SupervisorModel>(
+  Future<SupervisorModel?> _showSupervisorSelectionDialog(
+      BuildContext context) async {
+    return showDialog<SupervisorModel>(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -99,10 +106,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
                 return ListTile(
                   title: Text(supervisor.name),
                   onTap: () {
-                    assignStudentToSupervisor(applicantIndex, supervisor).then((_) {
-                      Navigator.of(context).pop();
-                      //Navigator.of(context).pop(supervisor);
-                    });
+                    Navigator.of(context).pop(supervisor);
                   },
                 );
               },
@@ -118,58 +122,75 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     final selectedSupervisor = await _showSupervisorSelectionDialog(context);
     if (selectedSupervisor != null) {
       try {
+        // Remove the applicant immediately from the list
+        filteredApplicants.removeAt(index);
+        notifyListeners();
+
+        // Perform async operations
         await _hrfirebaseService.assignStudentToSupervisor(
             student.uid, selectedSupervisor);
         await _updateApplicantInCollection('Job Position', student.uid);
         await _updateApplicantInCollection('Training Position', student.uid);
-        filteredApplicants.removeAt(index);
-        
-         final url = Uri.parse('https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'userId': student.uid,
-        'title': 'Application Approved',
-        'message': 'Congratulations! Your application has been approved.',
-      }),
-    );
-    if (response.statusCode == 200) {
-      print('Notification sent successfully');
-    } else {
-      print('Failed to send notification: ${response.body}');
-    }
-        notifyListeners();
+
+        // Send notification
+        final url = Uri.parse(
+            'https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'userId': student.uid,
+            'title': 'Application Approved',
+            'message': 'Congratulations! Your application has been approved.',
+          }),
+        );
+        if (response.statusCode == 200) {
+          print('Notification sent successfully');
+        } else {
+          print('Failed to send notification: ${response.body}');
+        }
       } catch (e) {
         print("Failed to approve applicant: $e");
+        // If an error occurs, you might want to add the applicant back to the list
+        filteredApplicants.insert(index, student);
+        notifyListeners();
       }
     }
   }
 
   Future<void> rejectApplicant(int index) async {
     final student = filteredApplicants[index];
-    applicants.removeWhere((applicant) => applicant.uid == student.uid);
+    // Remove the applicant immediately from the list
     filteredApplicants.removeAt(index);
-
-    await _updateApplicantInCollection('Training Position', student.uid);
-    await _updateApplicantInCollection('Job Position', student.uid);
-    
-     final url = Uri.parse('https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'userId': student.uid,
-        'title': 'Application Rejected',
-        'message': 'We regret to inform you that your application has been rejected.',
-      }),
-    );
-    if (response.statusCode == 200) {
-      print('Notification sent successfully');
-    } else {
-      print('Failed to send notification: ${response.body}');
-    }
     notifyListeners();
+
+    try {
+      await _updateApplicantInCollection('Training Position', student.uid);
+      await _updateApplicantInCollection('Job Position', student.uid);
+
+      final url = Uri.parse(
+          'https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'userId': student.uid,
+          'title': 'Application Rejected',
+          'message':
+              'We regret to inform you that your application has been rejected.',
+        }),
+      );
+      if (response.statusCode == 200) {
+        print('Notification sent successfully');
+      } else {
+        print('Failed to send notification: ${response.body}');
+      }
+    } catch (e) {
+      print("Failed to reject applicant: $e");
+      // If an error occurs, you might want to add the applicant back to the list
+      filteredApplicants.insert(index, student);
+      notifyListeners();
+    }
   }
 
   Future<void> assignStudentToSupervisor(
@@ -183,10 +204,14 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print("Failed to assign student to supervisor: $e");
+      // If an error occurs, you might want to add the applicant back to the list
+      filteredApplicants.insert(applicantIndex, student);
+      notifyListeners();
     }
   }
 
-  Future<void> _updateApplicantInCollection(String collectionName, String studentId) async {
+  Future<void> _updateApplicantInCollection(
+      String collectionName, String studentId) async {
     var snapshot = await _db.collection(collectionName).get();
     for (var doc in snapshot.docs) {
       if (doc.data()['studentApplicantsList'] != null &&

@@ -39,7 +39,8 @@ class StudentView extends StatelessWidget {
               }
                   : null,
               onNotificationPressed: () {
-               Navigator.of(context).pushNamed('/notifications');},
+                Navigator.of(context).pushNamed('/notifications');
+              },
               onFeedback: isSupervisor
                   ? () {
                 Navigator.of(context).pushNamed('/assign-feedback');
@@ -52,7 +53,8 @@ class StudentView extends StatelessWidget {
               isInstructor: isInstructor,
               onJobPressed: !isSupervisor && !isInstructor && !isHR
                   ? () {
-                Navigator.of(context).pushNamed('/student-position-search');
+                Navigator.of(context)
+                    .pushNamed('/student-position-search');
               }
                   : null,
             ),
@@ -75,7 +77,6 @@ class StudentView extends StatelessWidget {
                           context,
                           'Add Section',
                           Color(0xFF427D9D),
-
                           SectionView(
                             firebaseService: firebaseService,
                           ),
@@ -94,7 +95,8 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, StudentViewModel _viewModel) {
+  Widget _buildProfileHeader(
+      BuildContext context, StudentViewModel _viewModel) {
     return Stack(
       clipBehavior: Clip.none,
       children: <Widget>[
@@ -171,6 +173,7 @@ class StudentView extends StatelessWidget {
       infoSection.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Text(student.name,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
           if (!isSupervisor && !isInstructor && !isHR)
             IconButton(
@@ -188,41 +191,45 @@ class StudentView extends StatelessWidget {
 
     if (student.summary.isNotEmpty) {
       infoSection.add(SizedBox(height: 30));
-      infoSection.add(_editableTextRow("Summary", null, student.summary, context, multiline: true));
+      infoSection.add(_editableTextRow(
+          "Summary", null, student.summary, context,
+          multiline: true));
     }
-
-    if (student.address.isNotEmpty || student.github.isNotEmpty || student.gpa > 0) {
-      infoSection.add(SizedBox(height: 20));
-      infoSection.add(Center(child: _buildInformationCard(student)));
+    if (student.address.isNotEmpty ||
+    student.github.isNotEmpty ||
+    student.gpa > 0) {
+    infoSection.add(SizedBox(height: 20));
+    infoSection.add(Center(child: _buildInformationCard(student)));
     }
 
     if (student.skills.isNotEmpty) {
-      infoSection.add(SizedBox(height: 20));
-      infoSection.add(Center(child: _buildSkillsCard(student)));
+    infoSection.add(SizedBox(height: 20));
+    infoSection.add(Center(child: _buildSkillsCard(student)));
     }
 
     if (student.experience.isNotEmpty) {
-      infoSection.add(SizedBox(height: 20));
-      infoSection.add(Center(child: _buildExperienceCard(student)));
+    infoSection.add(SizedBox(height: 20));
+    infoSection.add(Center(child: _buildExperienceCard(student)));
     }
 
     if (viewModel.trainings.isNotEmpty) {
-      infoSection.add(SizedBox(height: 20));
-      infoSection.add(_buildTrainingSection(context, viewModel));
+    infoSection.add(SizedBox(height: 20));
+    infoSection.add(_buildTrainingSection(context, viewModel));
     }
 
     infoSection.add(SizedBox(height: 50));
 
     return Padding(
-      padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: infoSection,
-      ),
+    padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: infoSection,
+    ),
     );
   }
 
-  Widget _buildTrainingSection(BuildContext context, StudentViewModel viewModel) {
+  Widget _buildTrainingSection(
+      BuildContext context, StudentViewModel viewModel) {
     if (viewModel.trainings.isEmpty) {
       print('No training records found.');
       return SizedBox.shrink();
@@ -260,7 +267,9 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  Widget _editableTextRow(String label, IconData? icon, String value, BuildContext context, {bool multiline = false}) {
+  Widget _editableTextRow(
+      String label, IconData? icon, String value, BuildContext context,
+      {bool multiline = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment:
@@ -275,16 +284,19 @@ class StudentView extends StatelessWidget {
             overflow: multiline ? TextOverflow.visible : TextOverflow.ellipsis,
           ),
         ),
-        if (!isSupervisor && !isInstructor)
+        if (icon != null)
           IconButton(
-            icon: const Icon(Icons.edit, color: Colors.black),
-            onPressed: () => _showEditableDialog(context, label, value, multiline, _nameController),
+            icon: Icon(icon, color: Colors.black),
+            onPressed: () {
+              // Define what happens when this is pressed
+            },
           ),
       ],
     );
   }
 
-  Widget _buildButton(BuildContext context, String label, Color color, Widget targetView) {
+  Widget _buildButton(
+      BuildContext context, String label, Color color, Widget targetView) {
     return ElevatedButton(
       onPressed: () {
         Navigator.push(
@@ -293,7 +305,8 @@ class StudentView extends StatelessWidget {
         );
       },
       style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), backgroundColor: color,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: color,
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
       child: Text(label, style: TextStyle(fontSize: 18, color: Colors.white)),
@@ -310,11 +323,16 @@ class StudentView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (student.address.isNotEmpty) Text("Address: ${student.address}", style: TextStyle(fontSize: 16)),
+            if (student.address.isNotEmpty)
+              Text("Address: ${student.address}",
+                  style: TextStyle(fontSize: 16)),
             if (student.github.isNotEmpty) SizedBox(height: 10),
-            if (student.github.isNotEmpty) Text("Github: ${student.github}", style: TextStyle(fontSize: 16)),
+            if (student.github.isNotEmpty)
+              Text("Github: ${student.github}", style: TextStyle(fontSize: 16)),
             if (student.gpa > 0) SizedBox(height: 10),
-            if (student.gpa > 0) Text("GPA: ${student.gpa.toString()}", style: TextStyle(fontSize: 16)),
+            if (student.gpa > 0)
+              Text("GPA: ${student.gpa.toString()}",
+                  style: TextStyle(fontSize: 16)),
           ],
         ),
       ),
@@ -334,7 +352,8 @@ class StudentView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Skills", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            Text("Skills",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
             SizedBox(height: 10),
             for (var skill in skills)
               Text(
@@ -360,7 +379,8 @@ class StudentView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Experience", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            Text("Experience",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
             SizedBox(height: 10),
             for (var exp in experience)
               Text(
@@ -373,7 +393,8 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  void _showEditableDialog(BuildContext context, String label, String initialValue, bool multiline, TextEditingController controller) {
+  void _showEditableDialog(BuildContext context, String label,
+      String initialValue, bool multiline, TextEditingController controller) {
     controller.text = initialValue;
     showDialog(
       context: context,
@@ -383,7 +404,8 @@ class StudentView extends StatelessWidget {
           content: TextField(
             controller: controller,
             maxLines: multiline ? null : 1,
-            keyboardType: multiline ? TextInputType.multiline : TextInputType.text,
+            keyboardType:
+            multiline ? TextInputType.multiline : TextInputType.text,
           ),
           actions: [
             TextButton(
@@ -405,15 +427,19 @@ class StudentView extends StatelessWidget {
     );
   }
 
-  void _showNameDialog(BuildContext context, StudentViewModel viewModel) {
-    _nameController.text = viewModel.currentStudent?.name ?? '';
+  void _showNameDialog(BuildContext context, StudentViewModel _viewModel) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Edit Name"),
-          content: TextField(
-            controller: _nameController,
+      builder: (context) => AlertDialog(
+        title: Text('Edit Name'),
+        content: TextField(
+          controller: _nameController,
+          decoration: InputDecoration(hintText: 'Enter new name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
