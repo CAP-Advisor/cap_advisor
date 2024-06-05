@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_appbar.dart';
 import '../model/job_model.dart';
@@ -9,7 +10,7 @@ class JobDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color iconColor = Color(0xFF164863);
+    Color iconColor = secondaryColor;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -30,7 +31,6 @@ class JobDetailsView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Job Title Card
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
@@ -83,9 +83,7 @@ class JobDetailsView extends StatelessWidget {
                           Text(
                             "Description",
                             style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold
-                            ),
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -120,11 +118,9 @@ class JobDetailsView extends StatelessWidget {
                           Icon(Icons.list, color: iconColor),
                           SizedBox(width: 8),
                           Text(
-                            "Requirements",
+                            "Required Skills",
                             style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold
-                            ),
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),

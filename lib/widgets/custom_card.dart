@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import '../model/assigning_feedback_model.dart';
 
@@ -16,7 +17,7 @@ class CustomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Color(0xFFDDF2FD),
+      color: cardColor,
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
@@ -41,7 +42,13 @@ class CustomCard extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Major: ${feedback.major}"),
+            Text(
+              'Major: ${feedback.major}',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
             Text(
               "Specialization: ${feedback.additionalInfo}",
               style: TextStyle(
@@ -51,14 +58,12 @@ class CustomCard extends StatelessWidget {
             ),
           ],
         ),
-        trailing: ElevatedButton(
-          onPressed: onAddFeedbackPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF164863),
-          ),
-          child: Text(
-            "Add Feedback",
-            style: TextStyle(color: Colors.white),
+        trailing: Tooltip(
+          message: 'Add Feedback',
+          child: IconButton(
+            onPressed: onAddFeedbackPressed,
+            icon: Icon(Icons.add_comment,color: secondaryColor,),
+            color: Colors.white,
           ),
         ),
       ),

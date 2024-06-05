@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/display_feedback_model.dart';
@@ -25,7 +26,6 @@ class DisplayFeedbackView extends StatelessWidget {
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
           },
-          // Other app bar actions
         ),
         body: Consumer<DisplayFeedbackViewModel>(
           builder: (context, viewModel, _) {
@@ -127,10 +127,10 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            fillColor: Color(0xFFF5F8F9),
+            fillColor: backgroundBoxColor,
             filled: true,
             hintStyle: TextStyle(
-              color: Color(0xFF9A9A9A),
+              color: hintTextColor,
               fontFamily: 'Roboto',
               fontWeight: FontWeight.w400,
               fontSize: 18,
@@ -161,10 +161,10 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
-              fillColor: Color(0xFFF5F8F9),
+              fillColor: backgroundBoxColor,
               filled: true,
               hintStyle: TextStyle(
-                color: Color(0xFF9A9A9A),
+                color: hintTextColor,
                 fontFamily: 'Roboto',
                 fontWeight: FontWeight.w400,
                 fontSize: 18,
@@ -206,10 +206,10 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            fillColor: Color(0xFFF5F8F9),
+            fillColor: backgroundBoxColor,
             filled: true,
             hintStyle: TextStyle(
-              color: Color(0xFF9A9A9A),
+              color: hintTextColor,
               fontFamily: 'Roboto',
               fontWeight: FontWeight.w400,
               fontSize: 18,

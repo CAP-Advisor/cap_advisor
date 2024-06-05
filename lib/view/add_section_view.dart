@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:cap_advisor/service/firebase_service.dart';
 import 'package:provider/provider.dart';
+import '../service/student_firebase_service.dart';
 import '../view-model/add_section_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/custom_submit_button.dart';
 import '../widgets/custom_text_field.dart';
 
 class SectionView extends StatelessWidget {
-  final FirebaseService firebaseService;
+  final StudentFirebaseService firebaseService;
 
   SectionView({Key? key, required this.firebaseService}) : super(key: key);
 

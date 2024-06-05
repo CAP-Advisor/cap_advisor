@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../service/firebase_service.dart';
+import '../service/student_firebase_service.dart';
 
 class StudentTasksViewModel extends ChangeNotifier {
   late TextEditingController searchController;
@@ -13,7 +14,17 @@ class StudentTasksViewModel extends ChangeNotifier {
     searchController = TextEditingController();
     _allTasks = [];
     _filteredTasks = [];
-    fetchTasks();
+    _init();
+  }
+
+  void _init() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        _clearData();
+      } else {
+        fetchTasks();
+      }
+    });
   }
 
   List<Map<String, dynamic>> get tasks =>
@@ -21,12 +32,14 @@ class StudentTasksViewModel extends ChangeNotifier {
 
   Future<void> fetchTasks() async {
     try {
-      FirebaseService firebaseService = FirebaseService();
+      isLoading = true;
+      notifyListeners();
+
+      StudentFirebaseService firebaseService = StudentFirebaseService();
       String userId = FirebaseService().currentUser!.uid;
       Map<String, dynamic>? studentDoc =
-          await firebaseService.fetchStudentData(userId);
+      await firebaseService.fetchStudentData(userId);
       if (studentDoc != null) {
-        // Fetch all tasks initially
         QuerySnapshot taskSnapshot = await FirebaseFirestore.instance
             .collection('Student')
             .doc(userId)
@@ -36,32 +49,39 @@ class StudentTasksViewModel extends ChangeNotifier {
             .map((taskDoc) => taskDoc.data() as Map<String, dynamic>)
             .toList();
       } else {
-        _allTasks = []; // Set _allTasks to an empty list if no tasks are found
+        _allTasks = [];
       }
-      // Notify listeners that tasks have been fetched
-      notifyListeners();
+      _filteredTasks = [];
     } catch (e) {
       print("Error fetching tasks: $e");
-      // Set _allTasks to an empty list in case of an error
       _allTasks = [];
-      // Notify listeners about the error
+    } finally {
+      isLoading = false;
       notifyListeners();
     }
   }
 
   List<Map<String, dynamic>> filterTasks(String query) {
     if (query.isEmpty) {
-      _filteredTasks = []; // Reset filtered tasks if the query is empty
+      _filteredTasks = [];
     } else {
       _filteredTasks = _allTasks.where((task) {
         String taskTitle = (task['Task Title'] ?? "").toLowerCase();
         return taskTitle.contains(query.toLowerCase());
       }).toList();
     }
-    notifyListeners(); // Notify listeners that the filtered tasks have changed
+    notifyListeners();
     return _filteredTasks;
   }
 
+  void _clearData() {
+    _allTasks.clear();
+    _filteredTasks.clear();
+    searchController.clear();
+    notifyListeners();
+  }
+
+  @override
   void dispose() {
     searchController.dispose();
     super.dispose();

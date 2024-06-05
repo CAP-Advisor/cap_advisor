@@ -1,18 +1,12 @@
-import 'dart:io';
 import 'package:cap_advisor/model/firebaseuser.dart';
 import 'package:cap_advisor/model/job_model.dart';
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import '../service/firebase_service.dart';
+import '../model/HR_model.dart';
+import '../service/hr_firebase_serviece.dart';
 import '../view/job-and-training_applicants_view.dart';
-
-enum ImageType {
-  background,
-  profile,
-}
 
 enum PositionType {
   job,
@@ -20,49 +14,41 @@ enum PositionType {
 }
 
 class HRViewModel extends ChangeNotifier {
-  final ImagePicker _picker = ImagePicker();
-  String profileImage = 'https://dummyimage.com/150/808080/000000';
-  String backgroundImage = 'https://dummyimage.com/500x300/808080/000000';
-  String bio = "I am working as HR in Superlink company for 10 years and am working as co-instructor";
   PositionType currentType = PositionType.job;
+  final HRFirebaseService _firebaseService = HRFirebaseService();
+  TextEditingController searchController = TextEditingController();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   List<Job> allPositions = [];
   List<Job> filteredPositions = [];
   bool isLoading = true;
   String? errorMessage;
-  FirebaseStorage storage= FirebaseStorage.instance;
   FireBaseUser? user;
+  HR? currentHR;
+  String? error;
+  String? get HRName => currentHR?.name;
+  String? get HREmail => currentHR?.email;
+  String? get HRPhotoUrl => currentHR?.photoUrl;
 
 
   HRViewModel() {
     fetchPositions();
-    fetchUserData();
+    getHRDataByEmail();
   }
 
-  Future<void> fetchUserData() async {
-    user = await getUserData();
+  Future<void> getHRDataByEmail() async {
+    isLoading = true;
     notifyListeners();
-  }
-
-  Future<FireBaseUser?> getUserData() async {
-    User? authedUser = firebaseAuth.currentUser;
-    if (authedUser == null) {
-      errorMessage = "User is not authenticated.";
-      return null;
-    }
 
     try {
-      FirebaseService service = FirebaseService();
-      var userMap = await service.getUserData(authedUser.email);
-      if (userMap != null) {
-        return FireBaseUser.fromMap(userMap['userData']);
-      } else {
-        errorMessage = "User data not found.";
-        return null;
+      currentHR = await _firebaseService.getHRDataByEmail();
+      if (currentHR == null) {
+        error = "No hr data available.";
       }
     } catch (e) {
-      errorMessage = "Failed to get user data: $e";
-      return null;
+      error = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -71,9 +57,13 @@ class HRViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      String collectionName = currentType == PositionType.job ? 'Job Position' : 'Training Position';
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(collectionName).get();
-      var positions = querySnapshot.docs.map((doc) => Job.fromFirestore(doc)).toList();
+      String collectionName = currentType == PositionType.job
+          ? 'Job Position'
+          : 'Training Position';
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection(collectionName).get();
+      var positions =
+          querySnapshot.docs.map((doc) => Job.fromFirestore(doc)).toList();
 
       final User? user = firebaseAuth.currentUser;
       if (user != null) {
@@ -90,75 +80,113 @@ class HRViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-  Future<String> fetchImageUrl({required ImageType type}) async {
 
-      String userId = firebaseAuth.currentUser?.uid ?? '';
-      String folderName = type == ImageType.background ? 'background' : 'profile';
-      Reference folderRef = storage.ref('$userId/$folderName');
+  Future<void> deleteJob(Job job) async {
+    isLoading = true;
+    notifyListeners();
 
-      ListResult result = await folderRef.listAll();
-      if (result.items.isNotEmpty) {
-        result.items.sort((a, b) => b.name.compareTo(a.name));
-        String imageUrl = await result.items.last.getDownloadURL();
-
-        return imageUrl;
-      } else {
-          return type == ImageType.background ? 'https://dummyimage.com/500x300/808080/000000' : 'https://dummyimage.com/150/808080/000000';
-      }
-  }
-
-
-  Future<void> pickImage(ImageSource source, {required ImageType type}) async {
-    final XFile? image = await _picker.pickImage(source: source);
-    if (image != null) {
-      String folderName = type == ImageType.background ? 'background' : 'profile';
-      String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-      String fileName = '$folderName/$timestamp.jpg';
-
-      String userId = firebaseAuth.currentUser?.uid ?? '';
-      Reference ref = storage.ref('$userId/$fileName');
-
-      TaskSnapshot uploadTask = await ref.putFile(File(image.path));
-      String fileURL = await uploadTask.ref.getDownloadURL();
-
-      if (type == ImageType.background) {
-        backgroundImage = fileURL;
-      } else {
-        profileImage = fileURL;
-      }
+    try {
+      await _firebaseService.deleteJob(job.id);
+      allPositions.removeWhere((j) => j.id == job.id);
+      filteredPositions.removeWhere((j) => j.id == job.id);
       notifyListeners();
-    } else {
-      print('No image selected');
+    } catch (e) {
+      errorMessage = 'Failed to delete job';
+      notifyListeners();
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
 
+  Future<void> deleteTraining(Job job) async {
+    isLoading = true;
+    notifyListeners();
 
+    try {
+      await _firebaseService.deleteTraining(job.id);
+      allPositions.removeWhere((j) => j.id == job.id);
+      filteredPositions.removeWhere((j) => j.id == job.id);
+      notifyListeners();
+    } catch (e) {
+      errorMessage = 'Failed to delete training';
+      notifyListeners();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 
-  void editBio(BuildContext context) {
-    TextEditingController bioController = TextEditingController(text: bio);
+  Future<bool> updateHRProfileImage() async {
+    bool result = await _firebaseService.updateHRProfileImage();
+    if (result) {
+      print("Profile image updated successfully.");
+    } else {
+      print("Failed to update profile image.");
+    }
+    return result;
+  }
+
+  Future<bool> updateHRCoverPhoto() async {
+    bool result = await _firebaseService.updateHRCoverPhoto();
+    if (result) {
+      print("Cover photo updated successfully.");
+    } else {
+      print("Failed to update cover photo.");
+    }
+    return result;
+  }
+
+  Future<void> handleProfileAction(BuildContext context, String value) async {
+    switch (value) {
+      case 'view_profile_photo':
+        if (currentHR?.photoUrl != null) {
+          _showImageDialog(context, currentHR!.photoUrl!, 'Profile Photo');
+        }
+        break;
+      case 'view_cover_photo':
+        if (currentHR?.coverPhotoUrl != null) {
+          _showImageDialog(context, currentHR!.coverPhotoUrl!, 'Cover Photo');
+        }
+        break;
+      case 'choose_profile_photo':
+        var result = await updateHRProfileImage();
+        _showSnackBar(context, result, 'Profile photo updated successfully!',
+            'Failed to update profile photo.');
+        break;
+      case 'choose_cover_photo':
+        var result = await updateHRCoverPhoto();
+        _showSnackBar(context, result, 'Cover photo updated successfully!',
+            'Failed to update cover photo.');
+        break;
+    }
+  }
+
+  void _showSnackBar(BuildContext context, bool result, String successMessage,
+      String errorMessage) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(result ? successMessage : errorMessage),
+      ),
+    );
+  }
+
+  void _showImageDialog(BuildContext context, String imageUrl, String title) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Edit Bio"),
-          content: TextField(
-            controller: bioController,
-            decoration: InputDecoration(labelText: "Edit your bio"),
+          title: Text(title),
+          content: Image.network(
+            imageUrl,
+            errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+            fit: BoxFit.contain,
+            width: double.maxFinite,
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Save'),
-              onPressed: () {
-                bio = bioController.text;
-                notifyListeners();
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
             ),
           ],
         );
@@ -167,9 +195,12 @@ class HRViewModel extends ChangeNotifier {
   }
 
   void editJobDescription(BuildContext context, Job job) {
-    TextEditingController titleController = TextEditingController(text: job.title);
-    TextEditingController descriptionController = TextEditingController(text: job.description);
-    TextEditingController skillsController = TextEditingController(text: job.skills.join(', ')); // Initialize skills controller
+    TextEditingController titleController =
+        TextEditingController(text: job.title);
+    TextEditingController descriptionController =
+        TextEditingController(text: job.description);
+    TextEditingController skillsController =
+        TextEditingController(text: job.skills.join(', '));
 
     showDialog(
       context: context,
@@ -201,8 +232,9 @@ class HRViewModel extends ChangeNotifier {
                 ),
                 SizedBox(height: 8),
                 TextField(
-                  controller: skillsController, // Use skillsController
-                  decoration: InputDecoration(labelText: 'Skills (comma-separated)'),
+                  controller: skillsController,
+                  decoration:
+                      InputDecoration(labelText: 'Skills (comma-separated)'),
                 ),
               ],
             ),
@@ -210,15 +242,24 @@ class HRViewModel extends ChangeNotifier {
           actions: [
             ElevatedButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF427D9D)), // Set the background color to #427D9D
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.white), // Set the text color to white
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    primaryColor),
+                foregroundColor: MaterialStateProperty.all<Color>(
+                    Colors.white),
               ),
               onPressed: () {
                 job.title = titleController.text;
                 job.description = descriptionController.text;
-                job.skills = skillsController.text.split(',').map((s) => s.trim()).toList();
-                String collectionName = currentType == PositionType.job ? 'Job Position' : 'Training';
-                final documentReference = FirebaseFirestore.instance.collection(collectionName).doc(job.id);
+                job.skills = skillsController.text
+                    .split(',')
+                    .map((s) => s.trim())
+                    .toList();
+                String collectionName = currentType == PositionType.job
+                    ? 'Job Position'
+                    : 'Training';
+                final documentReference = FirebaseFirestore.instance
+                    .collection(collectionName)
+                    .doc(job.id);
 
                 documentReference.update(job.toMap()).then((_) {
                   notifyListeners();
@@ -226,7 +267,18 @@ class HRViewModel extends ChangeNotifier {
                 }).catchError((error) {
                   print("Error updating document: $error");
                 });
-
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => JobAndTrainingApplicantsView(
+                      hrDocumentId: job.hrId,
+                      positionId: job.id, // Pass position ID
+                      positionType: currentType == PositionType.job
+                          ? 'Job Position'
+                          : 'Training Position', // Pass position type
+                    ),
+                  ),
+                );
                 Navigator.of(context).pop();
               },
               child: Text('Save'),
@@ -236,15 +288,6 @@ class HRViewModel extends ChangeNotifier {
       },
     );
   }
-  bool is_account_owner(String requiredId){
-    User? user= firebaseAuth.currentUser;
-
-    if(requiredId!=user?.uid){
-      return false;
-    }
-    return true;
-  }
-
 
   void togglePositionType(PositionType type) {
     currentType = type;
@@ -254,10 +297,9 @@ class HRViewModel extends ChangeNotifier {
   void searchPositions(String query) {
     filteredPositions = allPositions
         .where((pos) =>
-    (pos.title.toLowerCase().contains(query.toLowerCase()) ||
-        pos.description.toLowerCase().contains(query.toLowerCase())))
+            (pos.title.toLowerCase().contains(query.toLowerCase()) ||
+                pos.description.toLowerCase().contains(query.toLowerCase())))
         .toList();
     notifyListeners();
   }
-
 }

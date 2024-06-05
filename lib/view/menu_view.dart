@@ -17,49 +17,75 @@ class MenuView extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text("Menu"),
+              elevation: 4,
             ),
-            body: Container(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+            body: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   _buildMenuItem(
                     context,
+                    "View Profile",
+                    Icons.person,
+                    onTap: () => _viewModel.navigateToProfile(context),
+                  ),
+                  _buildMenuItem(
+                    context,
                     "Change Password",
+                    Icons.lock,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => ChangePasswordPage()),
                     ),
                   ),
-                  _buildMenuItem(context, "View Profile",
-                      onTap: () => _viewModel.navigateToProfile(context)),
                   if (model.userRole == 'Student') ...[
-                    _buildMenuItem(context, "View Tasks",
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => StudentTasksView(
-                                      studentId: model.currentUser?.uid ?? '',
-                                      studentName:
-                                          '', // Pass the appropriate student name
-                                    )))),
-                    _buildMenuItem(context, "Assign Instructor",
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => InstructorSearchView(
-                                      studentId: model.currentUser?.uid ??
-                                          '', // Pass the appropriate studentId
-                                    )))),
+                    Divider(),
+                    _buildMenuItem(
+                      context,
+                      "View Tasks",
+                      Icons.assignment,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StudentTasksView(
+                            studentId: model.currentUser?.uid ?? '',
+                            studentName:
+                            '',
+                          ),
+                        ),
+                      ),
+                    ),
+                    _buildMenuItem(
+                      context,
+                      "Assign Instructor",
+                      Icons.person_add,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AssigningInstructorView(
+                            studentId: model.currentUser?.uid ??
+                                '', // Pass the appropriate studentId
+                          ),
+                        ),
+                      ),
+                    ),
+                    Divider(),
                   ],
-                  _buildMenuItem(context, "Delete Account",
-                      onTap: () => _viewModel.confirmDeleteAccount(context)),
-                  _buildMenuItem(context, "Logout",
-                      onTap: () => _viewModel.logout(context)),
+                  _buildMenuItem(
+                    context,
+                    "Delete Account",
+                    Icons.delete,
+                    onTap: () => _viewModel.confirmDeleteAccount(context),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    "Logout",
+                    Icons.logout,
+                    onTap: () => _viewModel.logout(context),
+                  ),
                   Spacer(),
-                  Padding(
-                    padding: EdgeInsets.all(20),
-                  )
                 ],
               ),
             ),
@@ -69,12 +95,16 @@ class MenuView extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, String title,
+  Widget _buildMenuItem(BuildContext context, String title, IconData icon,
       {VoidCallback? onTap}) {
     return ListTile(
-      title: Text(title, style: TextStyle(color: Colors.black)),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, size: 28),
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 16),
+      ),
     );
   }
 }

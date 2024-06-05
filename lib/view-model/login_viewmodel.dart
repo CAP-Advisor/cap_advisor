@@ -23,7 +23,6 @@ class LoginViewModel {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Unknown user type')),
       );
-      // Redirect to login page for unknown user type
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginView()),
@@ -31,7 +30,8 @@ class LoginViewModel {
     }
   }
 
-  Future<FireBaseUser?> login(String email, String password) async {
+  Future<FireBaseUser?> login(
+      String email, String password, bool rememberMe) async {
     try {
       if (!ValidationUtils.isValidEmail(email)) {
         return null;
@@ -54,7 +54,13 @@ class LoginViewModel {
           Map<String, dynamic>? userdata =
               await _firebaseService.getUserData(email);
           userObj = FireBaseUser.fromMap(userdata!);
-          // await storage.write(key: 'session_token', value: token);
+          if (rememberMe) {
+            await storage.write(key: 'email', value: email);
+            await storage.write(key: 'password', value: password);
+          } else {
+            await storage.delete(key: 'email');
+            await storage.delete(key: 'password');
+          }
           return userObj;
         }
       }
@@ -64,6 +70,12 @@ class LoginViewModel {
       print('Error during login: $e');
       return null;
     }
+  }
+
+  Future<Map<String, String?>> getStoredCredentials() async {
+    String? email = await storage.read(key: 'email');
+    String? password = await storage.read(key: 'password');
+    return {'email': email, 'password': password};
   }
 
   void setEmail(String? email) {

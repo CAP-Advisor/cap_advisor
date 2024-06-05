@@ -24,7 +24,6 @@ class PostPositionViewModel {
 
   Future<void> savePosition(String positionTitle, String positionDescription,
       List<String>? skills, String hrId) async {
-    String positionType = model.positionType ?? '';
     model.positionTitle = positionTitle;
     model.positionDescription = positionDescription;
     model.skillList = skills;
@@ -42,21 +41,21 @@ class PostPositionViewModel {
         'title': model.positionTitle,
         'description': model.positionDescription,
         'skills': model.skillList,
-        'hrId': hrId, // Add HR ID field
+        'hrId': hrId,
+        'studentApplicantsList': [],
       });
-      // Reset model fields after saving
       model.positionTitle = '';
       model.positionDescription = '';
       model.skillList = [];
     } catch (error) {
-      // Handle error
       print('Failed to save position: $error');
-      rethrow; // Rethrow the error for handling in the view
+      rethrow;
     }
   }
 
   bool isValidDescription() {
-    return model.positionDescription != null && model.positionDescription!.isNotEmpty;
+    return model.positionDescription != null &&
+        model.positionDescription!.isNotEmpty;
   }
 
   bool isValidTitle() {

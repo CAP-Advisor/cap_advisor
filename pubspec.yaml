@@ -49,6 +49,10 @@ dependencies:
   cloud_firestore: ^4.17.2
   shared_preferences: ^2.0.15
   multi_dropdown: ^2.0.0
+  firebase_messaging: ^14.9.4
+  fluttertoast: ^8.2.6
+  flutter_local_notifications: ^8.2.0
+#  flutter_local_notifications: ^8.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

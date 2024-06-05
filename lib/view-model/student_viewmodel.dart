@@ -1,10 +1,10 @@
 import 'package:cap_advisor/model/student_model.dart';
 import 'package:flutter/material.dart';
 import '../model/final_feedback_model.dart';
-import '../service/firebase_service.dart';
+import '../service/student_firebase_service.dart';
 
 class StudentViewModel with ChangeNotifier {
-  final FirebaseService _firebaseService = FirebaseService();
+  final StudentFirebaseService _firebaseService = StudentFirebaseService();
   bool isLoading = false;
   String? error;
   final String uid;
@@ -19,13 +19,13 @@ class StudentViewModel with ChangeNotifier {
     if (uid.isNotEmpty) {
       getStudentDataByUid().then((_) {
         if (currentStudent?.email != null) {
-          fetchTrainingDataByEmail(currentStudent!.email!);
+          fetchTrainingDataByEmail(currentStudent!.email);
         }
       });
     } else {
       getStudentDataByEmail().then((_) {
         if (currentStudent?.email != null) {
-          fetchTrainingDataByEmail(currentStudent!.email!);
+          fetchTrainingDataByEmail(currentStudent!.email);
         }
       });
     }
@@ -40,7 +40,7 @@ class StudentViewModel with ChangeNotifier {
       if (currentStudent == null) {
         error = "No student data available.";
       } else {
-        fetchTrainingDataByEmail(currentStudent!.email!);
+        fetchTrainingDataByEmail(currentStudent!.email);
       }
     } catch (e) {
       error = e.toString();
@@ -59,7 +59,7 @@ class StudentViewModel with ChangeNotifier {
       if (currentStudent == null) {
         error = "No student data available for the uid $uid.";
       } else {
-        fetchTrainingDataByEmail(currentStudent!.email!);
+        fetchTrainingDataByEmail(currentStudent!.email);
       }
     } catch (e) {
       error = e.toString();
@@ -75,7 +75,7 @@ class StudentViewModel with ChangeNotifier {
       return false;
     }
     bool updateResult = await _firebaseService.updateStudentName(
-        currentStudent!.email!, newName);
+        currentStudent!.email, newName);
     if (updateResult) {
       currentStudent?.name = newName;
       print("Name updated successfully to $newName.");

@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view-model/supervisor_viewmodel.dart';
@@ -36,7 +37,7 @@ class SupervisorView extends StatelessWidget {
                 _buildProfileHeader(context, _viewModel),
                 _buildSupervisorDetails(context, _viewModel),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 130, 0),
                   child: CustomSearchField(
                     controller: _viewModel.searchController,
                     onChanged: (value) {
@@ -57,7 +58,7 @@ class SupervisorView extends StatelessWidget {
                       return Container(
                         margin: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Color(0xFFDDF2FD),
+                          color: cardColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: ListTile(
@@ -75,8 +76,7 @@ class SupervisorView extends StatelessWidget {
                           leading: CircleAvatar(
                             backgroundColor: Colors.grey,
                             radius: 24,
-                            backgroundImage: student.photoUrl !=
-                                null
+                            backgroundImage: student.photoUrl != null
                                 ? NetworkImage(student.photoUrl!)
                                 : null,
                             child: student.photoUrl == null
@@ -89,37 +89,47 @@ class SupervisorView extends StatelessWidget {
                             )
                                 : null,
                           ),
-                          title: Text(student.name),
-                          subtitle: Text(student.email),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddTaskView(
-                                      studentId: student.uid,
-                                      studentName: student.name),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                student.name,
+                              ),
+                              Text(
+                                'Major: ${student.major}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
                                 ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF164863),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(20),
                               ),
-                            ),
-                            child: Text(
-                              'Add Task',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                color: Colors.white,
+                              Text(
+                                'Specialization: ${student.additionalInfo}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
                               ),
+                            ],
+                          ),
+                          trailing: Tooltip(
+                            message: 'Add Task',
+                            child: IconButton(
+                              icon: Icon(Icons.add_box, color: secondaryColor),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AddTaskView(
+                                      studentId: student.uid,
+                                      studentName: student.name,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
+
                       );
                     },
                   ),
@@ -254,7 +264,6 @@ class SupervisorView extends StatelessWidget {
               if (success) {
                 Navigator.pop(context);
               } else {
-                // Show error message
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Failed to update name'),

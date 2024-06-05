@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import '../view-model/sign_up_viewmodel.dart';
 import 'dart:core';
@@ -53,7 +54,7 @@ class _SignUpViewState extends State<SignUpView> {
               Navigator.pop(context);
             },
           ),
-          iconTheme: IconThemeData(color: Color(0xFF164863)),
+          iconTheme: IconThemeData(color: secondaryColor),
         ),
         body: SingleChildScrollView(
           child: Center(
@@ -70,7 +71,7 @@ class _SignUpViewState extends State<SignUpView> {
                       fontFamily: 'Roboto',
                       fontSize: 40,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF9A9A9A),
+                      color: hintTextColor,
                     ),
                   ),
                   SizedBox(height: 40),
@@ -82,7 +83,7 @@ class _SignUpViewState extends State<SignUpView> {
                         CustomDropdownButton(
                           items: ["HR", "Student", "Supervisor", "Instructor"],
                           value: viewModel
-                              .userType, // Assuming userType is a property in your SignUpViewModel
+                              .userType,
                           hintText: "User Type",
                           onChanged: (newValue) {
                             viewModel.setUserType(newValue);
@@ -148,7 +149,7 @@ class _SignUpViewState extends State<SignUpView> {
                             padding: EdgeInsets.only(top: 8),
                             child: Text(
                               "Error: Email already exists",
-                              style: TextStyle(color: Colors.red),
+                              style: TextStyle(color: errorColor),
                             ),
                           ),
                         ),

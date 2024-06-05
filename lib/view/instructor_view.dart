@@ -1,4 +1,4 @@
-import 'package:cap_advisor/view/student_task_view.dart';
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:cap_advisor/view/student_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -57,7 +57,7 @@ class InstructorView extends StatelessWidget {
                                       return Container(
                                         margin: EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: Color(0xFFCFE0E9),
+                                          color: positionCardColor,
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
@@ -83,7 +83,7 @@ class InstructorView extends StatelessWidget {
                                               Text(student.email),
                                             ],
                                           ),
-                                          trailing: ElevatedButton(
+                                          trailing: IconButton(
                                             onPressed: () {
                                               Navigator.push(
                                                 context,
@@ -96,22 +96,9 @@ class InstructorView extends StatelessWidget {
                                                 ),
                                               );
                                             },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Color(0xFF164863),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                            ),
-                                            child: Text(
-                                              'Tasks',
-                                              style: TextStyle(
-                                                fontFamily: 'Roboto',
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14,
-                                                color: Colors.white,
-                                              ),
+                                            icon: Icon(
+                                              Icons.task,
+                                              color: secondaryColor,
                                             ),
                                           ),
                                           onTap: () {
@@ -202,35 +189,36 @@ class InstructorView extends StatelessWidget {
           ),
         ),
         Positioned(
-            right: 16,
-            bottom: 16,
-            child: PopupMenuButton<String>(
-              onSelected: (String value) {
-                _viewModel.handleProfileAction(context, value);
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'view_profile_photo',
-                  child: Text('View Profile Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'choose_profile_photo',
-                  child: Text('Choose Profile Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'view_cover_photo',
-                  child: Text('View Cover Photo'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'choose_cover_photo',
-                  child: Text('Choose Cover Photo'),
-                ),
-              ],
-              child: CircleAvatar(
-                backgroundColor: Colors.grey[800],
-                child: const Icon(Icons.add_a_photo, color: Colors.white),
+          right: 16,
+          bottom: 16,
+          child: PopupMenuButton<String>(
+            onSelected: (String value) {
+              _viewModel.handleProfileAction(context, value);
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'view_profile_photo',
+                child: Text('View Profile Photo'),
               ),
-            ))
+              const PopupMenuItem<String>(
+                value: 'choose_profile_photo',
+                child: Text('Choose Profile Photo'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'view_cover_photo',
+                child: Text('View Cover Photo'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'choose_cover_photo',
+                child: Text('Choose Cover Photo'),
+              ),
+            ],
+            child: CircleAvatar(
+              backgroundColor: Colors.grey[800],
+              child: const Icon(Icons.add_a_photo, color: Colors.white),
+            ),
+          ),
+        )
       ],
     );
   }

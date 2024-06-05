@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropdownButton extends StatefulWidget {
@@ -51,10 +52,10 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            fillColor: Color(0xFFF5F8F9),
+            fillColor: backgroundBoxColor,
             filled: true,
             hintStyle: TextStyle(
-              color: Color(0xFF9A9A9A),
+              color: hintTextColor,
               fontFamily: 'Roboto',
               fontWeight: FontWeight.w400,
               fontSize: 18,

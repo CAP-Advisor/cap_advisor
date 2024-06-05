@@ -1,6 +1,6 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'sign_up_view.dart';
 import 'login_view.dart';
 
 class HomeView extends StatelessWidget {
@@ -36,7 +36,7 @@ class HomeView extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        backgroundColor: Color(0xFF427D9D),
+                        backgroundColor: primaryColor,
                       ),
                       child: Text(
                         "Login",
@@ -59,14 +59,14 @@ class HomeView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         side: BorderSide(
-                          color: Color(0xFF427D9D),
+                          color: primaryColor,
                           width: 2,
                         ),
                       ),
                       child: Text(
                         "Join us!",
                         style: TextStyle(
-                          color: Color(0xFF427D9D),
+                          color: primaryColor,
                           fontFamily: 'Roboto',
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -93,8 +93,8 @@ class HomeView extends StatelessWidget {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
         },
         child: const Text(
-          'Logout', // Changed the text to indicate the action clearly
-          style: TextStyle(color: Color(0xFF427D9D)),
+          'Logout',
+          style: TextStyle(color: primaryColor),
         ),
       ),
     );

@@ -2,9 +2,7 @@ import 'package:cap_advisor/view-model/instructor_task_viewmodel.dart';
 import 'package:cap_advisor/view/task_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../view-model/student_task_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
-import '../widgets/custom_dialog.dart';
 import '../widgets/custom_search_field.dart';
 import '../widgets/custom_task_card.dart';
 
@@ -22,11 +20,9 @@ class InstructorTasksView extends StatelessWidget {
       create: (_) {
         var viewModel = InstructorTasksViewModel(studentId);
         viewModel.fetchTasksForSpecificStudent(
-            studentId); // Fetch tasks for the specific student
+            studentId);
         return viewModel;
       },
-      // return ChangeNotifierProvider(
-      //   create: (context) => InstructorTasksViewModel(studentId), // Pass the studentId to the view model
       child: Scaffold(
         appBar: CustomAppBar(
           title: '${studentName} Tasks',
@@ -70,11 +66,12 @@ class InstructorTasksView extends StatelessWidget {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => TaskDetailsView(
-                                    taskData: viewModel.tasks[index]),
+                                  taskData: viewModel.tasks[index],
+                                ),
                               ),
                             );
                           },
-                          buttonTitle: "Details",
+                          iconData: Icons.info,
                         );
                       },
                     );

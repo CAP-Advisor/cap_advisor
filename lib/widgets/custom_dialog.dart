@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -84,7 +85,7 @@ class CustomDialog extends StatelessWidget {
             ElevatedButton(
               onPressed: onClose,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), backgroundColor: Color(0xFF164863),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), backgroundColor: secondaryColor,
               ),
               child: Text(
                 "Close",
