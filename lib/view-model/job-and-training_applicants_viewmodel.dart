@@ -3,9 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
-import '../service/firebase_service.dart';
 import '../service/hr_firebase_serviece.dart';
-import '../service/student_firebase_service.dart';
 
 class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
   final HRFirebaseService _hrfirebaseService = HRFirebaseService();

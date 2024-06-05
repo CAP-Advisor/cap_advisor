@@ -1,8 +1,5 @@
-import 'package:cap_advisor/model/student_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../service/firebase_service.dart';
-import '../service/instructor_firebase_service.dart';
 import '../service/student_firebase_service.dart';
 
 class InstructorTasksViewModel extends ChangeNotifier {

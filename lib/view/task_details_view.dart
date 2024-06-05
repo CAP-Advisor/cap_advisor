@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../widgets/custom_appbar.dart';
@@ -10,7 +11,7 @@ class TaskDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String formattedDeadline = DateFormat('MMMM dd, yyyy').format(taskData['deadline'].toDate());
-    Color iconColor = Color(0xFF164863);
+    Color iconColor = secondaryColor;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -31,7 +32,6 @@ class TaskDetailsView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Task Title Card
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
@@ -79,7 +79,6 @@ class TaskDetailsView extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16),
-              // Description Card
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
@@ -119,7 +118,6 @@ class TaskDetailsView extends StatelessWidget {
               ),
               if (taskData['Task Feedback'] != null && taskData['Task Feedback'].isNotEmpty)
                 SizedBox(height: 16),
-              // Feedback Card
               if (taskData['Task Feedback'] != null && taskData['Task Feedback'].isNotEmpty)
                 Card(
                   elevation: 4,

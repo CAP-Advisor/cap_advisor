@@ -80,7 +80,6 @@ class AssigningInstructorViewModel extends ChangeNotifier {
         studentList = data['studentList'] ?? [];
       }
 
-      // Check if the studentId is already in the studentList
       if (!studentList.contains(studentId)) {
         studentList.add(studentId);
         transaction.update(instructorRef, {'studentList': studentList});

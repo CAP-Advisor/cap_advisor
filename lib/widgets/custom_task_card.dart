@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomTaskCard extends StatelessWidget {
@@ -15,7 +16,7 @@ class CustomTaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Color(0xFFDDF2FD),
+      color: cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
@@ -42,7 +43,7 @@ class CustomTaskCard extends StatelessWidget {
             IconButton(
               onPressed: onPressed,
               icon: Icon(iconData),
-              color: Color(0XFF164863),
+              color: secondaryColor,
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cap_advisor/widgets/custom_dropdown_button.dart';
 import 'package:cap_advisor/widgets/custom_text_field.dart';
@@ -156,7 +157,7 @@ class _PostPositionViewState extends State<PostPositionView> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 22),
                 decoration: BoxDecoration(
-                  color: Color(0xFFF5F8F9),
+                  color: backgroundBoxColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -167,7 +168,7 @@ class _PostPositionViewState extends State<PostPositionView> {
                           ? 'Select Required Skills'
                           : selectedSkills!.join(', '),
                       style: TextStyle(
-                        color: Color(0xFF9A9A9A),
+                        color: hintTextColor,
                       ),
                     ),
                     Icon(
@@ -225,7 +226,7 @@ class _PostPositionViewState extends State<PostPositionView> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Position saved successfully'),
-                                backgroundColor: Colors.green,
+                                backgroundColor: successColor,
                               ),
                             );
                             Navigator.of(context).pushReplacement(
@@ -241,7 +242,7 @@ class _PostPositionViewState extends State<PostPositionView> {
                             SnackBar(
                               content: Text(
                                   'Failed to save position: ${error.toString()}'),
-                              backgroundColor: Colors.red,
+                              backgroundColor: errorColor,
                             ),
                           );
                         } finally {

@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../view-model/add_task_viewmodel.dart';
@@ -25,10 +26,10 @@ class CustomDeadline extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               color:
-                  showError ? Colors.red.withOpacity(0.2) : Color(0xFFF5F8F9),
+                  showError ? errorColor.withOpacity(0.2) : backgroundBoxColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                  color: showError ? Colors.red : Colors.transparent),
+                  color: showError ? errorColor : Colors.transparent),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -56,7 +57,7 @@ class CustomDeadline extends StatelessWidget {
             padding: EdgeInsets.only(left: 16, top: 4),
             child: Text(
               "Please select a deadline",
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: errorColor),
             ),
           ),
       ],

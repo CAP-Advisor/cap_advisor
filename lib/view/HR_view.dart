@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:cap_advisor/view/post_position_view.dart';
 import 'package:cap_advisor/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
@@ -62,8 +63,8 @@ class _HRViewState extends State<HRView> {
             ),
             bottomNavigationBar: BottomNavigationBar(
               backgroundColor: Colors.white,
-              selectedItemColor: Color(0xFF9DB2CE),
-              unselectedItemColor: Color(0xFF9DB2CE),
+              selectedItemColor: bottomNavbarColor,
+              unselectedItemColor: bottomNavbarColor,
               currentIndex: 0,
               onTap: (index) {
                 switch (index) {
@@ -241,7 +242,7 @@ class _HRViewState extends State<HRView> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(9),
           ),
-          backgroundColor: isSelected ? Color(0xFF9BBEC8) : Colors.grey[200],
+          backgroundColor: isSelected ? toggleButtonColor : Colors.grey[200],
         ),
         child: Text(
           text,
@@ -277,7 +278,7 @@ class _HRViewState extends State<HRView> {
           height: 100,
           margin: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Color(0xFFCFE0E9),
+            color: positionCardColor,
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(

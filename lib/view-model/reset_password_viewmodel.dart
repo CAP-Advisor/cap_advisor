@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +24,7 @@ class ResetPasswordViewModel {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Password reset email sent.'),
-            backgroundColor: Colors.green),
+            backgroundColor: successColor),
       );
     } catch (error) {
       String errorMessage = 'An error occurred';
@@ -41,7 +42,7 @@ class ResetPasswordViewModel {
         errorMessage = 'Unknown error occurred';
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+        SnackBar(content: Text(errorMessage), backgroundColor: errorColor),
       );
     }
   }

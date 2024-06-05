@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view-model/supervisor_viewmodel.dart';
@@ -57,7 +58,7 @@ class SupervisorView extends StatelessWidget {
                       return Container(
                         margin: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Color(0xFFDDF2FD),
+                          color: cardColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: ListTile(
@@ -97,15 +98,15 @@ class SupervisorView extends StatelessWidget {
                               Text(
                                 'Major: ${student.major}',
                                 style: TextStyle(
-                                  fontSize: 14, // Change the font size as needed
-                                  color: Colors.grey, // Change the color as needed
+                                  fontSize: 14,
+                                  color: Colors.grey,
                                 ),
                               ),
                               Text(
                                 'Specialization: ${student.additionalInfo}',
                                 style: TextStyle(
-                                  fontSize: 14, // Change the font size as needed
-                                  color: Colors.grey, // Change the color as needed
+                                  fontSize: 14,
+                                  color: Colors.grey,
                                 ),
                               ),
                             ],
@@ -113,7 +114,7 @@ class SupervisorView extends StatelessWidget {
                           trailing: Tooltip(
                             message: 'Add Task',
                             child: IconButton(
-                              icon: Icon(Icons.add_box, color: Color(0xFF164863)),
+                              icon: Icon(Icons.add_box, color: secondaryColor),
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -263,7 +264,6 @@ class SupervisorView extends StatelessWidget {
               if (success) {
                 Navigator.pop(context);
               } else {
-                // Show error message
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Failed to update name'),

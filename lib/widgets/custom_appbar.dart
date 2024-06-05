@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -60,11 +61,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     actions.addAll([
-      // IconButton(
-      //   icon: Icon(Icons.notifications),
-      //   onPressed: onNotificationPressed,
-      //   color: Colors.white,
-      // ),
       IconButton(
         icon: Icon(Icons.menu),
         onPressed: onMenuPressed,
@@ -73,7 +69,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     ]);
 
     return AppBar(
-      backgroundColor: Color(0xFF164863),
+      backgroundColor: secondaryColor,
       leading: onBack != null
           ? IconButton(
               icon: Icon(Icons.arrow_back),

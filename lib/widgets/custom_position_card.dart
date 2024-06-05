@@ -1,8 +1,8 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomPositionCard extends StatelessWidget {
   final String title;
-  //final ImageProvider companyImage;
   final String companyName;
   final String description;
   final String positionType;
@@ -11,7 +11,6 @@ class CustomPositionCard extends StatelessWidget {
 
   const CustomPositionCard({
     required this.title,
-    //required this.companyImage,
     required this.companyName,
     required this.description,
     required this.positionType,
@@ -22,7 +21,7 @@ class CustomPositionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Color(0xFFDDF2FD),
+      color: cardColor,
       margin: EdgeInsets.all(10.0),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -33,10 +32,6 @@ class CustomPositionCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    /*CircleAvatar(
-                      backgroundImage: companyImage,
-                      radius: 20.0,
-                    ),*/
                     SizedBox(width: 10.0),
                     Text(
                       companyName,
@@ -84,7 +79,7 @@ class CustomPositionCard extends StatelessWidget {
                             label: Text(
                               skill,
                             ),
-                            backgroundColor: Color(0xFFDDF2FD),
+                            backgroundColor: cardColor,
                           ))
                       .toList(),
                 ),

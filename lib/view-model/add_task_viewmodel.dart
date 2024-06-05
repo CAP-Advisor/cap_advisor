@@ -1,7 +1,7 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../model/add_task_model.dart';
-import '../service/firebase_service.dart';
 import '../service/supervisor_firebase_service.dart';
 
 class AddTaskViewModel extends ChangeNotifier {
@@ -73,7 +73,7 @@ class AddTaskViewModel extends ChangeNotifier {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Task added successfully'),
-          backgroundColor: Colors.green,
+          backgroundColor: successColor,
         ),
       );
       notifyListeners();
@@ -81,7 +81,7 @@ class AddTaskViewModel extends ChangeNotifier {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error adding task: $error'),
-          backgroundColor: Colors.red,
+          backgroundColor: errorColor,
         ),
       );
       print("Error adding task: $error");

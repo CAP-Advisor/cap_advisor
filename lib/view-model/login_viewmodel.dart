@@ -61,7 +61,6 @@ class LoginViewModel {
             await storage.delete(key: 'email');
             await storage.delete(key: 'password');
           }
-          // await storage.write(key: 'session_token', value: token);
           return userObj;
         }
       }

@@ -26,7 +26,6 @@ class StudentTasksViewModel extends ChangeNotifier {
       Map<String, dynamic>? studentDoc =
           await firebaseService.fetchStudentData(userId);
       if (studentDoc != null) {
-        // Fetch all tasks initially
         QuerySnapshot taskSnapshot = await FirebaseFirestore.instance
             .collection('Student')
             .doc(userId)
@@ -36,29 +35,26 @@ class StudentTasksViewModel extends ChangeNotifier {
             .map((taskDoc) => taskDoc.data() as Map<String, dynamic>)
             .toList();
       } else {
-        _allTasks = []; // Set _allTasks to an empty list if no tasks are found
+        _allTasks = [];
       }
-      // Notify listeners that tasks have been fetched
       notifyListeners();
     } catch (e) {
       print("Error fetching tasks: $e");
-      // Set _allTasks to an empty list in case of an error
       _allTasks = [];
-      // Notify listeners about the error
       notifyListeners();
     }
   }
 
   List<Map<String, dynamic>> filterTasks(String query) {
     if (query.isEmpty) {
-      _filteredTasks = []; // Reset filtered tasks if the query is empty
+      _filteredTasks = [];
     } else {
       _filteredTasks = _allTasks.where((task) {
         String taskTitle = (task['Task Title'] ?? "").toLowerCase();
         return taskTitle.contains(query.toLowerCase());
       }).toList();
     }
-    notifyListeners(); // Notify listeners that the filtered tasks have changed
+    notifyListeners();
     return _filteredTasks;
   }
 

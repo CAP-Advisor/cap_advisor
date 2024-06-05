@@ -1,3 +1,4 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:cap_advisor/view/post_position_view.dart';
 import 'package:cap_advisor/view/student_search_view.dart';
 import 'package:flutter/cupertino.dart';
@@ -124,7 +125,7 @@ class _JobAndTrainingApplicantsViewState
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.check, color: Colors.green),
+                leading: Icon(Icons.check, color: successColor),
                 title: Text('Approve'),
                 onTap: () async {
                   Navigator.of(context).pop();
@@ -226,7 +227,7 @@ class _JobAndTrainingApplicantsViewState
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Color(0xFFEBEBEB),
+                      fillColor: backgroundBoxColor,
                     ),
                     onChanged: _onSearchChanged,
                   ),
@@ -245,7 +246,7 @@ class _JobAndTrainingApplicantsViewState
                                 viewModel.filteredApplicants[index];
                             return Card(
                               key: ValueKey<int>(applicant.hashCode),
-                              color: Color(0xFFDDF2FD),
+                              color: cardColor,
                               margin: const EdgeInsets.symmetric(vertical: 8),
                               child: ListTile(
                                 leading: CircleAvatar(
@@ -274,8 +275,8 @@ class _JobAndTrainingApplicantsViewState
             ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
-        selectedItemColor: Color(0xFF9DB2CE),
-        unselectedItemColor: Color(0xFF9DB2CE),
+        selectedItemColor: bottomNavbarColor,
+        unselectedItemColor: bottomNavbarColor,
         currentIndex: 0,
         onTap: (index) {
           switch (index) {

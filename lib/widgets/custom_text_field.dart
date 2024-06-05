@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../resources/colors.dart';
+
 class CustomTextField extends StatefulWidget {
   final String hintText;
   final TextEditingController controller;
@@ -50,10 +52,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            fillColor: Color(0xFFF5F8F9),
+            fillColor: backgroundBoxColor,
             filled: true,
             hintStyle: TextStyle(
-              color: Color(0xFF9A9A9A),
+              color: hintTextColor,
               fontFamily: 'Roboto',
               fontWeight: FontWeight.w400,
               fontSize: 18,
@@ -67,7 +69,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             padding: EdgeInsets.only(top: widget.isValid ? 0 : 8),
             child: Text(
               widget.errorMessage,
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: errorColor),
             ),
           ),
         ),

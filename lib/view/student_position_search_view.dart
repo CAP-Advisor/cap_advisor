@@ -59,7 +59,6 @@ class _StudentPositionSearchViewState extends State<StudentPositionSearchView> {
       });
     } catch (e) {
       print("Error fetching positions: $e");
-      // Handle error appropriately
     }
   }
 
@@ -107,7 +106,6 @@ class _StudentPositionSearchViewState extends State<StudentPositionSearchView> {
                         final position = viewModel.filteredPositions[index];
                         return CustomPositionCard(
                           title: position.title,
-                          //companyImage: AssetImage("assets/images/company_logo.png"),
                           companyName: position.companyName,
                           description: position.description,
                           positionType: position.positionType,

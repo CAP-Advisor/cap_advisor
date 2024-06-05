@@ -79,5 +79,4 @@ class AddTaskView extends StatelessWidget {
       ),
     );
   }
-
 }

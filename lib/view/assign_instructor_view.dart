@@ -1,7 +1,7 @@
+import 'package:cap_advisor/resources/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../view-model/assign_instructor_viewmodel.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/custom_search_field.dart';
@@ -19,7 +19,6 @@ class AssigningInstructorView extends StatelessWidget {
         appBar: CustomAppBar(
           title: 'Assign Instructor',
           onNotificationPressed: () {
-            // Define what happens when notification button is pressed
           },
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
@@ -84,7 +83,7 @@ class AssigningInstructorView extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0)),
                           elevation: 4,
-                          color: Color(0xFFDDF2FD),
+                          color: cardColor,
                           child: ListTile(
                             onTap: () {
                               Navigator.push(
@@ -120,7 +119,7 @@ class AssigningInstructorView extends StatelessWidget {
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
-                                backgroundColor: Color(0xFF427D9D),
+                                backgroundColor: primaryColor,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
