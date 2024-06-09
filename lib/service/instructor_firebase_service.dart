@@ -40,6 +40,23 @@ class InstructorFirebaseService {
     }
   }
 
+  Future<Instructor?> getInstructorDataByUid(String uid) async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Instructor')
+          .doc(uid)
+          .get();
+
+      if (!snapshot.exists) {
+        return null;
+      } else {
+        return Instructor.fromFirestore(snapshot);
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch data: ${e.toString()}");
+    }
+  }
+
   Future<List<Student>> fetchStudentsForInstructor(
       String instructorEmail) async {
     try {
@@ -59,7 +76,7 @@ class InstructorFirebaseService {
       List<Student> students = [];
       for (String studentId in studentRefs) {
         DocumentSnapshot studentSnapshot =
-            await _firestore.collection('Student').doc(studentId).get();
+        await _firestore.collection('Student').doc(studentId).get();
         if (studentSnapshot.exists) {
           students.add(Student.fromFirestore(studentSnapshot));
         }
@@ -100,7 +117,7 @@ class InstructorFirebaseService {
 
       String userId = _auth.currentUser!.uid;
       DocumentReference instructorRef =
-          _firestore.collection('Instructor').doc(userId);
+      _firestore.collection('Instructor').doc(userId);
 
       DocumentSnapshot instructorSnapshot = await instructorRef.get();
 
@@ -131,7 +148,7 @@ class InstructorFirebaseService {
 
       String userId = _auth.currentUser!.uid;
       DocumentReference instructorRef =
-          _firestore.collection('Instructor').doc(userId);
+      _firestore.collection('Instructor').doc(userId);
 
       DocumentSnapshot instructorSnapshot = await instructorRef.get();
 

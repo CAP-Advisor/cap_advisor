@@ -6,7 +6,7 @@ import '../service/instructor_firebase_service.dart';
 
 class InstructorViewModel with ChangeNotifier {
   final InstructorFirebaseService _firebaseService =
-      InstructorFirebaseService();
+  InstructorFirebaseService();
   TextEditingController searchController = TextEditingController();
   bool isLoading = false;
   String? error;
@@ -18,27 +18,43 @@ class InstructorViewModel with ChangeNotifier {
   List<Student> students = [];
   List<Student> filteredStudents = [];
 
+
   InstructorViewModel(this.uid) {
-    _init();
-  }
-
-  void _init() {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user == null) {
-        _clearData();
-      } else {
-        getInstructorDataByUid();
+    print("InstructorViewModel initialized with uid: $uid");
+    if (uid.isNotEmpty) {
+      getInstructorData().then((_) {
+        loadStudentsForInstructorView();
+      });
+    } else {
+      getInstructorDataByUid().then((_) {
         loadStudentsForInstructor();
-      }
-    });
+      });
+    }
   }
 
-  void _clearData() {
-    currentInstructor = null;
-    students.clear();
-    filteredStudents.clear();
-    notifyListeners();
+  Future<void> loadStudentsForInstructorView() async {
+    if (currentInstructor == null) {
+      error = 'Instructor data is not loaded';
+      notifyListeners();
+      return;
+    }
+
+    try {
+      print(
+          "Fetching students for instructor email: ${currentInstructor!.email}");
+      students = await _firebaseService
+          .fetchStudentsForInstructor(currentInstructor!.email);
+      print(
+          "Number of students fetched: ${students.length}");
+      filteredStudents = List<Student>.from(students);
+      notifyListeners();
+    } catch (e) {
+      print("Error in loadStudentsForInstructor: $e");
+      error = 'Failed to fetch students: $e';
+      notifyListeners();
+    }
   }
+
 
   void filterStudents(String query) {
     if (query.isEmpty) {
@@ -76,6 +92,23 @@ class InstructorViewModel with ChangeNotifier {
     }
   }
 
+  Future<void> getInstructorData() async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      currentInstructor = await _firebaseService.getInstructorDataByUid(uid);
+      if (currentInstructor == null) {
+        error = "No instructor data available for the uid $uid.";
+      }
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> loadStudentsForInstructor() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null || user.email == null) {
@@ -86,11 +119,11 @@ class InstructorViewModel with ChangeNotifier {
       print("Fetching students for instructor email: ${user.email}");
       students = await _firebaseService.fetchStudentsForInstructor(user.email!);
       print(
-          "Number of students fetched: ${students.length}"); // Log the number of students fetched
+          "Number of students fetched: ${students.length}");
       filteredStudents = List<Student>.from(students);
       notifyListeners();
     } catch (e) {
-      print("Error in loadStudentsForInstructor: $e"); // Log the error
+      print("Error in loadStudentsForInstructor: $e");
       error = 'Failed to fetch students: $e';
       notifyListeners();
     }
