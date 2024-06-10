@@ -8,8 +8,10 @@ import '../widgets/custom_search_field.dart';
 import 'instructor_task_view.dart';
 
 class InstructorView extends StatelessWidget {
+  final bool isStudent;
   final String uid;
-  InstructorView({Key? key, required this.uid}) : super(key: key);
+  InstructorView({Key? key, required this.uid, this.isStudent = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,20 @@ class InstructorView extends StatelessWidget {
           return Scaffold(
             appBar: CustomAppBar(
               title: "CAP Advisor",
-              onNotificationPressed: () {},
+              onBack: (isStudent)
+                  ? () {
+                Navigator.of(context).pop();
+              }
+                  : null,
+              onNotificationPressed: () {
+                Navigator.of(context).pushNamed('/notifications');
+              },
+              onJobPressed: isStudent
+                  ? () {
+                Navigator.of(context)
+                    .pushNamed('/student-position-search');
+              }
+                  : null,
               onMenuPressed: () {
                 Navigator.of(context).pushNamed('/menu');
               },
@@ -28,98 +43,102 @@ class InstructorView extends StatelessWidget {
             body: model.isLoading
                 ? Center(child: CircularProgressIndicator())
                 : model.currentInstructor == null
-                    ? Center(
-                        child:
-                            Text(model.error ?? 'No instructor data available'))
-                    : Column(
-                        children: [
-                          _buildProfileHeader(context, model),
-                          _buildInstructorDetails(context, model),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: CustomSearchField(
-                              controller: model.searchController,
-                              onChanged: (value) {
-                                model.filterStudents(value);
-                              },
-                              hintText: 'Search for student',
+                ? Center(
+                child:
+                Text(model.error ?? 'No instructor data available'))
+                : Column(
+              children: [
+                _buildProfileHeader(context, model),
+                _buildInstructorDetails(context, model),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomSearchField(
+                    controller: model.searchController,
+                    onChanged: (value) {
+                      model.filterStudents(value);
+                    },
+                    hintText: 'Search for student',
+                  ),
+                ),
+                SizedBox(height: 20),
+                Expanded(
+                  child: model.filteredStudents.isEmpty
+                      ? Center(child: Text('No students found'))
+                      : ListView.builder(
+                    itemCount: model.filteredStudents.length,
+                    itemBuilder: (context, index) {
+                      final student =
+                      model.filteredStudents[index];
+                      return Container(
+                        margin: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: positionCardColor,
+                          borderRadius:
+                          BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.grey[200],
+                            backgroundImage:
+                            student.photoUrl != null
+                                ? NetworkImage(
+                                student.photoUrl!)
+                                : null,
+                            child: student.photoUrl == null
+                                ? Text(student.name[0])
+                                : null,
+                          ),
+                          title: Text(student.name),
+                          subtitle: Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                            children: [
+                              Text(student.training),
+                              Text(student.company),
+                              Text(student.email),
+                            ],
+                          ),
+                          trailing: isStudent
+                              ? null
+                              : IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      InstructorTasksView(
+                                        studentId:
+                                        student.uid,
+                                        studentName:
+                                        student.name,
+                                      ),
+                                ),
+                              );
+                            },
+                            icon: Icon(
+                              Icons.task,
+                              color: secondaryColor,
                             ),
                           ),
-                          SizedBox(height: 20),
-                          Expanded(
-                            child: model.filteredStudents.isEmpty
-                                ? Center(child: Text('No students found'))
-                                : ListView.builder(
-                                    itemCount: model.filteredStudents.length,
-                                    itemBuilder: (context, index) {
-                                      final student =
-                                          model.filteredStudents[index];
-                                      return Container(
-                                        margin: EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: positionCardColor,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: ListTile(
-                                          leading: CircleAvatar(
-                                            backgroundColor: Colors.grey[200],
-                                            backgroundImage:
-                                                student.photoUrl != null
-                                                    ? NetworkImage(
-                                                        student.photoUrl!)
-                                                    : null,
-                                            child: student.photoUrl == null
-                                                ? Text(student.name[0])
-                                                : null,
-                                          ),
-                                          title: Text(student.name),
-                                          subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(student.training),
-                                              Text(student.company),
-                                              Text(student.email),
-                                            ],
-                                          ),
-                                          trailing: IconButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      InstructorTasksView(
-                                                    studentId: student.uid,
-                                                    studentName: student.name,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            icon: Icon(
-                                              Icons.task,
-                                              color: secondaryColor,
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    StudentView(
-                                                  uid: student.uid,
-                                                  isInstructor: true,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  ),
-                          ),
-                        ],
-                      ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    StudentView(
+                                      uid: student.uid,
+                                      isInstructor: !isStudent,
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -165,9 +184,9 @@ class InstructorView extends StatelessWidget {
           decoration: BoxDecoration(
             image: (_viewModel.currentInstructor?.coverPhotoUrl != null)
                 ? DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                        _viewModel.currentInstructor!.coverPhotoUrl!))
+                fit: BoxFit.cover,
+                image: NetworkImage(
+                    _viewModel.currentInstructor!.coverPhotoUrl!))
                 : null,
             color: Colors.grey[300],
           ),
@@ -183,42 +202,43 @@ class InstructorView extends StatelessWidget {
                 : null,
             child: _viewModel.currentInstructor?.photoUrl == null
                 ? Text(
-                    _viewModel.currentInstructor?.name.substring(0, 1) ?? 'A',
-                    style: TextStyle(fontSize: 40))
+                _viewModel.currentInstructor?.name.substring(0, 1) ?? 'A',
+                style: TextStyle(fontSize: 40))
                 : null,
           ),
         ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: PopupMenuButton<String>(
-            onSelected: (String value) {
-              _viewModel.handleProfileAction(context, value);
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'view_profile_photo',
-                child: Text('View Profile Photo'),
+        if (!isStudent)
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: PopupMenuButton<String>(
+              onSelected: (String value) {
+                _viewModel.handleProfileAction(context, value);
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'view_profile_photo',
+                  child: Text('View Profile Photo'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'choose_profile_photo',
+                  child: Text('Choose Profile Photo'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'view_cover_photo',
+                  child: Text('View Cover Photo'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'choose_cover_photo',
+                  child: Text('Choose Cover Photo'),
+                ),
+              ],
+              child: CircleAvatar(
+                backgroundColor: Colors.grey[800],
+                child: const Icon(Icons.add_a_photo, color: Colors.white),
               ),
-              const PopupMenuItem<String>(
-                value: 'choose_profile_photo',
-                child: Text('Choose Profile Photo'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'view_cover_photo',
-                child: Text('View Cover Photo'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'choose_cover_photo',
-                child: Text('Choose Cover Photo'),
-              ),
-            ],
-            child: CircleAvatar(
-              backgroundColor: Colors.grey[800],
-              child: const Icon(Icons.add_a_photo, color: Colors.white),
             ),
-          ),
-        )
+          )
       ],
     );
   }
