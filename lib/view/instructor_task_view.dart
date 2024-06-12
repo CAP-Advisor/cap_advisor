@@ -19,16 +19,12 @@ class InstructorTasksView extends StatelessWidget {
     return ChangeNotifierProvider<InstructorTasksViewModel>(
       create: (_) {
         var viewModel = InstructorTasksViewModel(studentId);
-        viewModel.fetchTasksForSpecificStudent(
-            studentId);
+        viewModel.fetchTasksForSpecificStudent(studentId);
         return viewModel;
       },
       child: Scaffold(
         appBar: CustomAppBar(
           title: '${studentName} Tasks',
-          onNotificationPressed: () {
-            // Add functionality for notification pressed
-          },
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
           },

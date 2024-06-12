@@ -20,7 +20,7 @@ class AddTaskView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => AddTaskViewModel(),
-      child:Consumer<AddTaskViewModel>(
+      child: Consumer<AddTaskViewModel>(
         builder: (context, model, _) {
           return Scaffold(
             appBar: CustomAppBar(
@@ -28,10 +28,9 @@ class AddTaskView extends StatelessWidget {
               onBack: () {
                 Navigator.of(context).pop();
               },
-              onFeedback: (){
+              onFeedback: () {
                 Navigator.of(context).pushNamed('/assign-feedback');
               },
-              onNotificationPressed: () {},
               onMenuPressed: () {
                 Navigator.of(context).pushNamed('/menu');
               },
@@ -68,7 +67,7 @@ class AddTaskView extends StatelessWidget {
                   ),
                   SizedBox(height: 50),
                   CustomButton(
-                    onPressed: () => model.addTask(context,studentId),
+                    onPressed: () => model.addTask(context, studentId),
                     text: "Submit",
                   ),
                 ],

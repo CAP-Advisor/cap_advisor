@@ -22,7 +22,6 @@ class DisplayFeedbackView extends StatelessWidget {
           onBack: () {
             Navigator.pop(context);
           },
-          onNotificationPressed: () {},
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
           },
@@ -62,7 +61,8 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
               _buildDropDown(context),
               SizedBox(height: 30),
               if (widget.viewModel.selectedFeedbackType != null) ...[
-                if (widget.viewModel.selectedFeedbackType == "Task Feedback") ...[
+                if (widget.viewModel.selectedFeedbackType ==
+                    "Task Feedback") ...[
                   CustomTextField(
                     controller: widget.viewModel.nameController,
                     hintText: "Student Name",
@@ -73,7 +73,8 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
                   ),
                   SizedBox(height: 20),
                   _buildTaskTitleDropdown(context),
-                ] else if (widget.viewModel.selectedFeedbackType == "Final Feedback") ...[
+                ] else if (widget.viewModel.selectedFeedbackType ==
+                    "Final Feedback") ...[
                   CustomTextField(
                     controller: widget.viewModel.nameController,
                     hintText: "Student Name",
@@ -156,7 +157,8 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
             value: widget.viewModel.selectedTraining,
             decoration: InputDecoration(
               hintText: 'Select Training',
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 22),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 22),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -170,7 +172,8 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
                 fontSize: 18,
               ),
             ),
-            items: ["Training 1", "Training 2", "Training 3"].map((String value) {
+            items:
+                ["Training 1", "Training 2", "Training 3"].map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(
@@ -245,7 +248,7 @@ class _DisplayFeedbackFormState extends State<DisplayFeedbackForm> {
           CustomTextField(
             controller: widget.viewModel.taskDescriptionController,
             hintText: "Task Description",
-            readOnly:true,
+            readOnly: true,
             onChanged: (String) {},
             errorMessage: 'Please fill the task description',
             isValid: widget.viewModel.nameController.text.isNotEmpty,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../exceptions/custom_exception.dart';
+
 class AssigningInstructorViewModel extends ChangeNotifier {
   TextEditingController searchController = TextEditingController();
   List<DocumentSnapshot> instructors = [];
@@ -23,9 +25,8 @@ class AssigningInstructorViewModel extends ChangeNotifier {
     try {
       QuerySnapshot querySnapshot;
       if (query.isEmpty) {
-        querySnapshot = await FirebaseFirestore.instance
-            .collection('Instructor')
-            .get();
+        querySnapshot =
+            await FirebaseFirestore.instance.collection('Instructor').get();
       } else {
         querySnapshot = await FirebaseFirestore.instance
             .collection('Instructor')
@@ -37,6 +38,7 @@ class AssigningInstructorViewModel extends ChangeNotifier {
       instructors = querySnapshot.docs;
     } catch (e) {
       error = 'Failed to fetch instructors: $e';
+      throw CustomException('Failed to fetch instructors: $e');
     } finally {
       isLoading = false;
       notifyListeners();
@@ -48,22 +50,23 @@ class AssigningInstructorViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('Instructor')
-          .get();
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Instructor').get();
 
       instructors = querySnapshot.docs;
     } catch (e) {
       error = 'Failed to fetch instructors: $e';
+      throw CustomException('Failed to fetch instructors: $e');
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> assignStudentToInstructor(String instructorId, String studentId, BuildContext context) async {
+  Future<void> assignStudentToInstructor(
+      String instructorId, String studentId, BuildContext context) async {
     DocumentReference instructorRef =
-    FirebaseFirestore.instance.collection('Instructor').doc(instructorId);
+        FirebaseFirestore.instance.collection('Instructor').doc(instructorId);
 
     try {
       DocumentSnapshot snapshot = await instructorRef.get();
@@ -72,7 +75,8 @@ class AssigningInstructorViewModel extends ChangeNotifier {
         throw Exception("Instructor does not exist!");
       }
 
-      List<dynamic> studentList = (snapshot.data() as Map<String, dynamic>)['studentList'] ?? [];
+      List<dynamic> studentList =
+          (snapshot.data() as Map<String, dynamic>)['studentList'] ?? [];
 
       if (!studentList.contains(studentId)) {
         studentList.add(studentId);
@@ -86,7 +90,8 @@ class AssigningInstructorViewModel extends ChangeNotifier {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('This student is already assigned to this instructor.'),
+            content:
+                Text('This student is already assigned to this instructor.'),
             backgroundColor: Colors.deepOrangeAccent,
           ),
         );
@@ -99,6 +104,7 @@ class AssigningInstructorViewModel extends ChangeNotifier {
           backgroundColor: Colors.red,
         ),
       );
+      throw CustomException('Failed to assign student: $e');
     }
   }
 

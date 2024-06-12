@@ -10,15 +10,13 @@ class TaskDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String formattedDeadline = DateFormat('MMMM dd, yyyy').format(taskData['deadline'].toDate());
+    String formattedDeadline =
+        DateFormat('MMMM dd, yyyy').format(taskData['deadline'].toDate());
     Color iconColor = secondaryColor;
 
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Task Details',
-        onNotificationPressed: () {
-          // Add functionality for notification pressed
-        },
         onMenuPressed: () {
           Navigator.of(context).pushNamed('/menu');
         },
@@ -68,9 +66,7 @@ class TaskDetailsView extends StatelessWidget {
                           Text(
                             "Deadline: $formattedDeadline",
                             style: TextStyle(
-                                fontSize: 16.0,
-                                color: Colors.grey[700]
-                            ),
+                                fontSize: 16.0, color: Colors.grey[700]),
                           ),
                         ],
                       ),
@@ -96,9 +92,7 @@ class TaskDetailsView extends StatelessWidget {
                           Text(
                             "Description",
                             style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold
-                            ),
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -116,9 +110,11 @@ class TaskDetailsView extends StatelessWidget {
                   ),
                 ),
               ),
-              if (taskData['Task Feedback'] != null && taskData['Task Feedback'].isNotEmpty)
+              if (taskData['Task Feedback'] != null &&
+                  taskData['Task Feedback'].isNotEmpty)
                 SizedBox(height: 16),
-              if (taskData['Task Feedback'] != null && taskData['Task Feedback'].isNotEmpty)
+              if (taskData['Task Feedback'] != null &&
+                  taskData['Task Feedback'].isNotEmpty)
                 Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(
@@ -136,9 +132,7 @@ class TaskDetailsView extends StatelessWidget {
                             Text(
                               "Feedback",
                               style: TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold
-                              ),
+                                  fontSize: 20.0, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),

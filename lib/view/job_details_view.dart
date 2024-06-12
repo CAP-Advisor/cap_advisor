@@ -15,9 +15,6 @@ class JobDetailsView extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Job Details',
-        onNotificationPressed: () {
-          // Add functionality for notification pressed
-        },
         onMenuPressed: () {
           Navigator.of(context).pushNamed('/menu');
         },

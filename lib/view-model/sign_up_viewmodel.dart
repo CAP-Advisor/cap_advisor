@@ -1,6 +1,7 @@
 import 'package:cap_advisor/utils/validation_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/sign_up_model.dart';
 import '../service/firebase_service.dart';
 
@@ -45,7 +46,7 @@ class SignUpViewModel {
       try {
         emailExists = await _firebaseService.checkEmailExists(model.email!);
         if (emailExists) {
-          return false;
+          throw CustomException('Email already exists');
         }
         UserCredential userCredential =
             await _auth.createUserWithEmailAndPassword(
@@ -63,12 +64,12 @@ class SignUpViewModel {
         return true;
       } catch (e) {
         print("Error creating user account: $e");
-        return false;
+        throw CustomException("Error creating user account: $e");
       }
     } else {
       print("Form validation failed");
+      throw CustomException("Form validation failed");
     }
-    return false;
   }
 
   bool _validateForm() {

@@ -2,8 +2,8 @@ import 'package:cap_advisor/resources/colors.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/display_feedback_model.dart';
-import '../service/firebase_service.dart';
 import 'package:http/http.dart' as http;
 import '../service/supervisor_firebase_service.dart';
 
@@ -39,7 +39,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
 
       QuerySnapshot taskSnapshot = await studentRef.collection('Task').get();
 
-      // Extract task titles and descriptions from the snapshot
       List<String> titles = [];
       Map<String, String> titleDescriptionMap = {};
       taskSnapshot.docs.forEach((doc) {
@@ -51,9 +50,9 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       taskTitles = titles;
       this.titleDescriptionMap = titleDescriptionMap;
 
-      notifyListeners(); 
+      notifyListeners();
     } catch (error) {
-      print("Error fetching task titles: $error");
+      throw CustomException("Error fetching task titles: $error");
     }
   }
 
@@ -103,7 +102,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           taskDescriptionController.clear();
           taskFeedbackController.clear();
 
-          // Send notification
           final url = Uri.parse(
               'https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
           final response = await http.post(
@@ -117,10 +115,8 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
               'message': 'Your feedback has been submitted successfully.',
             }),
           );
-          if (response.statusCode == 200) {
-            print('Notification sent successfully');
-          } else {
-            print('Failed to send notification: ${response.body}');
+          if (response.statusCode != 200) {
+            throw CustomException('Failed to send notification');
           }
         }
 
@@ -131,7 +127,21 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           ),
         );
       } catch (error) {
-        print("Error adding feedback: $error");
+        if (error is CustomException) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error.message),
+              backgroundColor: errorColor,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error adding feedback: $error'),
+              backgroundColor: errorColor,
+            ),
+          );
+        }
       }
     }
   }
@@ -149,7 +159,6 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           studentRef.collection(feedbackType).doc(feedbackId);
       await feedbackDocRef.update(feedbackData);
 
-      // Send notification
       final url = Uri.parse(
           'https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
       final response = await http.post(
@@ -163,19 +172,15 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
           'message': 'Your feedback has been updated successfully.',
         }),
       );
-      if (response.statusCode == 200) {
-        print('Notification sent successfully');
-      } else {
-        print('Failed to send notification: ${response.body}');
+      if (response.statusCode != 200) {
+        throw CustomException('Failed to send notification');
       }
 
       print('Feedback updated successfully');
     } catch (error) {
-      print("Error updating feedback: $error");
-      throw error;
+      throw CustomException("Error updating feedback: $error");
     }
   }
-
 
   Future<String> getTaskId(String taskTitle) async {
     try {
@@ -191,11 +196,10 @@ class DisplayFeedbackViewModel extends ChangeNotifier {
       if (taskSnapshot.docs.isNotEmpty) {
         return taskSnapshot.docs.first.id;
       } else {
-        return '';
+        throw CustomException('Task ID not found');
       }
     } catch (error) {
-      print("Error fetching task ID: $error");
-      return '';
+      throw CustomException("Error fetching task ID: $error");
     }
   }
 

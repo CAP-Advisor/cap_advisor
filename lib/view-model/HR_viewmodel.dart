@@ -4,6 +4,7 @@ import 'package:cap_advisor/resources/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/HR_model.dart';
 import '../service/hr_firebase_serviece.dart';
 import '../view/job-and-training_applicants_view.dart';
@@ -29,7 +30,6 @@ class HRViewModel extends ChangeNotifier {
   String? get HREmail => currentHR?.email;
   String? get HRPhotoUrl => currentHR?.photoUrl;
 
-
   HRViewModel() {
     fetchPositions();
     getHRDataByEmail();
@@ -46,6 +46,7 @@ class HRViewModel extends ChangeNotifier {
       }
     } catch (e) {
       error = e.toString();
+      throw CustomException("Failed to fetch HR data: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -75,6 +76,7 @@ class HRViewModel extends ChangeNotifier {
       errorMessage = null;
     } catch (e) {
       errorMessage = 'Error fetching positions: $e';
+      throw CustomException("Error fetching positions: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -92,7 +94,7 @@ class HRViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       errorMessage = 'Failed to delete job';
-      notifyListeners();
+      throw CustomException("Failed to delete job: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -110,7 +112,7 @@ class HRViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       errorMessage = 'Failed to delete training';
-      notifyListeners();
+      throw CustomException("Failed to delete training: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -242,10 +244,8 @@ class HRViewModel extends ChangeNotifier {
           actions: [
             ElevatedButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    primaryColor),
-                foregroundColor: MaterialStateProperty.all<Color>(
-                    Colors.white),
+                backgroundColor: MaterialStateProperty.all<Color>(primaryColor),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
               ),
               onPressed: () {
                 job.title = titleController.text;
@@ -260,7 +260,6 @@ class HRViewModel extends ChangeNotifier {
                 final documentReference = FirebaseFirestore.instance
                     .collection(collectionName)
                     .doc(job.id);
-
                 documentReference.update(job.toMap()).then((_) {
                   notifyListeners();
                   print("Document successfully updated");

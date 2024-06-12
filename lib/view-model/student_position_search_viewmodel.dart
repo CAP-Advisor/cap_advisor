@@ -1,65 +1,35 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cap_advisor/service/student_firebase_service.dart';
+import 'package:flutter/material.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/student_position_search_model.dart';
 
-class StudentPositionSearchViewModel {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+class StudentPositionSearchViewModel extends ChangeNotifier {
+  final StudentFirebaseService _firestore = StudentFirebaseService();
   List<StudentPositionSearchModel> positions = [];
   List<StudentPositionSearchModel> filteredPositions = [];
+  bool isLoading = false;
 
-  Future<List<StudentPositionSearchModel>> fetchPositions() async {
+  Future<void> fetchPositions() async {
+    isLoading = true;
+    notifyListeners();
     try {
-      QuerySnapshot jobSnapshot =
-          await _firestore.collection('Job Position').get();
-      QuerySnapshot trainingSnapshot =
-          await _firestore.collection('Training Position').get();
-
-      List<StudentPositionSearchModel> jobPositions =
-          jobSnapshot.docs.map((doc) {
-        return StudentPositionSearchModel.fromFirestore(
-            doc.data() as Map<String, dynamic>, doc.id, 'Job Position');
-      }).toList();
-
-      List<StudentPositionSearchModel> trainingPositions =
-          trainingSnapshot.docs.map((doc) {
-        return StudentPositionSearchModel.fromFirestore(
-            doc.data() as Map<String, dynamic>, doc.id, 'Training Position');
-      }).toList();
-
-      positions = [...jobPositions, ...trainingPositions];
+      positions = await _firestore.fetchPositions();
       filteredPositions = List.from(positions);
-
-      return positions;
+      notifyListeners();
     } catch (e) {
-      print("Error fetching positions: $e");
-      throw e;
+      throw CustomException('Error fetching positions: $e');
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<void> applyForPosition(String positionId, String studentId) async {
-    bool applied =
-        await _applyToCollection('Job Position', positionId, studentId);
-    if (!applied) {
-      await _applyToCollection('Training Position', positionId, studentId);
-    }
-  }
-
-  Future<bool> _applyToCollection(
-      String collectionName, String positionId, String studentId) async {
     try {
-      final positionRef = _firestore.collection(collectionName).doc(positionId);
-      DocumentSnapshot positionDoc = await positionRef.get();
-
-      if (positionDoc.exists) {
-        await positionRef.update({
-          'studentApplicantsList': FieldValue.arrayUnion([studentId])
-        });
-        return true;
-      }
+      await _firestore.applyForPosition(positionId, studentId);
     } catch (e) {
-      print("Error applying to $collectionName: $e");
+      throw CustomException('Error fetching positions: $e');
     }
-    return false;
   }
 
   void filterPositionsByTitle(String query) {
