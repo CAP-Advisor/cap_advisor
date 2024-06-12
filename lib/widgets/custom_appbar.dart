@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBack;
-  final VoidCallback onNotificationPressed;
   final VoidCallback onMenuPressed;
   final VoidCallback? onFeedback;
   final VoidCallback? onJobPressed;
@@ -18,7 +17,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.onFeedback,
     this.onJobPressed,
-    required this.onNotificationPressed,
     required this.onMenuPressed,
     this.isInstructor = false,
     this.isSupervisor = false,
@@ -30,14 +28,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> actions = [];
-
-    actions.add(
-      IconButton(
-        icon: Icon(Icons.notifications),
-        onPressed: onNotificationPressed,
-        color: Colors.white,
-      ),
-    );
 
     if (onFeedback != null) {
       actions.add(

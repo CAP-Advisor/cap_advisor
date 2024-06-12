@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../exceptions/custom_exception.dart';
 import '../service/firebase_service.dart';
 import '../service/student_firebase_service.dart';
 
@@ -38,7 +39,7 @@ class StudentTasksViewModel extends ChangeNotifier {
       StudentFirebaseService firebaseService = StudentFirebaseService();
       String userId = FirebaseService().currentUser!.uid;
       Map<String, dynamic>? studentDoc =
-      await firebaseService.fetchStudentData(userId);
+          await firebaseService.fetchStudentData(userId);
       if (studentDoc != null) {
         QuerySnapshot taskSnapshot = await FirebaseFirestore.instance
             .collection('Student')
@@ -53,8 +54,7 @@ class StudentTasksViewModel extends ChangeNotifier {
       }
       _filteredTasks = [];
     } catch (e) {
-      print("Error fetching tasks: $e");
-      _allTasks = [];
+      throw CustomException("Error fetching tasks: $e");
     } finally {
       isLoading = false;
       notifyListeners();

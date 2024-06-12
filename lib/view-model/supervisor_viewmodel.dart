@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import '../service/supervisor_firebase_service.dart';
 
 class SupervisorViewModel extends ChangeNotifier {
@@ -36,8 +36,7 @@ class SupervisorViewModel extends ChangeNotifier {
     try {
       String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
-        print("No user is currently logged in.");
-        return false;
+        throw CustomException("No user is currently logged in.");
       }
       QuerySnapshot querySnapshot = await _firestore
           .collection('Supervisor')
@@ -45,8 +44,7 @@ class SupervisorViewModel extends ChangeNotifier {
           .limit(1)
           .get();
       if (querySnapshot.docs.isEmpty) {
-        print("No supervisor found for email $email");
-        return false;
+        throw CustomException("No supervisor found for email $email");
       }
       DocumentSnapshot docSnapshot = querySnapshot.docs.first;
       currentSupervisor = SupervisorModel.fromDocSnapshot(docSnapshot);
@@ -54,19 +52,23 @@ class SupervisorViewModel extends ChangeNotifier {
       return true;
     } catch (e) {
       print("Error setting current supervisor: $e");
-      return false;
+      throw CustomException("Error setting current supervisor: $e");
     }
   }
 
   Future<void> loadStudentsForSupervisor() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null || user.email == null) {
-      print('User not logged in or email is null');
-      return;
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null || user.email == null) {
+        throw CustomException('User not logged in or email is null');
+      }
+      students = await _firebaseService.fetchStudentsForSupervisor(user.email!);
+      filteredStudents = List<Student>.from(students);
+      notifyListeners();
+    } catch (e) {
+      print("Error loading students: $e");
+      throw CustomException("Error loading students: $e");
     }
-    students = await _firebaseService.fetchStudentsForSupervisor(user.email!);
-    filteredStudents = List<Student>.from(students);
-    notifyListeners();
   }
 
   void filterStudents(String query) {
@@ -83,67 +85,85 @@ class SupervisorViewModel extends ChangeNotifier {
   }
 
   Future<bool> updateSupervisorName(String newName) async {
-    if (currentSupervisor?.email == null) {
-      print("No email available for the current supervisor.");
-      return false;
-    }
-    bool updateResult = await _firebaseService.updateSupervisorName(
-        currentSupervisor!.email!, newName);
-    if (updateResult) {
-      currentSupervisor?.name = newName;
-      print("Name updated successfully to $newName.");
-      notifyListeners();
-      return true;
-    } else {
-      print("Failed to update name.");
-      return false;
+    try {
+      if (currentSupervisor?.email == null) {
+        throw CustomException("No email available for the current supervisor.");
+      }
+      bool updateResult = await _firebaseService.updateSupervisorName(
+          currentSupervisor!.email!, newName);
+      if (updateResult) {
+        currentSupervisor?.name = newName;
+        notifyListeners();
+        return true;
+      } else {
+        throw CustomException("Failed to update name.");
+      }
+    } catch (e) {
+      print("Error updating supervisor name: $e");
+      throw CustomException("Error updating supervisor name: $e");
     }
   }
 
   Future<bool> updateSupervisorProfileImage() async {
-    bool result = await _firebaseService.updateSupervisorProfileImage();
-    if (result) {
-      print("Profile image updated successfully.");
-    } else {
-      print("Failed to update profile image.");
+    try {
+      bool result = await _firebaseService.updateSupervisorProfileImage();
+      if (!result) {
+        throw CustomException("Failed to update profile image.");
+      }
+      notifyListeners();
+      return result;
+    } catch (e) {
+      print("Error updating profile image: $e");
+      throw CustomException("Error updating profile image: $e");
     }
-    return result;
   }
 
   Future<bool> updateSupervisorCoverPhoto() async {
-    bool result = await _firebaseService.updateSupervisorCoverPhoto();
-    if (result) {
-      print("Cover photo updated successfully.");
-    } else {
-      print("Failed to update cover photo.");
+    try {
+      bool result = await _firebaseService.updateSupervisorCoverPhoto();
+      if (!result) {
+        throw CustomException("Failed to update cover photo.");
+      }
+      notifyListeners();
+      return result;
+    } catch (e) {
+      print("Error updating cover photo: $e");
+      throw CustomException("Error updating cover photo: $e");
     }
-    return result;
   }
 
   Future<void> handleProfileAction(BuildContext context, String value) async {
-    switch (value) {
-      case 'view_profile_photo':
-        if (currentSupervisor?.photoUrl != null) {
-          _showImageDialog(
-              context, currentSupervisor!.photoUrl!, 'Profile Photo');
-        }
-        break;
-      case 'view_cover_photo':
-        if (currentSupervisor?.coverPhotoUrl != null) {
-          _showImageDialog(
-              context, currentSupervisor!.coverPhotoUrl!, 'Cover Photo');
-        }
-        break;
-      case 'choose_profile_photo':
-        var result = await updateSupervisorProfileImage();
-        _showSnackBar(context, result, 'Profile photo updated successfully!',
-            'Failed to update profile photo.');
-        break;
-      case 'choose_cover_photo':
-        var result = await updateSupervisorCoverPhoto();
-        _showSnackBar(context, result, 'Cover photo updated successfully!',
-            'Failed to update cover photo.');
-        break;
+    try {
+      switch (value) {
+        case 'view_profile_photo':
+          if (currentSupervisor?.photoUrl != null) {
+            _showImageDialog(
+                context, currentSupervisor!.photoUrl!, 'Profile Photo');
+          }
+          break;
+        case 'view_cover_photo':
+          if (currentSupervisor?.coverPhotoUrl != null) {
+            _showImageDialog(
+                context, currentSupervisor!.coverPhotoUrl!, 'Cover Photo');
+          }
+          break;
+        case 'choose_profile_photo':
+          var result = await updateSupervisorProfileImage();
+          _showSnackBar(context, result, 'Profile photo updated successfully!',
+              'Failed to update profile photo.');
+          break;
+        case 'choose_cover_photo':
+          var result = await updateSupervisorCoverPhoto();
+          _showSnackBar(context, result, 'Cover photo updated successfully!',
+              'Failed to update cover photo.');
+          break;
+      }
+    } catch (e) {
+      if (e is CustomException) {
+        _showSnackBar(context, false, '', e.toString());
+      } else {
+        _showSnackBar(context, false, '', 'An unexpected error occurred.');
+      }
     }
   }
 

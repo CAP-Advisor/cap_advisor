@@ -4,8 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/final_feedback_model.dart';
 import '../model/student_model.dart';
+import '../model/student_position_search_model.dart';
 
 class StudentFirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -13,7 +15,6 @@ class StudentFirebaseService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
   final storage = const FlutterSecureStorage();
-
   User? get currentUser => _auth.currentUser;
 
   Future<Map<String, dynamic>?> fetchStudentData(String? userId) async {
@@ -127,21 +128,20 @@ class StudentFirebaseService {
   }
 
   Future<String?> uploadImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      File file = File(image.path);
-      String filePath =
-          'supervisors/${FirebaseAuth.instance.currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch.toString()}.png';
-      try {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        File file = File(image.path);
+        String filePath =
+            'student/${FirebaseAuth.instance.currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch.toString()}.png';
         TaskSnapshot task = await _storage.ref(filePath).putFile(file);
         String imageUrl = await task.ref.getDownloadURL();
         return imageUrl;
-      } catch (e) {
-        print('Failed to upload image: $e');
-        return null;
+      } else {
+        throw CustomException("Image upload cancelled.");
       }
-    } else {
-      return null;
+    } catch (e) {
+      throw CustomException("Failed to upload image: $e");
     }
   }
 
@@ -171,8 +171,7 @@ class StudentFirebaseService {
         return true;
       }
     } catch (e) {
-      print("Error updating profile image: $e");
-      return false;
+      throw CustomException("Error updating profile image: $e");
     }
   }
 
@@ -199,8 +198,7 @@ class StudentFirebaseService {
         return false;
       }
     } catch (e) {
-      print("Error updating cover photo: $e");
-      return false;
+      throw CustomException("Error updating cover photo: $e");
     }
   }
 
@@ -229,18 +227,17 @@ class StudentFirebaseService {
             .map((doc) => FinalTraining.fromDocument(doc))
             .toList();
       } else {
-        return [];
+        throw CustomException("No training data found for email: $email");
       }
     } catch (e) {
-      print("Failed to fetch training data: ${e.toString()}");
-      return [];
+      throw CustomException("Failed to fetch training data: $e");
     }
   }
 
   Future<bool> addGithub(String github) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await _firestore
@@ -249,29 +246,27 @@ class StudentFirebaseService {
           .update({'github': github});
       return true;
     } catch (e) {
-      print("Failed to add github link");
-      return false;
+      throw CustomException("Failed to add GitHub link: $e");
     }
   }
 
   Future<bool> addGpa(double gpa) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await _firestore.collection('Student').doc(userId).update({'gpa': gpa});
       return true;
     } catch (e) {
-      print("Failed to add GPA: $e");
-      return false;
+      throw CustomException("Failed to add GPA: $e");
     }
   }
 
   Future<bool> addAddress(String address) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await _firestore
@@ -280,15 +275,14 @@ class StudentFirebaseService {
           .update({'address': address});
       return true;
     } catch (e) {
-      print("Failed to add Address");
-      return false;
+      throw CustomException("Failed to add address: $e");
     }
   }
 
   Future<bool> addExperience(String experience) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await _firestore.collection('Student').doc(userId).update({
@@ -296,15 +290,14 @@ class StudentFirebaseService {
       });
       return true;
     } catch (e) {
-      print("Failed to add experience: $e");
-      return false;
+      throw CustomException("Failed to add experience: $e");
     }
   }
 
   Future<bool> addSkill(String skill) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await _firestore.collection('Student').doc(userId).update({
@@ -312,15 +305,14 @@ class StudentFirebaseService {
       });
       return true;
     } catch (e) {
-      print("Failed to add skill: $e");
-      return false;
+      throw CustomException("Failed to add skill: $e");
     }
   }
 
   Future<bool> addSummary(String summary) async {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await FirebaseFirestore.instance
@@ -329,15 +321,14 @@ class StudentFirebaseService {
           .update({'summary': summary});
       return true;
     } catch (e) {
-      print("Failed to add summary: $e");
-      return false;
+      throw CustomException("Failed to add summary: $e");
     }
   }
 
   Future<bool> addMajor(String major) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await FirebaseFirestore.instance
@@ -346,15 +337,14 @@ class StudentFirebaseService {
           .update({'additionalInfo': major});
       return true;
     } catch (e) {
-      print("Failed to add major");
-      return false;
+      throw CustomException("Failed to add major: $e");
     }
   }
 
   Future<bool> addCompany(String company) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await FirebaseFirestore.instance
@@ -363,15 +353,14 @@ class StudentFirebaseService {
           .update({'company': company});
       return true;
     } catch (e) {
-      print("Failed to add company");
-      return false;
+      throw CustomException("Failed to add company: $e");
     }
   }
 
   Future<bool> addTraining(String training) async {
     String? userId = _auth.currentUser?.uid;
     if (userId == null) {
-      return false;
+      throw CustomException("User is not logged in");
     }
     try {
       await FirebaseFirestore.instance
@@ -380,8 +369,63 @@ class StudentFirebaseService {
           .update({'training': training});
       return true;
     } catch (e) {
-      print("Failed to add training");
-      return false;
+      throw CustomException("Failed to add training: $e");
     }
+  }
+
+  Future<List<StudentPositionSearchModel>> fetchPositions() async {
+    try {
+      QuerySnapshot jobSnapshot =
+          await _firestore.collection('Job Position').get();
+      QuerySnapshot trainingSnapshot =
+          await _firestore.collection('Training Position').get();
+
+      List<StudentPositionSearchModel> jobPositions =
+          jobSnapshot.docs.map((doc) {
+        return StudentPositionSearchModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id, 'Job Position');
+      }).toList();
+
+      List<StudentPositionSearchModel> trainingPositions =
+          trainingSnapshot.docs.map((doc) {
+        return StudentPositionSearchModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id, 'Training Position');
+      }).toList();
+
+      List<StudentPositionSearchModel> positions = [
+        ...jobPositions,
+        ...trainingPositions
+      ];
+
+      return positions;
+    } catch (e) {
+      throw CustomException("Error fetching positions: $e");
+    }
+  }
+
+  Future<void> applyForPosition(String positionId, String studentId) async {
+    bool applied =
+        await _applyToCollection('Job Position', positionId, studentId);
+    if (!applied) {
+      await _applyToCollection('Training Position', positionId, studentId);
+    }
+  }
+
+  Future<bool> _applyToCollection(
+      String collectionName, String positionId, String studentId) async {
+    try {
+      final positionRef = _firestore.collection(collectionName).doc(positionId);
+      DocumentSnapshot positionDoc = await positionRef.get();
+
+      if (positionDoc.exists) {
+        await positionRef.update({
+          'studentApplicantsList': FieldValue.arrayUnion([studentId])
+        });
+        return true;
+      }
+    } catch (e) {
+      throw CustomException("Error applying to $collectionName: $e");
+    }
+    return false;
   }
 }

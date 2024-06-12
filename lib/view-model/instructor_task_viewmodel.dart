@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../exceptions/custom_exception.dart';
 import '../service/student_firebase_service.dart';
 
 class InstructorTasksViewModel extends ChangeNotifier {
@@ -43,6 +44,9 @@ class InstructorTasksViewModel extends ChangeNotifier {
     } catch (e) {
       print("Error fetching tasks: $e");
       _allTasks = [];
+      throw CustomException("Error fetching tasks: $e");
+    } finally {
+      isLoading = false;
       notifyListeners();
     }
   }
@@ -57,6 +61,7 @@ class InstructorTasksViewModel extends ChangeNotifier {
     } catch (e) {
       error = "Error fetching tasks: $e";
       _allTasks = [];
+      throw CustomException("Error fetching tasks for specific student: $e");
     } finally {
       isLoading = false;
       notifyListeners();

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../exceptions/custom_exception.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -25,12 +26,10 @@ class FirebaseService {
         print('Generated Custom Token: $customToken');
         return customToken;
       } else {
-        print('User is not signed in.');
-        return null;
+        throw CustomException('User is not signed in.');
       }
     } catch (e) {
-      print('Error generating custom token: $e');
-      return null;
+      throw CustomException('Error generating custom token: $e');
     }
   }
 
@@ -44,16 +43,15 @@ class FirebaseService {
           print('Custom token verified successfully');
           return true;
         } else {
-          print('Error verifying custom token: User not authenticated');
-          return false;
+          throw CustomException(
+              'Error verifying custom token: User not authenticated');
         }
       } else {
-        print('Error verifying custom token: User not authenticated');
-        return false;
+        throw CustomException(
+            'Error verifying custom token: User not authenticated');
       }
     } catch (e) {
-      print('Error verifying custom token: $e');
-      return false;
+      throw CustomException('Error verifying custom token: $e');
     }
   }
 
@@ -61,7 +59,7 @@ class FirebaseService {
     try {
       User? user = _auth.currentUser;
       if (user == null) {
-        throw Exception('User not authenticated');
+        throw CustomException('User not authenticated');
       }
 
       DocumentSnapshot snapshot =
@@ -70,11 +68,10 @@ class FirebaseService {
       if (snapshot.exists) {
         return snapshot.data() as Map<String, dynamic>;
       } else {
-        throw Exception('User data not found');
+        throw CustomException('User data not found');
       }
     } catch (e) {
-      print('Error getting user data from token: $e');
-      return null;
+      throw CustomException('Error getting user data from token: $e');
     }
   }
 
@@ -94,8 +91,7 @@ class FirebaseService {
 
       return user != null;
     } catch (e) {
-      print('Error signing in: $e');
-      return false;
+      throw CustomException('Error signing in: $e');
     }
   }
 
@@ -112,8 +108,7 @@ class FirebaseService {
           .get();
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
-      print('Error checking email existence: $e');
-      return false;
+      throw CustomException('Error checking email existence: $e');
     }
   }
 
@@ -137,7 +132,7 @@ class FirebaseService {
 
       print('User data stored successfully in Firestore');
     } catch (e) {
-      print('Error storing user data: $e');
+      throw CustomException('Error storing user data: $e');
     }
   }
 
@@ -156,11 +151,10 @@ class FirebaseService {
       if (snapshot.exists) {
         return snapshot['password'];
       } else {
-        throw Exception('User not found');
+        throw CustomException('User not found');
       }
     } catch (e) {
-      print('Error getting hashed password: $e');
-      throw Exception('Failed to retrieve hashed password');
+      throw CustomException('Error getting hashed password: $e');
     }
   }
 
@@ -179,15 +173,13 @@ class FirebaseService {
         if (userType != null) {
           return {'userData': userData, 'userType': userType};
         } else {
-          print('User type is null for user: $email');
-          return null;
+          throw CustomException('User type is null for user: $email');
         }
       } else {
-        return null;
+        throw CustomException('No user data found for email: $email');
       }
     } catch (e) {
-      print('Error getting user data: $e');
-      return null;
+      throw CustomException('Error getting user data: $e');
     }
   }
 
@@ -195,7 +187,7 @@ class FirebaseService {
     try {
       String? uid = _auth.currentUser?.uid;
       if (uid == null) {
-        return null;
+        throw CustomException('User not authenticated');
       }
       DocumentSnapshot userDoc =
           await _firestore.collection('Users').doc(uid).get();
@@ -203,11 +195,10 @@ class FirebaseService {
         Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
         return data['userType'];
       } else {
-        return null;
+        throw CustomException('User role not found');
       }
     } catch (e) {
-      print("Error getting user role: $e");
-      return null;
+      throw CustomException("Error getting user role: $e");
     }
   }
 }
@@ -220,10 +211,9 @@ Future<bool> verifyIdToken(String idToken) async {
     if (user != null) {
       return true;
     } else {
-      return false;
+      throw CustomException('User not authenticated');
     }
   } catch (e) {
-    print('Error verifying ID token: $e');
-    return false;
+    throw CustomException('Error verifying ID token: $e');
   }
 }

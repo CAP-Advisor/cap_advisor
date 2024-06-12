@@ -87,7 +87,7 @@ class _JobAndTrainingApplicantsViewState
                   });
                 },
                 items:
-                filterTypes.map<DropdownMenuItem<String>>((String value) {
+                    filterTypes.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -185,9 +185,6 @@ class _JobAndTrainingApplicantsViewState
           onBack: () {
             Navigator.of(context).pop();
           },
-          onNotificationPressed: () {
-            // Handle notifications
-          },
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
           },
@@ -195,104 +192,104 @@ class _JobAndTrainingApplicantsViewState
         body: _isLoading
             ? Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 20),
-              SizedBox(height: 8),
-              /*Text(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 20),
+                    SizedBox(height: 8),
+                    /*Text(
                 "Gain hands-on experience, enhance skills, and contribute to real-world projects in a collaborative environment. Your gateway to growth and innovation in software development.",
                 style: TextStyle(fontSize: 16),
               ),*/
-              SizedBox(height: 16),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Search",
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.filter_alt),
-                    onPressed: () {
-                      _showFilterDialog(context);
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor:  backgroundBoxColor,
-                ),
-                onChanged: _onSearchChanged,
-              ),
-              SizedBox(height: 16),
-              Consumer<JobAndTrainingApplicantsViewModel>(
-                builder: (context, viewModel, child) {
-                  return viewModel.filteredApplicants.isEmpty
-                      ? Text(
-                    "No applicants yet",
-                    style:
-                    TextStyle(fontSize: 18, color: Colors.grey),
-                  )
-                      : ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: viewModel.filteredApplicants.length,
-                    itemBuilder: (context, index) {
-                      final applicant =
-                      viewModel.filteredApplicants[index];
-                      return Card(
-                        key: ValueKey<int>(applicant.hashCode),
-                        color: cardColor,
-                        margin:
-                        const EdgeInsets.symmetric(vertical: 8),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: applicant.photoUrl !=
-                                null
-                                ? NetworkImage(applicant.photoUrl!)
-                                : null,
-                            child: applicant.photoUrl == null
-                                ? Icon(Icons.person)
-                                : null,
-                          ),
-                          title: Text(applicant.name),
-                          subtitle: Text(applicant.email),
-                          trailing: IconButton(
-                            icon: Icon(Icons.more_vert),
-                            onPressed: () {
-                              _showActionSheet(context, index);
-                            },
-                          ),
-                          onTap: () {
-                            // Navigate to the StudentView page when a card is tapped
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => StudentView(
-                                  uid: applicant.uid,
-                                  isHR: true,
-                                ),
-                              ),
-                            );
+                    SizedBox(height: 16),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.filter_alt),
+                          onPressed: () {
+                            _showFilterDialog(context);
                           },
                         ),
-                      );
-                    },
-                  );
-                },
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: backgroundBoxColor,
+                      ),
+                      onChanged: _onSearchChanged,
+                    ),
+                    SizedBox(height: 16),
+                    Consumer<JobAndTrainingApplicantsViewModel>(
+                      builder: (context, viewModel, child) {
+                        return viewModel.filteredApplicants.isEmpty
+                            ? Text(
+                                "No applicants yet",
+                                style:
+                                    TextStyle(fontSize: 18, color: Colors.grey),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: viewModel.filteredApplicants.length,
+                                itemBuilder: (context, index) {
+                                  final applicant =
+                                      viewModel.filteredApplicants[index];
+                                  return Card(
+                                    key: ValueKey<int>(applicant.hashCode),
+                                    color: cardColor,
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: Colors.grey[200],
+                                        backgroundImage: applicant.photoUrl !=
+                                                null
+                                            ? NetworkImage(applicant.photoUrl!)
+                                            : null,
+                                        child: applicant.photoUrl == null
+                                            ? Icon(Icons.person)
+                                            : null,
+                                      ),
+                                      title: Text(applicant.name),
+                                      subtitle: Text(applicant.email),
+                                      trailing: IconButton(
+                                        icon: Icon(Icons.more_vert),
+                                        onPressed: () {
+                                          _showActionSheet(context, index);
+                                        },
+                                      ),
+                                      onTap: () {
+                                        // Navigate to the StudentView page when a card is tapped
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => StudentView(
+                                              uid: applicant.uid,
+                                              isHR: true,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Colors.white,
           selectedItemColor: bottomNavbarColor,
@@ -309,7 +306,8 @@ class _JobAndTrainingApplicantsViewState
               case 1:
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => StudentSearchScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => StudentSearchScreen()),
                 );
                 break;
             }

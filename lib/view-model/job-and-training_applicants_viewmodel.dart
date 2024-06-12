@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../exceptions/custom_exception.dart';
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
 import '../service/hr_firebase_serviece.dart';
@@ -120,17 +121,14 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
     final selectedSupervisor = await _showSupervisorSelectionDialog(context);
     if (selectedSupervisor != null) {
       try {
-        // Remove the applicant immediately from the list
         filteredApplicants.removeAt(index);
         notifyListeners();
 
-        // Perform async operations
         await _hrfirebaseService.assignStudentToSupervisor(
             student.uid, selectedSupervisor);
         await _updateApplicantInCollection('Job Position', student.uid);
         await _updateApplicantInCollection('Training Position', student.uid);
 
-        // Send notification
         final url = Uri.parse(
             'https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
         final response = await http.post(
@@ -142,23 +140,23 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
             'message': 'Congratulations! Your application has been approved.',
           }),
         );
-        if (response.statusCode == 200) {
-          print('Notification sent successfully');
+        if (response.statusCode != 200) {
+          throw CustomException(
+              'Failed to send notification: ${response.body}');
         } else {
           print('Failed to send notification: ${response.body}');
         }
       } catch (e) {
         print("Failed to approve applicant: $e");
-        // If an error occurs, you might want to add the applicant back to the list
         filteredApplicants.insert(index, student);
         notifyListeners();
+        throw CustomException("Failed to approve applicant: $e");
       }
     }
   }
 
   Future<void> rejectApplicant(int index) async {
     final student = filteredApplicants[index];
-    // Remove the applicant immediately from the list
     filteredApplicants.removeAt(index);
     notifyListeners();
 
@@ -178,16 +176,16 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
               'We regret to inform you that your application has been rejected.',
         }),
       );
-      if (response.statusCode == 200) {
-        print('Notification sent successfully');
+      if (response.statusCode != 200) {
+        throw CustomException('Failed to send notification: ${response.body}');
       } else {
         print('Failed to send notification: ${response.body}');
       }
     } catch (e) {
       print("Failed to reject applicant: $e");
-      // If an error occurs, you might want to add the applicant back to the list
       filteredApplicants.insert(index, student);
       notifyListeners();
+      throw CustomException("Failed to reject applicant: $e");
     }
   }
 
@@ -202,9 +200,9 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print("Failed to assign student to supervisor: $e");
-      // If an error occurs, you might want to add the applicant back to the list
       filteredApplicants.insert(applicantIndex, student);
       notifyListeners();
+      throw CustomException("Failed to assign student to supervisor: $e");
     }
   }
 
