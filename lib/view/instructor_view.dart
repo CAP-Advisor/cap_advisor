@@ -125,6 +125,7 @@ class InstructorView extends StatelessWidget {
                                                     StudentView(
                                                   uid: student.uid,
                                                   isInstructor: !isStudent,
+                                                  isStudentView: true,
                                                 ),
                                               ),
                                             );

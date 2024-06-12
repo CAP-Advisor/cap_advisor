@@ -19,6 +19,12 @@ class AssigningInstructorView extends StatelessWidget {
       child: Scaffold(
         appBar: CustomAppBar(
           title: 'Assign Instructor',
+          onBack: () {
+            Navigator.of(context).pop();
+          },
+          onJobPressed: () {
+            Navigator.of(context).pushNamed('/student-position-search');
+          },
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
           },
