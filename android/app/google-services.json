@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1076600979829",
+    "project_id": "cap-advisor-a1c2d",
+    "storage_bucket": "cap-advisor-a1c2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1076600979829:android:eaa83474f8326c47b2933c",
+        "android_client_info": {
+          "package_name": "com.cap_advisor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQYRsFz0D1RzD693QMsmkzA645-pSQ1_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
