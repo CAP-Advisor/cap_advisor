@@ -11,6 +11,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isInstructor;
   final bool isSupervisor;
   final bool isHR;
+  final bool isStudentView;
+
+  static const IconData customJobIcon = IconData(0xf11a, fontFamily: 'MaterialIcons');
 
   const CustomAppBar({
     Key? key,
@@ -23,10 +26,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.isInstructor = false,
     this.isSupervisor = false,
     this.isHR = false,
+    this.isStudentView = false,
   }) : super(key: key);
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+
   @override
   Widget build(BuildContext context) {
     List<Widget> actions = [];
@@ -53,7 +58,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (onJobPressed != null) {
       actions.add(
         IconButton(
-          icon: Icon(IconData(0xf11a, fontFamily: 'MaterialIcons')),
+          icon: Icon(customJobIcon),
           onPressed: onJobPressed!,
           color: Colors.white,
         ),
@@ -72,10 +77,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: secondaryColor,
       leading: onBack != null
           ? IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: onBack,
-              color: Colors.white,
-            )
+        icon: Icon(Icons.arrow_back),
+        onPressed: onBack,
+        color: Colors.white,
+      )
           : null,
       title: Text(
         title,

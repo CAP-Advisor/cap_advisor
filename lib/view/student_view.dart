@@ -12,6 +12,7 @@ class StudentView extends StatelessWidget {
   final bool isSupervisor;
   final bool isInstructor;
   final bool isHR;
+  final bool isStudentView;
 
   StudentView({
     Key? key,
@@ -19,6 +20,7 @@ class StudentView extends StatelessWidget {
     this.isSupervisor = false,
     this.isInstructor = false,
     this.isHR = false,
+    this.isStudentView = false,
   }) : super(key: key);
 
   final TextEditingController _nameController = TextEditingController();
@@ -33,7 +35,7 @@ class StudentView extends StatelessWidget {
           return Scaffold(
             appBar: CustomAppBar(
               title: "CAP Advisor",
-              onBack: (isSupervisor || isInstructor || isHR)
+              onBack: (isSupervisor || isInstructor || isHR || isStudentView)
                   ? () {
                 Navigator.of(context).pop();
               }
@@ -51,6 +53,7 @@ class StudentView extends StatelessWidget {
               },
               isHR: isHR,
               isInstructor: isInstructor,
+              isStudentView: isStudentView,
               onJobPressed: !isSupervisor && !isInstructor && !isHR
                   ? () {
                 Navigator.of(context)
@@ -68,7 +71,7 @@ class StudentView extends StatelessWidget {
                 children: <Widget>[
                   _buildProfileHeader(context, model),
                   SizedBox(height: 60),
-                  if (!isSupervisor && !isInstructor && !isHR)
+                  if (!isSupervisor && !isInstructor && !isHR && !isStudentView)
                     Align(
                       alignment: Alignment.centerRight,
                       child: Padding(
@@ -128,7 +131,7 @@ class StudentView extends StatelessWidget {
                 : null,
           ),
         ),
-        if (!isSupervisor && !isInstructor && !isHR)
+        if (!isSupervisor && !isInstructor && !isHR && !isStudentView)
           Positioned(
               right: 16,
               bottom: 16,
@@ -175,7 +178,7 @@ class StudentView extends StatelessWidget {
         children: [
           Text(student.name,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-          if (!isSupervisor && !isInstructor && !isHR)
+          if (!isSupervisor && !isInstructor && !isHR && !isStudentView)
             IconButton(
               icon: Icon(Icons.edit, color: Colors.black),
               onPressed: () => _showNameDialog(context, viewModel),
