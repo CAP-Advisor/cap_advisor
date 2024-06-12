@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cap_advisor/exceptions/custom_exception.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -41,8 +42,7 @@ class SupervisorFirebaseService {
       }
       return students;
     } catch (e) {
-      print('Error fetching students: $e');
-      return [];
+      throw CustomException('Error fetching students: $e');
     }
   }
 
@@ -53,21 +53,20 @@ class SupervisorFirebaseService {
           .where('email', isEqualTo: email)
           .get();
       if (querySnapshot.docs.isEmpty) {
-        print('No supervisor found for email: $email');
-        return null;
+        throw CustomException('No supervisor found for email: $email');
       } else {
         var data = querySnapshot.docs.first.data() as Map<String, dynamic>;
         print('Fetched supervisor data for email $email: $data');
         if (data['name'] != null && data['email'] != null) {
           return data;
         } else {
-          print('Data is missing critical fields for email: $email');
-          return null;
+          throw CustomException(
+              'Data is missing critical fields for email: $email');
         }
       }
     } catch (e) {
-      print('Error getting supervisor data for email $email: $e');
-      return null;
+      throw CustomException(
+          'Error getting supervisor data for email $email: $e');
     }
   }
 
@@ -83,31 +82,29 @@ class SupervisorFirebaseService {
         print("Updated supervisor name for email $email to $newName");
         return true;
       } else {
-        print("No supervisor found with email $email to update");
-        return false;
+        throw CustomException(
+            'No supervisor found with email $email to update');
       }
     } catch (e) {
-      print("Error updating supervisor name by email: $e");
-      return false;
+      throw CustomException('Error updating supervisor name by email: $e');
     }
   }
 
   Future<String?> uploadImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      File file = File(image.path);
-      String filePath =
-          'supervisors/${FirebaseAuth.instance.currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch.toString()}.png';
-      try {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        File file = File(image.path);
+        String filePath =
+            'supervisor/${FirebaseAuth.instance.currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch.toString()}.png';
         TaskSnapshot task = await _storage.ref(filePath).putFile(file);
         String imageUrl = await task.ref.getDownloadURL();
         return imageUrl;
-      } catch (e) {
-        print('Failed to upload image: $e');
-        return null;
+      } else {
+        throw CustomException("Image upload cancelled.");
       }
-    } else {
-      return null;
+    } catch (e) {
+      throw CustomException("Failed to upload image: $e");
     }
   }
 
@@ -116,8 +113,7 @@ class SupervisorFirebaseService {
       DocumentSnapshot supervisorSnapshot =
           await _firestore.collection('Supervisor').doc(supervisorId).get();
       if (!supervisorSnapshot.exists) {
-        print('Supervisor not found');
-        return [];
+        throw CustomException('Supervisor not found');
       } else {
         print('Fetched supervisor data for email ${supervisorSnapshot.data()}');
       }
@@ -130,8 +126,7 @@ class SupervisorFirebaseService {
           querySnapshot.docs.map((doc) => Student.fromFirestore(doc)).toList();
       return students;
     } catch (e) {
-      print('Error fetching students: $e');
-      return [];
+      throw CustomException('Error fetching students: $e');
     }
   }
 
@@ -161,8 +156,7 @@ class SupervisorFirebaseService {
         return true;
       }
     } catch (e) {
-      print("Error updating profile image: $e");
-      return false;
+      throw CustomException("Error updating profile image: $e");
     }
   }
 
@@ -189,8 +183,7 @@ class SupervisorFirebaseService {
         return false;
       }
     } catch (e) {
-      print("Error updating cover photo: $e");
-      return false;
+      throw CustomException("Error updating cover photo: $e");
     }
   }
 
@@ -210,8 +203,7 @@ class SupervisorFirebaseService {
 
       print('Feedback added successfully');
     } catch (error) {
-      print("Error adding feedback: $error");
-      throw error;
+      throw CustomException("Error adding feedback: $error");
     }
   }
 
@@ -225,8 +217,7 @@ class SupervisorFirebaseService {
       await studentRef.collection('Task').add(taskData);
       print('Task added successfully');
     } catch (error) {
-      print("Error adding Task: $error");
-      throw error;
+      throw CustomException("Error adding Task: $error");
     }
   }
 }

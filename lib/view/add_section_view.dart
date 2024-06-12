@@ -21,7 +21,6 @@ class SectionView extends StatelessWidget {
             appBar: CustomAppBar(
               title: "Add Section",
               onBack: () => Navigator.of(context).pop(),
-              onNotificationPressed: () {},
               onJobPressed: () {},
               onMenuPressed: () => Navigator.of(context).pushNamed('/menu'),
             ),

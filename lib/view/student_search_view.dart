@@ -33,9 +33,6 @@ class StudentSearchScreen extends StatelessWidget {
                 ),
               );
             },
-            onNotificationPressed: () {
-              // Handle notification pressed
-            },
             onMenuPressed: () {
               Navigator.of(context).pushNamed('/menu');
             },
@@ -98,8 +95,7 @@ class StudentSearchScreen extends StatelessWidget {
                                   vertical: 8, horizontal: 10),
                               decoration: BoxDecoration(
                                 color: cardColor,
-                                borderRadius: BorderRadius.circular(
-                                    10),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: ListTile(
                                 onTap: () {

@@ -1,6 +1,8 @@
 import 'package:cap_advisor/model/post_position_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../exceptions/custom_exception.dart';
+
 class PostPositionViewModel {
   PostPositionModel model = PostPositionModel();
 
@@ -48,8 +50,7 @@ class PostPositionViewModel {
       model.positionDescription = '';
       model.skillList = [];
     } catch (error) {
-      print('Failed to save position: $error');
-      rethrow;
+      throw CustomException('Failed to save position: $error');
     }
   }
 

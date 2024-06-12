@@ -18,8 +18,8 @@ class StudentTasksView extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: "Tasks",
-        onNotificationPressed: () {
-          // Add functionality for notification pressed
+        onJobPressed: () {
+          Navigator.of(context).pushNamed('/student-position-search');
         },
         onMenuPressed: () {
           Navigator.of(context).pushNamed('/menu');
@@ -27,6 +27,7 @@ class StudentTasksView extends StatelessWidget {
         onBack: () {
           Navigator.of(context).pop();
         },
+
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../exceptions/custom_exception.dart';
 import '../service/firebase_service.dart';
 import '../view/HR_view.dart';
 import '../view/change_password_view.dart';
@@ -85,7 +86,7 @@ class MenuViewModel extends ChangeNotifier {
                 FirebaseAuth.instance.signOut().then((_) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => LoginView()),
-                        (Route<dynamic> route) => false,
+                    (Route<dynamic> route) => false,
                   );
                 });
               },
@@ -132,12 +133,16 @@ class MenuViewModel extends ChangeNotifier {
           MaterialPageRoute(builder: (context) => LoginView()),
           (Route<dynamic> route) => false,
         );
+      } else {
+        throw CustomException("User not logged in");
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
-        print(
-            'Please re-login to confirm your identity and delete your account.');
+      } else {
+        throw CustomException("Error deleting user account: $e");
       }
+    } catch (e) {
+      throw CustomException("Error deleting user account: $e");
     }
   }
 }

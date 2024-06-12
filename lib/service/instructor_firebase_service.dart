@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/instructor_model.dart';
 import '../model/student_model.dart';
 
@@ -36,7 +37,7 @@ class InstructorFirebaseService {
         return Instructor.fromFirestore(doc);
       }
     } catch (e) {
-      throw Exception("Failed to fetch data: ${e.toString()}");
+      throw CustomException("Failed to fetch HR data: $e");
     }
   }
 
@@ -67,8 +68,7 @@ class InstructorFirebaseService {
           .get();
 
       if (instructorQuery.docs.isEmpty) {
-        print('Instructor not found');
-        return [];
+        throw CustomException('Instructor not found');
       }
 
       DocumentSnapshot instructorSnapshot = instructorQuery.docs.first;
@@ -76,34 +76,32 @@ class InstructorFirebaseService {
       List<Student> students = [];
       for (String studentId in studentRefs) {
         DocumentSnapshot studentSnapshot =
-        await _firestore.collection('Student').doc(studentId).get();
+            await _firestore.collection('Student').doc(studentId).get();
         if (studentSnapshot.exists) {
           students.add(Student.fromFirestore(studentSnapshot));
         }
       }
       return students;
     } catch (e) {
-      print('Error fetching students: $e');
-      return [];
+      throw CustomException('Error fetching students: $e');
     }
   }
 
   Future<String?> uploadImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      File file = File(image.path);
-      String filePath =
-          'supervisors/${FirebaseAuth.instance.currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch.toString()}.png';
-      try {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        File file = File(image.path);
+        String filePath =
+            'instructor/${FirebaseAuth.instance.currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch.toString()}.png';
         TaskSnapshot task = await _storage.ref(filePath).putFile(file);
         String imageUrl = await task.ref.getDownloadURL();
         return imageUrl;
-      } catch (e) {
-        print('Failed to upload image: $e');
-        return null;
+      } else {
+        throw CustomException("Image upload cancelled.");
       }
-    } else {
-      return null;
+    } catch (e) {
+      throw CustomException("Failed to upload image: $e");
     }
   }
 
@@ -117,7 +115,7 @@ class InstructorFirebaseService {
 
       String userId = _auth.currentUser!.uid;
       DocumentReference instructorRef =
-      _firestore.collection('Instructor').doc(userId);
+          _firestore.collection('Instructor').doc(userId);
 
       DocumentSnapshot instructorSnapshot = await instructorRef.get();
 
@@ -133,8 +131,7 @@ class InstructorFirebaseService {
         return true;
       }
     } catch (e) {
-      print("Error updating profile image: $e");
-      return false;
+      throw CustomException("Error updating profile image: $e");
     }
   }
 
@@ -148,7 +145,7 @@ class InstructorFirebaseService {
 
       String userId = _auth.currentUser!.uid;
       DocumentReference instructorRef =
-      _firestore.collection('Instructor').doc(userId);
+          _firestore.collection('Instructor').doc(userId);
 
       DocumentSnapshot instructorSnapshot = await instructorRef.get();
 
@@ -161,8 +158,7 @@ class InstructorFirebaseService {
         return false;
       }
     } catch (e) {
-      print("Error updating cover photo: $e");
-      return false;
+      throw CustomException("Error updating cover photo: $e");
     }
   }
 }

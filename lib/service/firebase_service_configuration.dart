@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 
-class FirebaseService {
+class FirebaseServices {
   static Future initialize() async {
     await Firebase.initializeApp(
       options: const FirebaseOptions(

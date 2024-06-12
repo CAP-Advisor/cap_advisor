@@ -82,11 +82,11 @@ class _StudentPositionSearchViewState extends State<StudentPositionSearchView> {
       child: Scaffold(
         appBar: CustomAppBar(
           title: "Position Search",
+          onJobPressed: () {
+            Navigator.of(context).pushNamed('/student-position-search');
+          },
           onBack: () {
             Navigator.of(context).pop();
-          },
-          onNotificationPressed: () {
-            // Handle notification pressed
           },
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');

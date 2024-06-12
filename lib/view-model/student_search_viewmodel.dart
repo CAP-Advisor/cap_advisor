@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/student_model.dart';
 import '../service/student_firebase_service.dart';
 
@@ -32,14 +33,12 @@ class StudentViewModel extends ChangeNotifier {
       final addressMatches = address == null ||
           student.address.toLowerCase() == address.toLowerCase();
 
-      // Check if the student has at least one of the selected skills
       final skillsMatches = skills == null ||
           student.skills != null &&
               student.skills!.isNotEmpty &&
               skills.any(
                   (skill) => student.skills!.contains(skill.toLowerCase()));
 
-      // Check if the student's GPA matches the provided GPA range (if gpa is not null)
       final gpaMatches = gpa == null ||
           (student.gpa != null &&
               student.gpa! >= gpa - 0.1 &&
@@ -63,14 +62,13 @@ class StudentViewModel extends ChangeNotifier {
 
       debugPrint('Fetched students: $students');
 
-      // Cast the students to a list of `Student` objects
       _students = students.cast<Student>();
 
       debugPrint('Cast students: $_students');
 
       notifyListeners();
     } catch (e) {
-      debugPrint('Error fetching or casting students: $e');
+      throw CustomException('Error fetching or casting students: $e');
     }
   }
 }

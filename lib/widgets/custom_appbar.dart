@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBack;
-  final VoidCallback onNotificationPressed;
   final VoidCallback onMenuPressed;
   final VoidCallback? onFeedback;
   final VoidCallback? onJobPressed;
   final bool isInstructor;
   final bool isSupervisor;
   final bool isHR;
+  final bool isStudentView;
+
+  static const IconData customJobIcon = IconData(0xf11a, fontFamily: 'MaterialIcons');
 
   static const IconData customJobIcon = IconData(0xf11a, fontFamily: 'MaterialIcons');
 
@@ -19,11 +21,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.onFeedback,
     this.onJobPressed,
-    required this.onNotificationPressed,
     required this.onMenuPressed,
     this.isInstructor = false,
     this.isSupervisor = false,
     this.isHR = false,
+    this.isStudentView = false,
   }) : super(key: key);
 
   @override
@@ -32,14 +34,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> actions = [];
-
-    actions.add(
-      IconButton(
-        icon: Icon(Icons.notifications),
-        onPressed: onNotificationPressed,
-        color: Colors.white,
-      ),
-    );
 
     if (onFeedback != null) {
       actions.add(

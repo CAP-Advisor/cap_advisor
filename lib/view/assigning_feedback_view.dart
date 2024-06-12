@@ -19,7 +19,6 @@ class _AssigningFeedbackViewState extends State<AssigningFeedbackView> {
       child: Scaffold(
         appBar: CustomAppBar(
           title: "Feedback",
-          onNotificationPressed: () {},
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
           },
@@ -60,8 +59,10 @@ class _AssigningFeedbackViewState extends State<AssigningFeedbackView> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  StudentView( uid:feedback.uid,isSupervisor: true,),
+                              builder: (context) => StudentView(
+                                uid: feedback.uid,
+                                isSupervisor: true,
+                              ),
                             ),
                           );
                         },
