@@ -13,8 +13,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   static const IconData customJobIcon = IconData(0xf11a, fontFamily: 'MaterialIcons');
 
-  static const IconData customJobIcon = IconData(0xf11a, fontFamily: 'MaterialIcons');
-
   const CustomAppBar({
     Key? key,
     required this.title,
