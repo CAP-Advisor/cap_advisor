@@ -18,12 +18,16 @@ class StudentTasksView extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: "Tasks",
+        onJobPressed: () {
+          Navigator.of(context).pushNamed('/student-position-search');
+        },
         onMenuPressed: () {
           Navigator.of(context).pushNamed('/menu');
         },
         onBack: () {
           Navigator.of(context).pop();
         },
+
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
