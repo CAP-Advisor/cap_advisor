@@ -1,5 +1,6 @@
 import 'package:cap_advisor/model/student_model.dart';
 import 'package:flutter/material.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/final_feedback_model.dart';
 import '../service/student_firebase_service.dart';
 
@@ -38,12 +39,13 @@ class StudentViewModel with ChangeNotifier {
     try {
       currentStudent = await _firebaseService.getStudentDataByEmail();
       if (currentStudent == null) {
-        error = "No student data available.";
+        throw CustomException("No student data available.");
       } else {
         fetchTrainingDataByEmail(currentStudent!.email);
       }
     } catch (e) {
-      error = e.toString();
+      error = e is CustomException ? e.message : e.toString();
+      throw CustomException("Failed to fetch student data by email: $error");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -57,12 +59,14 @@ class StudentViewModel with ChangeNotifier {
     try {
       currentStudent = await _firebaseService.getStudentDataByUid(uid);
       if (currentStudent == null) {
-        error = "No student data available for the uid $uid.";
+        throw CustomException("No student data available for the uid $uid.");
+        ;
       } else {
         fetchTrainingDataByEmail(currentStudent!.email);
       }
     } catch (e) {
-      error = e.toString();
+      error = e is CustomException ? e.message : e.toString();
+      throw CustomException("Failed to fetch student data by UID: $error");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -71,8 +75,7 @@ class StudentViewModel with ChangeNotifier {
 
   Future<bool> updateStudentName(String newName) async {
     if (currentStudent?.email == null) {
-      print("No email available for the current student.");
-      return false;
+      throw CustomException("No email available for the current student.");
     }
     bool updateResult = await _firebaseService.updateStudentName(
         currentStudent!.email, newName);
@@ -82,29 +85,36 @@ class StudentViewModel with ChangeNotifier {
       notifyListeners();
       return true;
     } else {
-      print("Failed to update name.");
-      return false;
+      throw CustomException("Failed to update name.");
     }
   }
 
   Future<bool> updateStudentProfileImage() async {
-    bool result = await _firebaseService.updateStudentProfileImage();
-    if (result) {
+    try {
+      bool result = await _firebaseService.updateStudentProfileImage();
+      if (!result) {
+        throw CustomException("Failed to update profile image.");
+      }
       print("Profile image updated successfully.");
-    } else {
-      print("Failed to update profile image.");
+      return result;
+    } catch (e) {
+      error = e is CustomException ? e.message : e.toString();
+      throw CustomException("Failed to update profile image: $error");
     }
-    return result;
   }
 
   Future<bool> updateStudentCoverPhoto() async {
-    bool result = await _firebaseService.updateStudentCoverPhoto();
-    if (result) {
+    try {
+      bool result = await _firebaseService.updateStudentCoverPhoto();
+      if (!result) {
+        throw CustomException("Failed to update cover photo.");
+      }
       print("Cover photo updated successfully.");
-    } else {
-      print("Failed to update cover photo.");
+      return result;
+    } catch (e) {
+      error = e is CustomException ? e.message : e.toString();
+      throw CustomException("Failed to update cover photo: $error");
     }
-    return result;
   }
 
   Future<void> handleProfileAction(BuildContext context, String value) async {
@@ -174,6 +184,7 @@ class StudentViewModel with ChangeNotifier {
       print('Fetched ${trainings.length} training records.');
     } catch (e) {
       error = "Failed to fetch training data: ${e.toString()}";
+      throw CustomException(error!);
     } finally {
       isLoading = false;
       notifyListeners();

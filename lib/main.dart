@@ -38,7 +38,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseServices.initialize();
 
@@ -70,15 +69,12 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    if (kDebugMode) {
-
-    }
+    if (kDebugMode) {}
     print('Handling a foreground message: ${message.messageId}');
     print('Message data: ${message.data}');
     print('Message notification: ${message.notification?.title}');
     print('Message notification: ${message.notification?.body}');
     _showToast(message);
-
   });
   bool isAuthenticated = user != null;
 
@@ -95,7 +91,6 @@ void main() async {
   runApp(MyApp(
     isAuthenticated: isAuthenticated,
     userType: userType,
-
   ));
 }
 
@@ -125,14 +120,14 @@ class MyApp extends StatelessWidget {
           '/SignUp': (context) => SignUpView(),
           '/HR': (context) => HRView(uid: ''),
           '/Supervisor': (context) => SupervisorView(
-            uid: '',
-          ),
+                uid: '',
+              ),
           '/Instructor': (context) => InstructorView(
-            uid: '',
-          ),
+                uid: '',
+              ),
           '/Student': (context) => StudentView(
-            uid: '',
-          ),
+                uid: '',
+              ),
           '/home': (context) => HomeView(),
           '/job-and-training-posting': (context) => PostPositionView(),
           '/menu': (context) => MenuView(),
@@ -153,11 +148,11 @@ class MyApp extends StatelessWidget {
 
 void _showToast(RemoteMessage message) {
   Fluttertoast.showToast(
-    msg: "${message.notification?.title ?? "Notification"}: ${message.notification?.body ?? "No body"}",
+    msg:
+        "${message.notification?.title ?? "Notification"}: ${message.notification?.body ?? "No body"}",
     toastLength: Toast.LENGTH_LONG,
     gravity: ToastGravity.BOTTOM,
     timeInSecForIosWeb: 1,
-
     backgroundColor: Colors.black54,
     textColor: Colors.white,
     fontSize: 16.0,

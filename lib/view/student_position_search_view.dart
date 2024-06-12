@@ -85,9 +85,6 @@ class _StudentPositionSearchViewState extends State<StudentPositionSearchView> {
           onBack: () {
             Navigator.of(context).pop();
           },
-          onNotificationPressed: () {
-            // Handle notification pressed
-          },
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
           },

@@ -5,6 +5,7 @@ import 'package:cap_advisor/utils/validation_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../exceptions/custom_exception.dart';
 import '../service/firebase_service.dart';
 import '../view/login_view.dart';
 
@@ -40,8 +41,7 @@ class LoginViewModel {
       bool isLoginSuccessful =
           await _firebaseService.signInWithEmailAndPassword(email, password);
       if (!isLoginSuccessful) {
-        print('Authentication failed');
-        return null;
+        throw CustomException('Authentication failed');
       }
 
       User? user = FirebaseAuth.instance.currentUser;
@@ -62,13 +62,15 @@ class LoginViewModel {
             await storage.delete(key: 'password');
           }
           return userObj;
+        } else {
+          throw CustomException('Failed to retrieve token');
         }
+      } else {
+        throw CustomException('User not found');
       }
-
-      return userObj;
     } catch (e) {
       print('Error during login: $e');
-      return null;
+      throw CustomException('Error during login: $e');
     }
   }
 

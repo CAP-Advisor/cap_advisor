@@ -110,9 +110,6 @@ class _PostPositionViewState extends State<PostPositionView> {
             ),
           );
         },
-        onNotificationPressed: () {
-          // Handle notification button press
-        },
         onMenuPressed: () {
           Navigator.of(context).pushNamed('/menu');
         },

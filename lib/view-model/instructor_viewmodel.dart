@@ -1,12 +1,13 @@
 import 'package:cap_advisor/model/instructor_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/student_model.dart';
 import '../service/instructor_firebase_service.dart';
 
 class InstructorViewModel with ChangeNotifier {
   final InstructorFirebaseService _firebaseService =
-  InstructorFirebaseService();
+      InstructorFirebaseService();
   TextEditingController searchController = TextEditingController();
   bool isLoading = false;
   String? error;
@@ -17,7 +18,6 @@ class InstructorViewModel with ChangeNotifier {
   String? get instructorPhotoUrl => currentInstructor?.photoUrl;
   List<Student> students = [];
   List<Student> filteredStudents = [];
-
 
   InstructorViewModel(this.uid) {
     print("InstructorViewModel initialized with uid: $uid");
@@ -44,17 +44,15 @@ class InstructorViewModel with ChangeNotifier {
           "Fetching students for instructor email: ${currentInstructor!.email}");
       students = await _firebaseService
           .fetchStudentsForInstructor(currentInstructor!.email);
-      print(
-          "Number of students fetched: ${students.length}");
+      print("Number of students fetched: ${students.length}");
       filteredStudents = List<Student>.from(students);
       notifyListeners();
     } catch (e) {
-      print("Error in loadStudentsForInstructor: $e");
       error = 'Failed to fetch students: $e';
       notifyListeners();
+      throw CustomException("Failed to fetch students: $e");
     }
   }
-
 
   void filterStudents(String query) {
     if (query.isEmpty) {
@@ -78,14 +76,16 @@ class InstructorViewModel with ChangeNotifier {
       if (user != null) {
         print("Fetching instructor data for email: ${user.email}");
         currentInstructor =
-        await _firebaseService.getInstructorDataByEmail(user.email!);
+            await _firebaseService.getInstructorDataByEmail(user.email!);
       }
       if (currentInstructor == null) {
         error = "No instructor data available.";
+        throw CustomException("No instructor data available.");
       }
     } catch (e) {
-      print("Error in getInstructorDataByUid: $e");
       error = e.toString();
+      notifyListeners();
+      throw CustomException("Error in getInstructorDataByUid: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -100,9 +100,12 @@ class InstructorViewModel with ChangeNotifier {
       currentInstructor = await _firebaseService.getInstructorDataByUid(uid);
       if (currentInstructor == null) {
         error = "No instructor data available for the uid $uid.";
+        throw CustomException("No instructor data available for the uid $uid.");
       }
     } catch (e) {
       error = e.toString();
+      notifyListeners();
+      throw CustomException("Error in getInstructorData: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -112,20 +115,20 @@ class InstructorViewModel with ChangeNotifier {
   Future<void> loadStudentsForInstructor() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null || user.email == null) {
-      print('User not logged in or email is null');
-      return;
+      error = 'User not logged in or email is null';
+      notifyListeners();
+      throw CustomException('User not logged in or email is null');
     }
     try {
       print("Fetching students for instructor email: ${user.email}");
       students = await _firebaseService.fetchStudentsForInstructor(user.email!);
-      print(
-          "Number of students fetched: ${students.length}");
+      print("Number of students fetched: ${students.length}");
       filteredStudents = List<Student>.from(students);
       notifyListeners();
     } catch (e) {
-      print("Error in loadStudentsForInstructor: $e");
       error = 'Failed to fetch students: $e';
       notifyListeners();
+      throw CustomException("Error in loadStudentsForInstructor: $e");
     }
   }
 

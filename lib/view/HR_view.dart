@@ -28,7 +28,6 @@ class _HRViewState extends State<HRView> {
           return Scaffold(
             appBar: CustomAppBar(
               title: "CAP Advisor",
-              onNotificationPressed: () {},
               onMenuPressed: () {
                 Navigator.of(context).pushNamed('/menu');
               },

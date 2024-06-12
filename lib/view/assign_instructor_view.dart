@@ -28,7 +28,6 @@ class AssigningInstructorView extends StatelessWidget {
           onMenuPressed: () {
             Navigator.of(context).pushNamed('/menu');
           },
-          onNotificationPressed: () {},
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

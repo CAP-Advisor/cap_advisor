@@ -2,9 +2,8 @@ import 'package:cap_advisor/resources/colors.dart';
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import '../exceptions/custom_exception.dart';
 import '../model/add_task_model.dart';
-import '../service/firebase_service.dart';
 import 'package:http/http.dart' as http;
 import '../service/supervisor_firebase_service.dart';
 
@@ -23,20 +22,23 @@ class AddTaskViewModel extends ChangeNotifier {
     fetchSupervisorName();
   }
   Future<void> fetchSupervisorName() async {
+    String? supervisorEmail = FirebaseAuth.instance.currentUser?.email;
+    if (supervisorEmail == null) {
+      throw CustomException('Supervisor email is null');
+    }
+
     try {
-      String? supervisorEmail = FirebaseAuth.instance.currentUser?.email;
-      if (supervisorEmail != null) {
-        Map<String, dynamic>? supervisorData = await SupervisorFirebaseService()
-            .getSupervisorData(supervisorEmail);
-        if (supervisorData != null) {
-          supervisorName = supervisorData['name'];
-          print('Supervisor Name: $supervisorName');
-        } else {
-          print('Supervisor data not found');
-        }
+      Map<String, dynamic>? supervisorData =
+          await SupervisorFirebaseService().getSupervisorData(supervisorEmail);
+      if (supervisorData != null) {
+        supervisorName = supervisorData['name'];
+        print('Supervisor Name: $supervisorName');
+      } else {
+        throw CustomException('Supervisor data not found');
       }
     } catch (error) {
       print('Error fetching supervisor name: $error');
+      throw CustomException('Error fetching supervisor name: $error');
     }
   }
 
@@ -71,7 +73,8 @@ class AddTaskViewModel extends ChangeNotifier {
         studentId: studentId,
         taskData: task.toMap(),
       );
-      final url = Uri.parse('https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
+      final url = Uri.parse(
+          'https://pacific-chamber-78827-0f1d28754b89.herokuapp.com/send-notification');
       final response = await http.post(
         url,
         headers: {
@@ -83,6 +86,9 @@ class AddTaskViewModel extends ChangeNotifier {
           'message': 'the supervisor added tasks',
         }),
       );
+      if (response.statusCode != 200) {
+        throw CustomException('Failed to send notification');
+      }
       taskTitleController.clear();
       taskDescriptionController.clear();
       selectedDeadline = null;
@@ -94,13 +100,16 @@ class AddTaskViewModel extends ChangeNotifier {
       );
       notifyListeners();
     } catch (error) {
+      String errorMessage = error is CustomException
+          ? error.message
+          : 'Error adding task: $error';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error adding task: $error'),
+          content: Text(errorMessage),
           backgroundColor: errorColor,
         ),
       );
-      print("Error adding task: $error");
+      print(errorMessage);
     }
   }
 

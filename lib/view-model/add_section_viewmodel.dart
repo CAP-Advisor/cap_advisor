@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../service/student_firebase_service.dart';
 import '../view/student_view.dart';
+import '../exceptions/custom_exception.dart';
 
 class SectionViewModel extends ChangeNotifier {
   final StudentFirebaseService _firebaseService;
@@ -37,166 +38,134 @@ class SectionViewModel extends ChangeNotifier {
   SectionViewModel(this._firebaseService);
 
   Future<void> addSection(BuildContext context) async {
-    summaryError = '';
-    majorError = '';
-    githubError = '';
-    gpaError = '';
-    skillsError = '';
-    experienceError = '';
-    addressError = '';
+    try {
+      summaryError = '';
+      majorError = '';
+      githubError = '';
+      gpaError = '';
+      skillsError = '';
+      experienceError = '';
+      addressError = '';
 
-    isSummaryValid = true;
-    isMajorValid = true;
-    isGithubValid = true;
-    isGpaValid = true;
-    isSkillValid = true;
-    isExperienceValid = true;
-    isAddressValid = true;
+      isSummaryValid = true;
+      isMajorValid = true;
+      isGithubValid = true;
+      isGpaValid = true;
+      isSkillValid = true;
+      isExperienceValid = true;
+      isAddressValid = true;
 
-    bool hasSummary = summaryController.text.isNotEmpty;
-    bool hasMajor = majorController.text.isNotEmpty;
-    bool hasGithub = githubController.text.isNotEmpty;
-    bool hasGpa = gpaController.text.isNotEmpty;
-    bool hasSkills = skillsController.text.isNotEmpty;
-    bool hasExperience = experienceController.text.isNotEmpty;
-    bool hasAddress = addressController.text.isNotEmpty;
-    bool hasCompany = companyController.text.isNotEmpty;
-    bool hasTraining = trainingController.text.isNotEmpty;
+      bool hasSummary = summaryController.text.isNotEmpty;
+      bool hasMajor = majorController.text.isNotEmpty;
+      bool hasGithub = githubController.text.isNotEmpty;
+      bool hasGpa = gpaController.text.isNotEmpty;
+      bool hasSkills = skillsController.text.isNotEmpty;
+      bool hasExperience = experienceController.text.isNotEmpty;
+      bool hasAddress = addressController.text.isNotEmpty;
+      bool hasCompany = companyController.text.isNotEmpty;
+      bool hasTraining = trainingController.text.isNotEmpty;
 
-    if (!hasSummary &&
-        !hasMajor &&
-        !hasGithub &&
-        !hasGpa &&
-        !hasSkills &&
-        !hasExperience &&
-        !hasAddress &&
-        !hasTraining &&
-        !hasCompany) {
-      showFeedback(context, 'Please fill in at least one field.');
-      return;
-    }
-
-    if (hasCompany) {
-      bool success = await _firebaseService.addCompany(companyController.text);
-      if (!success) {
-        companyError = "Failed to add company.";
-        isCompanyValid = false;
-        notifyListeners();
-        showFeedback(context, companyError);
-        return;
+      if (!hasSummary &&
+          !hasMajor &&
+          !hasGithub &&
+          !hasGpa &&
+          !hasSkills &&
+          !hasExperience &&
+          !hasAddress &&
+          !hasTraining &&
+          !hasCompany) {
+        throw CustomException('Please fill in at least one field.');
       }
-    }
 
-    if (hasTraining) {
-      bool success =
-          await _firebaseService.addTraining(trainingController.text);
-      if (!success) {
-        trainingError = "Failed to add training.";
-        isTrainingValid = false;
-        notifyListeners();
-        showFeedback(context, trainingError);
-        return;
-      }
-    }
-
-    if (hasMajor) {
-      bool success = await _firebaseService.addMajor(majorController.text);
-      if (!success) {
-        majorError = "Failed to add major.";
-        isMajorValid = false;
-        notifyListeners();
-        showFeedback(context, majorError);
-        return;
-      }
-    }
-
-    if (hasAddress) {
-      bool success = await _firebaseService.addSkill(addressController.text);
-      if (!success) {
-        addressError = "Failed to add address.";
-        isAddressValid = false;
-        notifyListeners();
-        showFeedback(context, addressError);
-        return;
-      }
-    }
-
-    if (hasSkills) {
-      bool success = await _firebaseService.addSkill(skillsController.text);
-      if (!success) {
-        skillsError = "Failed to add skill.";
-        isSkillValid = false;
-        notifyListeners();
-        showFeedback(context, skillsError);
-        return;
-      }
-    }
-
-    if (hasExperience) {
-      bool success =
-          await _firebaseService.addExperience(experienceController.text);
-      if (!success) {
-        experienceError = "Failed to add experience.";
-        isExperienceValid = false;
-        notifyListeners();
-        showFeedback(context, experienceError);
-        return;
-      }
-    }
-
-    if (hasSummary) {
-      bool success = await _firebaseService.addSummary(summaryController.text);
-      if (!success) {
-        summaryError = "Failed to add summary.";
-        isSummaryValid = false;
-        notifyListeners();
-        showFeedback(context, summaryError);
-        return;
-      }
-    }
-
-    if (hasGithub) {
-      bool success = await _firebaseService.addGithub(githubController.text);
-      if (!success) {
-        githubError = "Failed to add GitHub.";
-        isGithubValid = false;
-        notifyListeners();
-        showFeedback(context, githubError);
-        return;
-      }
-    }
-
-    if (hasGpa) {
-      try {
-        double gpaValue = double.parse(gpaController.text);
-        bool success = await _firebaseService.addGpa(gpaValue);
+      if (hasCompany) {
+        bool success =
+            await _firebaseService.addCompany(companyController.text);
         if (!success) {
-          gpaError = "Failed to add GPA.";
-          isGpaValid = false;
-          notifyListeners();
-          showFeedback(context, gpaError);
-          return;
+          throw CustomException("Failed to add company.");
         }
-      } catch (e) {
-        gpaError = "Invalid GPA value.";
-        isGpaValid = false;
-        notifyListeners();
-        showFeedback(context, gpaError);
-        return;
+      }
+
+      if (hasTraining) {
+        bool success =
+            await _firebaseService.addTraining(trainingController.text);
+        if (!success) {
+          throw CustomException("Failed to add training.");
+        }
+      }
+
+      if (hasMajor) {
+        bool success = await _firebaseService.addMajor(majorController.text);
+        if (!success) {
+          throw CustomException("Failed to add major.");
+        }
+      }
+
+      if (hasAddress) {
+        bool success = await _firebaseService.addSkill(addressController.text);
+        if (!success) {
+          throw CustomException("Failed to add address.");
+        }
+      }
+
+      if (hasSkills) {
+        bool success = await _firebaseService.addSkill(skillsController.text);
+        if (!success) {
+          throw CustomException("Failed to add skill.");
+        }
+      }
+
+      if (hasExperience) {
+        bool success =
+            await _firebaseService.addExperience(experienceController.text);
+        if (!success) {
+          throw CustomException("Failed to add experience.");
+        }
+      }
+
+      if (hasSummary) {
+        bool success =
+            await _firebaseService.addSummary(summaryController.text);
+        if (!success) {
+          throw CustomException("Failed to add summary.");
+        }
+      }
+
+      if (hasGithub) {
+        bool success = await _firebaseService.addGithub(githubController.text);
+        if (!success) {
+          throw CustomException("Failed to add GitHub.");
+        }
+      }
+
+      if (hasGpa) {
+        try {
+          double gpaValue = double.parse(gpaController.text);
+          bool success = await _firebaseService.addGpa(gpaValue);
+          if (!success) {
+            throw CustomException("Failed to add GPA.");
+          }
+        } catch (e) {
+          throw CustomException("Invalid GPA value.");
+        }
+      }
+
+      notifyListeners();
+      showFeedback(context, "Added successfully");
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => StudentView(
+            uid: '',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (e is CustomException) {
+        showFeedback(context, e.message);
+      } else {
+        showFeedback(context, 'An unexpected error occurred.');
       }
     }
-
-    notifyListeners();
-    showFeedback(context, "Added successfully");
-
-    // Navigate to StudentView
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => StudentView(
-          uid: '',
-        ),
-      ),
-    );
   }
 
   void showFeedback(BuildContext context, String message) {

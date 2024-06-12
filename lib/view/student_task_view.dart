@@ -18,9 +18,6 @@ class StudentTasksView extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: "Tasks",
-        onNotificationPressed: () {
-          // Add functionality for notification pressed
-        },
         onMenuPressed: () {
           Navigator.of(context).pushNamed('/menu');
         },

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import '../exceptions/custom_exception.dart';
 import '../model/HR_model.dart';
 import '../model/student_model.dart';
 import '../model/supervisor_model.dart';
@@ -47,32 +48,31 @@ class HRFirebaseService {
           .get();
 
       if (snapshot.docs.isEmpty) {
-        throw Exception("No HR data available for the email $email.");
+        throw CustomException("No HR data available for the email $email.");
       } else {
         DocumentSnapshot doc = snapshot.docs.first;
         return HR.fromFirestore(doc);
       }
     } catch (e) {
-      throw Exception("Failed to fetch data: ${e.toString()}");
+      throw CustomException("Failed to fetch data: ${e.toString()}");
     }
   }
 
   Future<String?> uploadImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      File file = File(image.path);
-      String filePath =
-          'supervisors/${FirebaseAuth.instance.currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch.toString()}.png';
-      try {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        File file = File(image.path);
+        String filePath =
+            'hr/${FirebaseAuth.instance.currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch.toString()}.png';
         TaskSnapshot task = await _storage.ref(filePath).putFile(file);
         String imageUrl = await task.ref.getDownloadURL();
         return imageUrl;
-      } catch (e) {
-        print('Failed to upload image: $e');
-        return null;
+      } else {
+        throw CustomException("Image upload cancelled.");
       }
-    } else {
-      return null;
+    } catch (e) {
+      throw CustomException("Failed to upload image: $e");
     }
   }
 
@@ -101,8 +101,7 @@ class HRFirebaseService {
         return true;
       }
     } catch (e) {
-      print("Error updating profile image: $e");
-      return false;
+      throw CustomException("Error updating profile image: $e");
     }
   }
 
@@ -128,8 +127,7 @@ class HRFirebaseService {
         return false;
       }
     } catch (e) {
-      print("Error updating cover photo: $e");
-      return false;
+      throw CustomException("Error updating cover photo: $e");
     }
   }
 
@@ -151,8 +149,7 @@ class HRFirebaseService {
         'studentList': FieldValue.arrayUnion([studentId])
       });
     } catch (e) {
-      print("Failed to assign student to supervisor: $e");
-      throw e;
+      throw CustomException("Failed to assign student to supervisor: $e");
     }
   }
 
