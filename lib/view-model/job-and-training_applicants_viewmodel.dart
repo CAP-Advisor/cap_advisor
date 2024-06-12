@@ -73,7 +73,7 @@ class JobAndTrainingApplicantsViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchSupervisors() async {
-    supervisors = await _hrfirebaseService.fetchSupervisors(hrDocumentId);
+    supervisors = await _hrfirebaseService.fetchAllSupervisors();
     notifyListeners();
   }
 

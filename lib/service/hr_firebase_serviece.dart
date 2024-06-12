@@ -18,21 +18,13 @@ class HRFirebaseService {
 
   User? get currentUser => _auth.currentUser;
 
-  Future<List<SupervisorModel>> fetchSupervisors(String hrDocumentId) async {
-    var hrDoc = await _firestore.collection('HR').doc(hrDocumentId).get();
-    if (hrDoc.exists) {
-      var hrId = hrDoc.id;
-
-      var snapshot = await _firestore
-          .collection('Supervisor')
-          .where('hrId', isEqualTo: hrId)
-          .get();
-      return snapshot.docs
-          .map((doc) => SupervisorModel.fromFirestore(doc))
-          .toList();
-    }
-    return [];
+  Future<List<SupervisorModel>> fetchAllSupervisors() async {
+    var snapshot = await _firestore.collection('Supervisor').get();
+    return snapshot.docs
+        .map((doc) => SupervisorModel.fromFirestore(doc))
+        .toList();
   }
+
 
   Future<HR> getHRDataByEmail() async {
     String? email = FirebaseAuth.instance.currentUser?.email;
