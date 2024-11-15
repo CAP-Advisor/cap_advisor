@@ -39,7 +39,7 @@ The application will cater to three primary user roles: Human Resource Officers,
 
 Privileged users with access to student data and the ability to select students for positions based on skills and other criteria. They can also add new positions for their company.
 
-### Academic Supervisors: 
+### Academic Supervisors:
 
 Have access to student data and can monitor student performance and progress. They can also remove students from companies if necessary.
 
@@ -47,13 +47,13 @@ Have access to student data and can monitor student performance and progress. Th
 
 Have access to student data and can observe students prograss through training.
 
-### CAP Students: 
+### CAP Students:
 
 Can view job offers, accept or reject offers, and browse for job opportunities or training internships.
 
 ## Requirements
 
-### Functional Requirements  
+### Functional Requirements
 
 - **User Authentication:** Each user must register and login to access the system. Different levels of access will be granted based on user roles (Student, HR officer, academic supervisor).
 - **Profile management:** Each user can create and update their profile information, such as personal information, educational background, skills, and experiences.
@@ -68,8 +68,8 @@ Can view job offers, accept or reject offers, and browse for job opportunities o
 
 - **Usability:** The interface should be intuitive and user-friendly to accommodate users with varying levels of technical expertise. The system should support multiple languages to cater to a diverse user base.
 - **Performance:** The application should have minimal response times to ensure a seamless user experience.
-The system should handle a large number of concurrent users without performance degradation.
+  The system should handle a large number of concurrent users without performance degradation.
 - **Security:** User data should be encrypted during transmission and storage to protect against unauthorized access.
-Role-based access control mechanisms should be implemented to restrict unauthorized actions.
+  Role-based access control mechanisms should be implemented to restrict unauthorized actions.
 - **Reliability:** The system should be reliable and available at all times to accommodate users who access the platform from different time zones or schedules.
 - **Scalability:** The application should be able to handle a growing user base and increasing data volumes without compromising performance or functionality.
